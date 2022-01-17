@@ -1,44 +1,65 @@
 <template>
     <div class="account-details">
-        <CloseButton class="top-right" @click="close"/>
+        <CloseButton class="top-right" @click="onClose"/>
         <Account layout="column" :address="address" :image="image" :label="label !== address ? label : ''"
              :walletLabel="walletLabel" :balance="balance" :editable="editable" :placeholder="placeholder"
-             @changed="changed" ref="account"/>
+             @changed="onInput" ref="account"/>
         <AddressDisplay :address="address" copyable />
     </div>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Emit, Vue } from 'vue-property-decorator';
+import { defineComponent, ref } from 'vue'
 import Account from './Account.vue';
 import Amount from './Amount.vue';
 import AddressDisplay from './AddressDisplay.vue';
 import CloseButton from './CloseButton.vue';
 
-@Component({components: {Account, Amount, AddressDisplay, CloseButton}})
-export default class AccountDetails extends Vue {
-    @Prop(String) private address!: string;
-    @Prop(String) private image?: string;
-    @Prop(String) private label?: string;
-    @Prop(String) private walletLabel?: string;
-    @Prop(Number) private balance?: number;
-    @Prop(Boolean) private editable?: boolean;
-    @Prop(String) private placeholder?: string;
+export default defineComponent({
+    props: {
+        address: {
+            type: String,
+            required: true,
+        },
+        image: String,
+        label: String,
+        walletLabel: String,
+        balance: Number,
+        editable: Boolean,
+        placeholder: String,
 
-    public focus() {
-        if (this.editable) {
-            (this.$refs.account as Account).focus();
+    },
+    setup: (props, context) => {
+        const account = ref<Account | null>(null);
+
+        function focus() {
+            account.value.focus();
         }
+
+        context.expose({ focus });
+
+        function onInput(label: string) {
+            context.emit('changed', label);
+        }
+
+        function onClose() {
+            context.emit('close');
+        }
+
+        return {
+            account,
+            onInput,
+            onClose,
+        };
+    },
+    components: {
+        Account,
+        Amount,
+        AddressDisplay,
+        CloseButton,
     }
+})
 
-    @Emit()
-    // tslint:disable-next-line no-empty
-    private close() {}
-
-    @Emit()
-    // tslint:disable-next-line no-empty
-    private changed(label: string) {}
-}
 </script>
 
 <style scoped>
