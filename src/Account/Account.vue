@@ -1,5 +1,5 @@
 <template>
-    <div class="account" :class="[{ editable }, layout, {cashlink: displayAsCashlink}]">
+    <div class="account" :class="[{ editable }, layout, { cashlink: displayAsCashlink }]">
         <div class="identicon-and-label">
             <img v-if="showImage" class="identicon account-image" :src="image" @error="showImage = false">
             <div v-else-if="displayAsCashlink" class="identicon">
@@ -7,11 +7,11 @@
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="white" stroke-linecap="round" stroke-width="2.5"><path d="M40.25 23.25v-.5a6.5 6.5 0 0 0-6.5-6.5h-3.5a6.5 6.5 0 0 0-6.5 6.5v6.5a6.5 6.5 0 0 0 6.5 6.5h2"/><path d="M23.75 40.75v.5a6.5 6.5 0 0 0 6.5 6.5h3.5a6.5 6.5 0 0 0 6.5-6.5v-6.5a6.5 6.5 0 0 0-6.5-6.5h-2"/><path d="M32 11.25v4M32 48.75v4"/></svg>
                 </div>
             </div>
-            <Identicon v-else-if="_isNimiqAddress" :address="address"/>
+            <Identicon v-else-if="_isNimiqAddress()" :address="address"/>
 
-            <div v-if="!editable" class="label" :class="{ 'address-font': _isLabelNimiqAddress }">{{ label }}</div>
-            <div v-else class="label editable" :class="{ 'address-font': _isLabelNimiqAddress }">
-                <LabelInput :maxBytes="63" :value="label" :placeholder="placeholder" @input="changed" ref="label"/>
+            <div v-if="!editable" class="label" :class="{ 'address-font': _isLabelNimiqAddress() }">{{ label }}</div>
+            <div v-else class="label editable" :class="{ 'address-font': _isLabelNimiqAddress() }">
+                <LabelInput :maxBytes="63" :value="label" :placeholder="placeholder" @input="onInput" ref="label"/>
             </div>
 
             <div v-if="layout === 'column' && walletLabel" class="nq-label wallet-label">{{ walletLabel }}</div>
@@ -22,54 +22,81 @@
 </template>
 
 <script lang="ts">
-    import { Component, Prop, Emit, Watch, Vue } from 'vue-property-decorator';
+    import { defineComponent, Ref, ref, watch } from 'vue'
     import Identicon from './Identicon.vue';
     import Amount from './Amount.vue';
     import LabelInput from './LabelInput.vue';
     import { ValidationUtils } from '@nimiq/utils';
 
-    @Component({components: {Amount, Identicon, LabelInput}})
-    export default class Account extends Vue {
-        @Prop(String) public label!: string;
-        @Prop(String) public address?: string;
-        @Prop(String) public image?: string;
-        @Prop({type: Boolean, default: false}) public displayAsCashlink!: boolean;
-        @Prop(String) public placeholder?: string;
-        @Prop(String) public walletLabel?: string;
-        @Prop(Number) public balance?: number;
-        @Prop({type: Number, default: 2}) public decimals!: number;
-        @Prop(Boolean) public editable?: boolean;
-        @Prop({
-            type: String,
-            default: 'row',
-            validator: (layout) => ['row', 'column'].indexOf(layout) !== -1,
-        }) public layout!: string;
+    export default defineComponent({
+        props: {
+            label: {
+                type: String,
+                required: true,
+            },
+            displayAsCashlink: {
+                type: Boolean,
+                default: false,
+            },
+            decimals: {
+                type: Number,
+                default: 2,
+            },
+            layout: {
+                type: String,
+                default: 'row',
+                validator: (layout: any) => ['row', 'column'].indexOf(layout) !== -1,
+            },
+            address: String,
+            image: String,
+            placeholder: String,
+            walletLabel: String,
+            balance: Number,
+            editable: Boolean,
 
-        private showImage: boolean = !!this.image;
+        },
+        setup: (props, context) => {
+            const label$ = ref<LabelInput | null>(null);
+            const showImage: Ref<boolean> = ref(!!props.image);
 
-        public focus() {
-            if (this.editable) {
-                (this.$refs.label as LabelInput).focus();
+            function focus() {
+                if (props.editable && label$.value) {
+                    label$.focus();
+                }
             }
-        }
 
-        @Emit()
-        // tslint:disable-next-line no-empty
-        private changed(label: string) {}
+            context.expose({ focus });
 
-        @Watch('image', { immediate: true })
-        private _onImageChange() {
-            this.showImage = !!this.image;
-        }
+            function onInput(label: string) {
+                context.emit('changed', label);
+            }
 
-        private get _isNimiqAddress() {
-            return ValidationUtils.isValidAddress(this.address);
-        }
+            watch(() => props.image, () => {
+                showImage.value = !!props.image;
+            }, { immediate: true });
 
-        private get _isLabelNimiqAddress() {
-            return ValidationUtils.isValidAddress(this.label);
+            function _isNimiqAddress() {
+                return props.address ? ValidationUtils.isValidAddress(props.address) : false;
+            }
+
+            function _isLabelNimiqAddress() {
+                return ValidationUtils.isValidAddress(props.label);
+            }
+
+            return {
+                label$,
+                showImage,
+                _isNimiqAddress,
+                _isLabelNimiqAddress,
+                onInput,
+            };
+        },
+        components: {
+            Identicon,
+            Amount,
+            LabelInput
         }
-    }
+    })
 </script>
 
 <style scoped>
