@@ -31,10 +31,10 @@ export default defineComponent({
 
     },
     setup: (props, context) => {
-        const account = ref<Account | null>(null);
+        const account = ref<(typeof Account) | null>(null);
 
         function focus() {
-            account.value.focus();
+            if (account.value) account.value.focus();
         }
 
         context.expose({ focus });

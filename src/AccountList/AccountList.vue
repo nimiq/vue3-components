@@ -155,6 +155,22 @@ export default defineComponent({
             }
             highlightedDisabledAddress.value = null;
         }
+
+        return {
+            highlightedDisabledAddress,
+            highlightedDisabledAddressTimeout,
+            accounts$,
+            tooltips$,
+            focus,
+            accountSelected,
+            onAccountChanged,
+            _isDisabled,
+            _isDisabledContract,
+            _isDisabledAccount,
+            _hasInsufficientBalance,
+            _hasTooltip,
+            _clearHighlightedDisabledAddress,
+        };
     },
     components: {
         Account,

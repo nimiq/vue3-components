@@ -54,15 +54,14 @@
             walletLabel: String,
             balance: Number,
             editable: Boolean,
-
         },
         setup: (props, context) => {
-            const label$ = ref<LabelInput | null>(null);
+            const label$ = ref<(typeof LabelInput) | null>(null);
             const showImage: Ref<boolean> = ref(!!props.image);
 
             function focus() {
                 if (props.editable && label$.value) {
-                    label$.focus();
+                    label$.value.focus();
                 }
             }
 

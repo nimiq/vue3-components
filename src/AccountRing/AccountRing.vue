@@ -7,17 +7,18 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { defineComponent } from '@vue/runtime-core';
 import Identicon from './Identicon.vue';
 
-@Component({components: { Identicon }})
-export default class AccountRing extends Vue {
-    @Prop({ default: () => [], type: Array })
-    public addresses!: string[];
-
-    @Prop({ default: false, type: Boolean })
-    public animate!: boolean;
-}
+export default defineComponent({
+    name: 'AccountRing',
+    components: { Identicon },
+    props: {
+        addresses: { default: () => [], type: Array },
+        animate: { default: false, type: Boolean },
+    },
+    setup(props) {},
+});
 </script>
 
 <style scoped>
