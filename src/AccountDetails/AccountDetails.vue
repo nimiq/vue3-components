@@ -16,6 +16,7 @@ import AddressDisplay from './AddressDisplay.vue';
 import CloseButton from './CloseButton.vue';
 
 export default defineComponent({
+    name: 'AccountDetails',
     props: {
         address: {
             type: String,

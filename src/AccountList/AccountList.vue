@@ -15,19 +15,19 @@
             @click="accountSelected(account)"
             :key="account.userFriendlyAddress"
         >
-            <Account :ref="account.userFriendlyAddress"
+            <Account :ref="account$ => accounts$[account.userFriendlyAddress] = account$"
                 :address="account.userFriendlyAddress"
                 :label="account.label"
                 :placeholder="account.defaultLabel"
                 :balance="minBalance ? account.balance : undefined"
                 :decimals="decimals"
                 :editable="editable && !disabled"
-                @changed="accountChanged(account.userFriendlyAddress, $event)"
+                @changed="onAccountChanged(account.userFriendlyAddress, $event)"
             />
 
             <CaretRightSmallIcon v-if="!_isDisabled(account)" class="caret"/>
             <Tooltip v-if="_hasTooltip(account)"
-                :ref="`tooltip-${account.userFriendlyAddress}`"
+                :ref="tooltip$ => tooltips$[`tooltip-${account.userFriendlyAddress}`] = tooltip$"
                 v-bind="{
                     preferredPosition: 'bottom left',
                     ...tooltipProps,
@@ -37,7 +37,7 @@
                         ...(tooltipProps ? tooltipProps.styles : undefined),
                     },
                 }"
-                @click.native.stop
+                @click.stop
             >
                 {{ _isDisabledContract(account)
                     ? $t('Contracts cannot be used for this operation.')
@@ -49,103 +49,119 @@
 </template>
 
 <script lang="ts">
-import {Component, Mixins, Emit, Prop} from 'vue-property-decorator';
-import Account from './Account.vue';
-import { AccountInfo, ContractInfo } from './AccountSelector.vue';
-import Tooltip from './Tooltip.vue';
-import { CaretRightSmallIcon } from './Icons';
+import { defineComponent, onBeforeUpdate, ref } from 'vue'
+import Account from '../Account/Account.vue';
+import { AccountInfo, ContractInfo } from '../AccountSelector/AccountSelector.vue';
+import Tooltip from '../Tooltip/Tooltip.vue';
+import { CaretRightSmallIcon } from '../Icons';
 import I18nMixin from '../i18n/I18nMixin';
 
-@Component({
+export default defineComponent({
     name: 'AccountList',
+    extends: I18nMixin,
+    props: {
+        accounts: {
+            type: Array as () => AccountInfo[],
+            required: true,
+        },
+        disabledAddresses: {
+            type: Array as () => string[],
+            default: () => [],
+        },
+        walletId: String,
+        editable: Boolean,
+        decimals: Number,
+        minBalance: Number,
+        disableContracts: Boolean,
+        disabled: Boolean,
+        tooltipProps: Object,
+    },
+    setup: (props, context) => {
+        const highlightedDisabledAddress = ref<string | null>(null);
+        const highlightedDisabledAddressTimeout = ref(-1);
+
+        const accounts$ = ref<Record<string, (typeof Account)>>({});
+        const tooltips$ = ref<Record<string, (typeof Tooltip)>>({});
+
+        function focus(address: string) {
+            if (props.editable && accounts$.value.hasOwnProperty(address)) {
+                (accounts$.value[address] as (typeof Account)).focus();
+            }
+        }
+
+        onBeforeUpdate(() => {
+            accounts$.value = {};
+            tooltips$.value = {};
+        });
+
+        function accountSelected(account: AccountInfo) {
+            if (props.disabled || props.editable) return;
+
+            window.clearTimeout(highlightedDisabledAddressTimeout.value);
+            if (account.userFriendlyAddress !== highlightedDisabledAddress.value) {
+                _clearHighlightedDisabledAddress();
+            }
+
+            const isDisabledContract = _isDisabledContract(account);
+            const isDisabledAccount = _isDisabledAccount(account);
+            if (isDisabledContract
+                || isDisabledAccount
+                || _hasInsufficientBalance(account)) {
+                highlightedDisabledAddress.value = account.userFriendlyAddress;
+                if (tooltips$.value[`tooltip-${highlightedDisabledAddress.value}`]) {
+                    tooltips$.value[`tooltip-${highlightedDisabledAddress.value}`].show();
+                }
+                const waitTime = isDisabledContract || isDisabledAccount ? 2000 : 300;
+                highlightedDisabledAddressTimeout.value =
+                    window.setTimeout(() => _clearHighlightedDisabledAddress(), waitTime);
+            } else {
+                context.emit('account-selected', account.walletId || props.walletId, account.userFriendlyAddress);
+            }
+        }
+
+        function onAccountChanged(address: string, label: string) {
+            context.emit('account-changed', address, label);
+        }
+
+        function _isDisabled(account: AccountInfo | ContractInfo) {
+            return props.disabled || (!props.editable
+                && (_isDisabledContract(account)
+                || _isDisabledAccount(account)
+                || _hasInsufficientBalance(account)));
+        }
+
+        function _isDisabledContract(account: AccountInfo | ContractInfo) {
+            return props.disableContracts && !('path' in account && account.path);
+        }
+
+        function _isDisabledAccount(account: AccountInfo | ContractInfo) {
+            return props.disabledAddresses.includes(account.userFriendlyAddress);
+        }
+
+        function _hasInsufficientBalance(account: AccountInfo | ContractInfo) {
+            return props.minBalance && (account.balance || 0) < props.minBalance;
+        }
+
+        function _hasTooltip(account: AccountInfo | ContractInfo) {
+            return !props.disabled && !props.editable
+                && (_isDisabledContract(account) || _isDisabledAccount(account));
+        }
+
+        function _clearHighlightedDisabledAddress() {
+            if (!highlightedDisabledAddress.value) return;
+            if (tooltips$.value[`tooltip-${highlightedDisabledAddress.value}`]) {
+                // Hide tooltip if it's not hovered
+                (tooltips$.value[`tooltip-${highlightedDisabledAddress.value}`] as (typeof Tooltip)).hide(/* force */ false);
+            }
+            highlightedDisabledAddress.value = null;
+        }
+    },
     components: {
         Account,
-        Tooltip,
         CaretRightSmallIcon,
+        Tooltip,
     },
 })
-export default class AccountList extends Mixins(I18nMixin) {
-    @Prop(Array) public accounts!: AccountInfo[];
-    @Prop({type: Array, default: () => []}) public disabledAddresses!: string[];
-    @Prop(String) private walletId?: string;
-    @Prop(Boolean) private editable?: boolean;
-    @Prop(Number) private decimals?: number;
-    @Prop(Number) private minBalance?: number;
-    @Prop(Boolean) private disableContracts?: boolean;
-    @Prop(Boolean) private disabled?: boolean;
-    @Prop(Object) private tooltipProps?: object;
-
-    private highlightedDisabledAddress: string | null = null;
-    private highlightedDisabledAddressTimeout: number = -1;
-
-    public focus(address: string) {
-        if (this.editable && this.$refs.hasOwnProperty(address)) {
-            (this.$refs[address] as Account[])[0].focus();
-        }
-    }
-
-    private accountSelected(account: AccountInfo) {
-        if (this.disabled || this.editable) return;
-
-        window.clearTimeout(this.highlightedDisabledAddressTimeout);
-        if (account.userFriendlyAddress !== this.highlightedDisabledAddress) {
-            this._clearHighlightedDisabledAddress();
-        }
-
-        const isDisabledContract = this._isDisabledContract(account);
-        const isDisabledAccount = this._isDisabledAccount(account);
-        if (isDisabledContract
-            || isDisabledAccount
-            || this._hasInsufficientBalance(account)) {
-            this.highlightedDisabledAddress = account.userFriendlyAddress;
-            if (this.$refs[`tooltip-${this.highlightedDisabledAddress}`]) {
-                (this.$refs[`tooltip-${this.highlightedDisabledAddress}`] as Tooltip[])[0].show();
-            }
-            const waitTime = isDisabledContract || isDisabledAccount ? 2000 : 300;
-            this.highlightedDisabledAddressTimeout =
-                window.setTimeout(() => this._clearHighlightedDisabledAddress(), waitTime);
-        } else {
-            this.$emit('account-selected', account.walletId || this.walletId, account.userFriendlyAddress);
-        }
-    }
-
-    @Emit()
-    // tslint:disable-next-line no-empty
-    private accountChanged(address: string, label: string) {}
-
-    private _isDisabled(account: AccountInfo | ContractInfo) {
-        return this.disabled || (!this.editable
-            && (this._isDisabledContract(account)
-            || this._isDisabledAccount(account)
-            || this._hasInsufficientBalance(account)));
-    }
-
-    private _isDisabledContract(account: AccountInfo | ContractInfo) {
-        return this.disableContracts && !('path' in account && account.path);
-    }
-
-    private _isDisabledAccount(account: AccountInfo | ContractInfo) {
-        return this.disabledAddresses.includes(account.userFriendlyAddress);
-    }
-
-    private _hasInsufficientBalance(account: AccountInfo | ContractInfo) {
-        return this.minBalance && account.balance < this.minBalance;
-    }
-
-    private _hasTooltip(account: AccountInfo | ContractInfo) {
-        return !this.disabled && !this.editable
-            && (this._isDisabledContract(account) || this._isDisabledAccount(account));
-    }
-
-    private _clearHighlightedDisabledAddress() {
-        if (!this.highlightedDisabledAddress) return;
-        if (this.$refs[`tooltip-${this.highlightedDisabledAddress}`]) {
-            // Hide tooltip if it's not hovered
-            (this.$refs[`tooltip-${this.highlightedDisabledAddress}`] as Tooltip[])[0].hide(/* force */ false);
-        }
-        this.highlightedDisabledAddress = null;
-    }
-}
 </script>
 
 <style scoped>

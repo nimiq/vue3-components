@@ -29,6 +29,7 @@
     import { ValidationUtils } from '@nimiq/utils';
 
     export default defineComponent({
+        name: 'Account',
         props: {
             label: {
                 type: String,
