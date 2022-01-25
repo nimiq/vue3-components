@@ -5,26 +5,25 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { computed, defineComponent } from '@vue/runtime-core';
 import Copyable from './Copyable.vue';
 
-@Component({ components: {Copyable} })
-export default class AddressDisplay extends Vue {
-    @Prop({
-        type: String,
-        required: true,
-    }) private address!: string;
+export default defineComponent({
+    name: 'AddressDisplay',
+    components: { Copyable },
+    props: {
+        address: { type: String, required: true },
+        copyable: { type: Boolean, default: false },
+    },
+    setup(props, context) {
+        const chunks = computed(() => {
+            if (!props.address) return new Array(9).fill('-');
+            return props.address.replace(/[+ ]/g, '').match(/.{4}/g)!;
+        });
 
-    @Prop({
-        type: Boolean,
-        default: false,
-    }) private copyable!: boolean;
-
-    private get chunks(): string[] {
-        if (!this.address) return new Array(9).fill('-');
-        return this.address.replace(/[+ ]/g, '').match(/.{4}/g)!;
+        return { chunks };
     }
-}
+})
 </script>
 
 <style scoped>
