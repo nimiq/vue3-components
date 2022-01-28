@@ -1,82 +1,109 @@
 <template>
     <span class="amount" :class="{ approx: showApprox && isApprox }">
         {{ formattedAmount }}
-        <span class="currency" :class="currency">{{ticker}}</span>
+        <span class="currency" :class="currency">{{ ticker }}</span>
     </span>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { computed, defineComponent, watch } from '@vue/runtime-core';
 import { FormattableNumber } from '@nimiq/utils';
+
 type BigInteger = import ('big-integer').BigInteger;
 
-export function amountValidator(value: unknown): boolean {
+export function amountValidator(value: any): boolean {
     return typeof value === 'number' || typeof value === 'bigint'
         || (value && value.constructor && value.constructor.name.endsWith('Integer'));
 }
 
-@Component
-export default class Amount extends Vue {
-    // Amount in smallest unit
-    @Prop({
-        required: true,
-        validator: amountValidator,
-    }) public amount!: number | bigint | BigInteger;
-    // If set takes precedence over minDecimals and maxDecimals
-    @Prop(Number) public decimals?: number;
-    @Prop({type: Number, default: 2}) public minDecimals!: number;
-    @Prop({type: Number, default: 5}) public maxDecimals!: number;
-    @Prop({type: Boolean, default: false}) public showApprox!: boolean;
-    @Prop({type: String, default: 'nim'}) public currency!: string;
-    @Prop({type: Number, default: 5}) public currencyDecimals!: number;
-
-    @Watch('minDecimals', {immediate: true})
-    @Watch('maxDecimals', {immediate: true})
-    @Watch('decimals', {immediate: true})
-    private _validateDecimals(decimals: number) {
-        if (this.decimals !== undefined && decimals !== this.decimals) {
-            // skip validation for minDecimals and maxDecimals if they're overwritten by decimals
-            return;
+export default defineComponent({
+    name: 'Amount',
+    props: {
+        // Amount in smallest unit
+        amount: {
+            required: true,
+            validator: amountValidator,
+            type: Number as () => number | bigint | BigInteger,
+        },
+        // If set takes precedence over minDecimals and maxDecimals
+        decimals: Number,
+        minDecimals: {
+            type: Number,
+            default: 2,
+        },
+        maxDecimals: {
+            type: Number,
+            default: 5,
+        },
+        showApprox: {
+            type: Boolean,
+            default: false,
+        },
+        currency: {
+            type: String,
+            default: 'nim',
+        },
+        currencyDecimals: {
+            type: Number,
+            default: 2,
+        },
+    },
+    setup(props, context) {
+        function _validateDecimals(decimals: number | undefined) {
+            if (props.decimals !== undefined && decimals !== props.decimals) {
+                // skip validation for minDecimals and maxDecimals if they're overwritten by decimals
+                return;
+            }
+            if (
+                decimals !== undefined && (
+                    decimals < 0
+                    || decimals > props.currencyDecimals
+                    || !Number.isInteger(decimals)
+                )
+            ) {
+                throw new Error('Amount: decimals is not in range');
+            }
         }
-        if (
-            decimals !== undefined && (
-                decimals < 0
-                || decimals > this.currencyDecimals
-                || !Number.isInteger(decimals)
-            )
-        ) {
-            throw new Error('Amount: decimals is not in range');
-        }
+
+        watch(() => props.minDecimals, _validateDecimals, { immediate: true });
+        watch(() => props.maxDecimals, _validateDecimals, { immediate: true });
+        watch(() => props.decimals, _validateDecimals, { immediate: true });
+
+        const formattedAmount = computed(() => {
+            let minDecimals: number;
+            let maxDecimals: number;
+            if (typeof props.decimals === 'number') {
+                minDecimals = maxDecimals = props.decimals;
+            } else {
+                minDecimals = props.minDecimals;
+                maxDecimals = props.maxDecimals;
+            }
+
+            return new FormattableNumber(props.amount).moveDecimalSeparator(-props.currencyDecimals)
+                .toString({ maxDecimals, minDecimals, useGrouping: true });
+        });
+
+        const isApprox = computed(() => {
+            return !new FormattableNumber(props.amount).moveDecimalSeparator(-props.currencyDecimals)
+                .equals(formattedAmount.value.replace(/\s/g, ''));
+        });
+
+        const ticker = computed(() => {
+            if (props.currency === 'tnim') return 'tNIM';
+
+            if (props.currency === 'mbtc') return 'mBTC';
+            if (props.currency === 'tbtc') return 'tBTC';
+
+            return props.currency.toUpperCase();
+        });
+
+        return {
+            formattedAmount,
+            isApprox,
+            ticker,
+        };
     }
-
-    private get formattedAmount() {
-        let minDecimals: number;
-        let maxDecimals: number;
-        if (typeof this.decimals === 'number') {
-            minDecimals = maxDecimals = this.decimals;
-        } else {
-            minDecimals = this.minDecimals;
-            maxDecimals = this.maxDecimals;
-        }
-
-        return new FormattableNumber(this.amount).moveDecimalSeparator(-this.currencyDecimals)
-            .toString({ maxDecimals, minDecimals, useGrouping: true });
-    }
-
-    private get isApprox() {
-        return !new FormattableNumber(this.amount).moveDecimalSeparator(-this.currencyDecimals)
-            .equals(this.formattedAmount.replace(/\s/g, ''));
-    }
-
-    private get ticker() {
-        if (this.currency === 'tnim') return 'tNIM';
-
-        if (this.currency === 'mbtc') return 'mBTC';
-        if (this.currency === 'tbtc') return 'tBTC';
-
-        return this.currency.toUpperCase();
-    }
-}
+})
 </script>
 
 <style scoped>
