@@ -1,12 +1,12 @@
 <template>
-    <div class="amount-input" :class="{'has-value': valueInLuna > 0, 'focussed': isFocussed}">
+    <div class="amount-input" :class="{ 'has-value': valueInLuna > 0, 'focussed': isFocussed }">
         <form class="label-input" @submit.prevent ref="fullWidth">
-            <span class="width-finder width-placeholder" ref="widthPlaceholder">{{placeholder}}</span>
-            <div v-if="maxFontSize" class="full-width" :class="{'width-finder': maxWidth > 0}">Width</div>
-            <span class="width-finder width-value" ref="widthValue">{{formattedValue || ''}}</span>
+            <span class="width-finder width-placeholder" ref="widthPlaceholder">{{ placeholder }}</span>
+            <div v-if="maxFontSize" class="full-width" :class="{ 'width-finder': maxWidth > 0 }">Width</div>
+            <span class="width-finder width-value" ref="widthValue">{{ formattedValue || '' }}</span>
             <input type="text" inputmode="decimal" class="nq-input" :class="vanishing"
                 :placeholder="placeholder"
-                :style="{width: `${this.width}px`, fontSize: `${this.fontSize}rem`}"
+                :style="{ width: `${width}px`, fontSize: `${fontSize}rem` }"
                 v-model="formattedValue"
                 @focus="isFocussed = true" @blur="isFocussed = false"
                 ref="input">
@@ -16,94 +16,130 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Watch, Vue } from 'vue-property-decorator';
+import { computed, defineComponent, onMounted, ref, watch, nextTick } from '@vue/runtime-core';
 
-@Component
-export default class AmountInput extends Vue {
-    public $refs!: {
-        fullWidth: HTMLDivElement,
-        input: HTMLInputElement,
-        widthPlaceholder: HTMLSpanElement,
-        widthValue: HTMLSpanElement,
-    };
+export default defineComponent({
+    name: 'AmountInput',
+    props: {
+        modelValue: Number,
+        maxFontSize: {
+            type: Number,
+            default: 8,
+        },
+        placeholder: {
+            type: String,
+            default: '0',
+        },
+        vanishing: {
+            type: Boolean,
+            default: false,
+        },
+        decimals: {
+            type: Number,
+            default: 5,
+        },
+    },
+    setup(props, context) {
+        const fullWidth$ = ref<HTMLDivElement | null>(null);
+        const input$ = ref<HTMLInputElement | null>(null);
+        const widthPlaceholder$ = ref<HTMLSpanElement | null>(null);
+        const widthValue$ = ref<HTMLSpanElement | null>(null);
 
-    @Prop({type: Number}) private value?: number;
-    @Prop({type: Number, default: 8}) private maxFontSize!: number;
-    @Prop({type: String, default: '0'}) private placeholder!: string;
-    @Prop({type: Boolean, default: false}) private vanishing!: boolean;
-    @Prop({type: Number, default: 5}) private decimals!: number;
+        const liveValue = ref('');
+        const lastEmittedValue = ref(0);
+        const width = ref(50);
+        const fontSize = ref(props.maxFontSize);
+        const maxWidth = ref(0);
+        const valueInLuna = ref(0);
+        const isFocussed = ref(false);
 
-    private liveValue: string = '';
-    private lastEmittedValue = 0;
-    private width = 50;
-    private fontSize = this.maxFontSize;
-    private maxWidth = 0;
-    private valueInLuna = 0;
-    private isFocussed = false;
+        onMounted(() => {
+            if (props.maxFontSize && fullWidth$.value) {
+                maxWidth.value = fullWidth$.value.offsetWidth;
+            }
+        });
 
-    public async mounted() {
-        if (this.maxFontSize) {
-            this.maxWidth = this.$refs.fullWidth.offsetWidth;
+        function focus() {
+            if (input$.value) {
+                input$.value.focus();
+            }
         }
-    }
+        context.expose({ focus });
 
-    public focus() {
-        this.$refs.input.focus();
-    }
-
-    @Watch('value', { immediate: true })
-    private updateValue(newValue: number) {
-        if (newValue === this.valueInLuna) return;
-        this.lastEmittedValue = newValue || 0;
-        this.formattedValue = newValue ? (newValue / Math.pow(10, this.decimals)).toString() : '';
-        this.updateWidth();
-    }
-
-    @Watch('formattedValue')
-    private async updateWidth() {
-        await Vue.nextTick(); // Await updated DOM
-        if (!this.$refs.widthPlaceholder) return;
-
-        const placeholderWidth = this.$refs.widthPlaceholder.offsetWidth;
-        const valueWidth = this.$refs.widthValue.offsetWidth;
-        const fontSizeFactor = Math.min(1.0, Math.max(this.maxWidth / valueWidth, 1 / this.maxFontSize));
-
-        this.fontSize = fontSizeFactor * this.maxFontSize;
-        this.width = (this.formattedValue ? (fontSizeFactor === 1 ? valueWidth : this.maxWidth) : placeholderWidth);
-    }
-
-    public get formattedValue() {
-        return this.liveValue;
-    }
-
-    public set formattedValue(value: string) {
-        if (!value) {
-            this.liveValue = '';
-            this.lastEmittedValue = 0;
-            this.valueInLuna = 0;
-            this.$emit('input', this.valueInLuna);
-            return;
+        function updateValue(newValue: number) {
+            if (newValue === valueInLuna.value) return;
+            lastEmittedValue.value = newValue || 0;
+            formattedValue.value = newValue ? (newValue / Math.pow(10, props.decimals)).toString() : '';
+            updateWidth();
         }
 
-        value = value.replace(/\,/, '.');
-        const regExp = new RegExp(`(\\d*)(\\.(\\d{0,${this.decimals}}))?`, 'g'); // Backslashes are escaped
-        const regExpResult = regExp.exec(value)!;
-        if (regExpResult[1] || regExpResult[2]) {
-            this.liveValue = `${regExpResult[1] ? regExpResult[1] : '0'}${regExpResult[2] ? regExpResult[2] : ''}`;
-            this.valueInLuna = Number(
-                `${regExpResult[1]}${(regExpResult[2] ? regExpResult[3] : '').padEnd(this.decimals, '0')}`,
-            );
+        async function updateWidth() {
+            await nextTick(); // Await updated DOM
+            if (!widthPlaceholder$.value || !widthValue$.value) return;
+
+            const placeholderWidth = widthPlaceholder$.value.offsetWidth;
+            const valueWidth = widthValue$.value.offsetWidth;
+            const fontSizeFactor = Math.min(1.0, Math.max(maxWidth.value / valueWidth, 1 / props.maxFontSize));
+
+            fontSize.value = fontSizeFactor * props.maxFontSize;
+            width.value = (formattedValue.value ? (fontSizeFactor === 1 ? valueWidth : maxWidth.value) : placeholderWidth);
         }
 
-        if (this.lastEmittedValue !== this.valueInLuna) {
-            this.$emit('input', this.valueInLuna);
-            this.lastEmittedValue = this.valueInLuna;
-        }
+        const formattedValue = computed({
+            get() {
+                return liveValue.value;
+            },
+            set(value: string) {
+                if (!value) {
+                    liveValue.value = '';
+                    lastEmittedValue.value = 0;
+                    valueInLuna.value = 0;
+                    context.emit('input', valueInLuna.value);
+                    return;
+                }
 
-        // Trigger a valueChange for the getter.
-        this.$forceUpdate();
-    }
-}
+                value = value.replace(/\,/, '.');
+                const regExp = new RegExp(`(\\d*)(\\.(\\d{0,${props.decimals}}))?`, 'g'); // Backslashes are escaped
+                const regExpResult = regExp.exec(value)!;
+                if (regExpResult[1] || regExpResult[2]) {
+                    liveValue.value = `${regExpResult[1] ? regExpResult[1] : '0'}${regExpResult[2] ? regExpResult[2] : ''}`;
+                    valueInLuna.value = Number(
+                        `${regExpResult[1]}${(regExpResult[2] ? regExpResult[3] : '').padEnd(props.decimals, '0')}`,
+                    );
+                }
+
+                if (lastEmittedValue.value !== valueInLuna.value) {
+                    context.emit('input', valueInLuna.value);
+                    lastEmittedValue.value = valueInLuna.value;
+                }
+
+                // Trigger a valueChange for the getter.
+                // context.forceUpdate(); // TODO: Does it still need this now ?
+            }
+        });
+
+        watch(formattedValue, updateWidth);
+        watch(
+            () => props.modelValue,
+            (newValue: number | undefined) => newValue && updateValue(newValue),
+            { immediate: true }
+        );
+
+        return {
+            fullWidth$,
+            input$,
+            widthPlaceholder$,
+            widthValue$,
+
+            valueInLuna,
+            isFocussed,
+            maxWidth,
+            formattedValue,
+            width,
+            fontSize,
+        };
+    },
+});
 </script>
 
 <style scoped>
