@@ -3,37 +3,51 @@
         <slot></slot>
         <CloseButton v-if="hasCloseButton"
             class="close-button" :class="{'inverse': ['dark', 'green'].includes(theme)}"
-            @click="$emit(constructor.Events.CLOSE)"
+            @click="onClose"
         />
     </div>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch  } from 'vue-property-decorator';
+import { defineComponent, ref, watch } from '@vue/runtime-core';
 import CloseButton from './CloseButton.vue';
 
-@Component({components: {CloseButton}})
-class BottomOverlay extends Vue {
-    @Prop({
-        type: String,
-        default: 'dark',
-        validator: (theme) => ['dark', 'light', 'green'].includes(theme),
-    })
-    public theme!: string;
-
-    private hasCloseButton = false;
-
-    @Watch('$listeners.close', { immediate: true })
-    private _onListenerChange() {
-        this.hasCloseButton = !!this.$listeners.close;
-    }
+enum BottomOverlayEvents {
+    CLOSE = 'close',
 }
-namespace BottomOverlay { // tslint:disable-line no-namespace
-    export enum Events {
-        CLOSE = 'close',
-    }
-}
-export default BottomOverlay;
+
+export default defineComponent({
+    name: 'BottomOverlay',
+    props: {
+        theme: {
+            type: String,
+            default: 'dark',
+            validator: (theme: any) => typeof theme === 'string' && ['dark', 'light', 'green'].includes(theme),
+        }
+    },
+    setup(props, context) {
+        const hasCloseButton = ref(false);
+
+        function onClose() {
+            context.emit(BottomOverlayEvents.CLOSE);
+        }
+
+        function _onListenerChange() {
+            hasCloseButton.value = !!context.attrs.onClose;
+        }
+
+        watch(() => context.attrs.onClose, _onListenerChange, { immediate: true });
+
+        return {
+            BottomOverlayEvents,
+            hasCloseButton,
+            onClose,
+        };
+    },
+    components: {
+        CloseButton,
+    },
+})
 </script>
 
 <style scoped>
