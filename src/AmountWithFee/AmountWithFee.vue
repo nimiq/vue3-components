@@ -1,14 +1,14 @@
 <template>
     <div class="amount-with-fee">
-        <AmountInput class="value" v-model="liveAmount" :class="{invalid: !isValid && liveAmount > 0}"  ref="amountInput" />
+        <AmountInput class="value" v-model="liveAmount" :class="{ invalid: !isValid && liveAmount > 0 }"  ref="amountInput" />
         <div class="fee-section nq-text-s">
             <div v-if="!isValid && liveAmount" class="nq-red"><slot name="insufficient-balance-error">{{ $t('Insufficient balance') }}</slot></div>
             <div v-else>
                 <span v-if="fiatAmount !== null && fiatCurrency" class="fiat">
                     ~<FiatAmount :amount="fiatAmount" :currency="fiatCurrency" />
                 </span>
-                <span v-if="value.fee" class="fee">
-                    + <Amount :amount="value.fee" :minDecimals="0" :maxDecimals="5" /> {{ $t('fee') }}
+                <span v-if="modelValue.fee" class="fee">
+                    + <Amount :amount="modelValue.fee" :minDecimals="0" :maxDecimals="5" /> {{ $t('fee') }}
                 </span>
             </div>
         </div>
@@ -16,56 +16,69 @@
 </template>
 
 <script lang="ts">
-import { Component, Mixins, Prop, Watch } from 'vue-property-decorator';
+import { computed, defineComponent, onMounted, ref, watch } from '@vue/runtime-core';
+
 import { FiatApiSupportedFiatCurrency } from '@nimiq/utils';
 import Amount from './Amount.vue';
-import AmountInput from './AmountInput.vue';
+import AmountInput from './AmountInput/AmountInput.vue';
 import FiatAmount from './FiatAmount.vue';
 import I18nMixin from '../i18n/I18nMixin';
 
-@Component({
-    name: 'AmountWithFee',
+export default defineComponent({
+    name: "AmountWithFee",
+    extends: I18nMixin,
+    props: {
+        modelValue: {
+            type: Object as () => ({ amount: number, fee: number, isValid: boolean }),
+            default: () => ({ amount: 0, fee: 0, isValid: false }),
+        },
+        availableBalance: {
+            type: Number,
+            default: 0,
+        },
+        fiatAmount: Number,
+        fiatCurrency: String as () => FiatApiSupportedFiatCurrency,
+    },
+    setup(props, context) {
+        const amountInput$ = ref<(typeof AmountInput) | null>(null);
+
+        const liveAmount = ref(props.modelValue.amount);
+
+        const isValid = computed(() => {
+            return liveAmount.value > 0
+                && liveAmount.value + props.modelValue.fee <= props.availableBalance;
+        });
+
+        onMounted(watchAmountChange);
+
+        watch(isValid, watchAvailableAmountChange, { immediate: true });
+        function watchAvailableAmountChange() {
+            context.emit('input', { amount: liveAmount.value, fee: props.modelValue.fee, isValid: isValid.value });
+        }
+
+        watch(liveAmount, watchAmountChange, { immediate: true });
+        function watchAmountChange() {
+            context.emit('input', { amount: liveAmount.value, fee: props.modelValue.fee, isValid: isValid.value });
+        }
+
+        function focus() {
+            if (amountInput$.value) amountInput$.value.focus();
+        }
+
+        context.expose({ focus });
+
+        return {
+            amountInput$,
+            liveAmount,
+            isValid,
+        };
+    },
     components: {
         Amount,
         AmountInput,
         FiatAmount,
     },
 })
-export default class AmountWithFee extends Mixins(I18nMixin) {
-    @Prop({
-        type: Object,
-        default: () => ({amount: 0, fee: 0, isValid: false}),
-    }) private value!: {amount: number, fee: number, isValid: boolean};
-    @Prop({type: Number, default: 0}) private availableBalance!: number;
-    @Prop(Number) private fiatAmount: number | null;
-    @Prop(String) private fiatCurrency: FiatApiSupportedFiatCurrency | null;
-
-    private liveAmount: number = this.value.amount;
-
-    public mounted() {
-        this.watchAmountChange(this.liveAmount);
-    }
-
-    @Watch('isValid', {immediate: true})
-    private watchAvailableAmountChange(value) {
-        this.$emit('input', {amount: this.liveAmount, fee: this.value.fee, isValid: this.isValid});
-    }
-
-    @Watch('liveAmount', {immediate: true})
-    private watchAmountChange(value) {
-        this.$emit('input', {amount: this.liveAmount, fee: this.value.fee, isValid: this.isValid});
-    }
-
-    private get isValid(): boolean {
-        return this.liveAmount > 0
-            && this.liveAmount + this.value.fee <= this.availableBalance;
-    }
-
-    public focus() {
-        (this.$refs.amountInput as AmountInput).focus();
-    }
-
-}
 </script>
 
 <style scoped>
