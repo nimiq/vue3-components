@@ -1,19 +1,27 @@
 <template>
-    <button class="close-button nq-button-s" @click="click" @mousedown.prevent>
+    <button class="close-button nq-button-s" @click="onClick" @mousedown.prevent>
         <CloseIcon/>
     </button>
 </template>
 
 <script lang="ts">
-import {Component, Emit, Vue} from 'vue-property-decorator';
-import { CloseIcon } from './Icons';
+import { defineComponent } from '@vue/runtime-core';
+import { CloseIcon } from '../Icons';
 
-@Component({components: {CloseIcon}})
-export default class CloseButton extends Vue {
-    @Emit()
-    // tslint:disable-next-line no-empty
-    public click(event: MouseEvent) {}
-}
+export default defineComponent({
+    name: 'CloseButton',
+    setup(props, context) {
+        function onClick(event: MouseEvent) {
+            context.emit('click', event);
+        }
+
+        return { onClick };
+    },
+    components: {
+        CloseIcon,
+    }
+})
+
 
 </script>
 
