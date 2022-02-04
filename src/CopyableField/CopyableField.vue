@@ -10,6 +10,7 @@
             <button
                 class="nq-button-s"
                 v-for="key in (isKeyedValue ? Object.keys(value) : [])"
+                :key="key"
                 @click.stop="currentKey = key"
                 :class="{
                     inverse: currentKey === key,
@@ -23,86 +24,104 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Mixins, Prop, Watch } from 'vue-property-decorator';
+import { computed, defineComponent, nextTick, onMounted, onUnmounted, ref, watch } from '@vue/runtime-core';
 import { Clipboard } from '@nimiq/utils';
 import I18nMixin from '../i18n/I18nMixin';
 
-@Component({ name: 'CopyableField' })
-export default class CopyableField extends Mixins(I18nMixin) {
-    private static readonly DEFAULT_FONT_SIZE = 3; // in rem
-    private static readonly DEFAULT_FONT_SIZE_SMALL = 2.5; // in rem
+export const COPYABLE_FIELD_DEFAULT_FONT_SIZE = 3; // in rem
+export const COPYABLE_FIELD_DEFAULT_FONT_SIZE_SMALL = 2.5; // in rem
 
-    @Prop({
-        required: true,
-        validator: (value: string | object) => typeof value === 'string' || typeof value === 'number'
-            || (typeof value === 'object' && Object.keys(value).length > 0),
-    })
-    public value!: string | number | { [key: string]: any };
+export default defineComponent({
+    name: 'CopyableField',
+    extends: I18nMixin,
+    props: {
+        modelValue: {
+            type: Object as () => (string | number | { [key: string]: any }),
+            required: true,
+            validator: (value: string | object) => typeof value === 'string' || typeof value === 'number'
+                || (typeof value === 'object' && Object.keys(value).length > 0),
+        },
+        label: String,
+        small: {
+            type: Boolean,
+            default: false,
+        },
+    },
+    setup(props, context) {
+        const value$ = ref<HTMLSpanElement | null>(null);
+        const valueContainer$ = ref<HTMLDivElement | null>(null);
 
-    @Prop(String)
-    public label?: string;
+        const currentKey = ref('');
+        const fontSize = ref(props.small ? COPYABLE_FIELD_DEFAULT_FONT_SIZE_SMALL : COPYABLE_FIELD_DEFAULT_FONT_SIZE);
+        const copied = ref(false);
+        const _copiedResetTimeout = ref<number | null>(null);
 
-    @Prop({ type: Boolean, default: false })
-    public small!: boolean;
+        onMounted(() => {
+            // this._updateFontSize = this._updateFontSize.bind(this);
+            window.addEventListener('resize', _updateFontSize);
+            _updateFontSize();
+        });
 
-    private currentKey: string = '';
-    private fontSize: number = this.small ? CopyableField.DEFAULT_FONT_SIZE_SMALL : CopyableField.DEFAULT_FONT_SIZE;
-    private copied: boolean = false;
-    private _copiedResetTimeout: number | undefined;
+        onUnmounted(() => window.removeEventListener('resize', _updateFontSize));
 
-    private mounted() {
-        this._updateFontSize = this._updateFontSize.bind(this);
-        window.addEventListener('resize', this._updateFontSize);
-        this._updateFontSize();
-    }
+        const isKeyedValue = computed(() => {
+            return typeof props.modelValue !== 'string' && typeof props.modelValue !== 'number';
+        });
 
-    private destroyed() {
-        window.removeEventListener('resize', this._updateFontSize);
-    }
+        const hasSingleKey = computed(() => {
+            return isKeyedValue.value && Object.keys(props.modelValue).length === 1;
+        });
 
-    private get isKeyedValue() {
-        return typeof this.value !== 'string' && typeof this.value !== 'number';
-    }
-
-    private get hasSingleKey() {
-        return this.isKeyedValue && Object.keys(this.value).length === 1;
-    }
-
-    @Watch('value', { immediate: true })
-    private _onValueChange() {
-        const keys = this.isKeyedValue ? Object.keys(this.value) : [];
-        if (keys.length > 0 && (!this.currentKey || !keys.includes(this.currentKey))) {
-            this.currentKey = keys[0]; // will also trigger _updateFontSize
-        } else {
-            this._updateFontSize(); // trigger manually
+        watch(() => props.modelValue, _onValueChange, { immediate: true });
+        function _onValueChange() {
+            const keys = isKeyedValue.value ? Object.keys(props.modelValue) : [];
+            if (keys.length > 0 && (!currentKey.value || !keys.includes(currentKey.value))) {
+                currentKey.value = keys[0]; // will also trigger _updateFontSize
+            } else {
+                _updateFontSize(); // trigger manually
+            }
         }
-    }
 
-    @Watch('currentKey')
-    @Watch('small')
-    private async _updateFontSize() {
-        await Vue.nextTick(); // let Vue render the component first
-        const valueContainer = this.$refs['value-container'] as HTMLDivElement;
-        const valueElement = this.$refs.value as HTMLSpanElement;
-        const defaultFontSize = this.small ? CopyableField.DEFAULT_FONT_SIZE_SMALL : CopyableField.DEFAULT_FONT_SIZE;
-        valueElement.style.fontSize = `${defaultFontSize}rem`;
-        const availableWidth = valueContainer.offsetWidth;
-        const referenceWidth = valueElement.offsetWidth;
-        const scaleFactor =  availableWidth / referenceWidth;
-        valueElement.style.fontSize = '';
-        this.fontSize = Math.min(defaultFontSize, defaultFontSize * scaleFactor);
-    }
+        watch(currentKey, _updateFontSize);
+        watch(() => props.small, _updateFontSize);
+        async function _updateFontSize() {
+            await nextTick(); // let Vue render the component first
+            if (!valueContainer$.value || !value$.value) return;
 
-    private copy() {
-        Clipboard.copy(this.isKeyedValue ? this.value[this.currentKey].toString() : this.value.toString());
-        this.copied = true;
+            const defaultFontSize = props.small ? COPYABLE_FIELD_DEFAULT_FONT_SIZE_SMALL : COPYABLE_FIELD_DEFAULT_FONT_SIZE;
+            value$.value.style.fontSize = `${defaultFontSize}rem`;
 
-        window.clearTimeout(this._copiedResetTimeout);
-        this._copiedResetTimeout = window.setTimeout(() => {
-            this.copied = false;
-        }, 500);
+            const availableWidth = valueContainer$.value.offsetWidth;
+            const referenceWidth = value$.value.offsetWidth;
+            const scaleFactor =  availableWidth / referenceWidth;
+            value$.value.style.fontSize = '';
+            fontSize.value = Math.min(defaultFontSize, defaultFontSize * scaleFactor);
+        }
+
+        function copy() {
+            Clipboard.copy(
+                isKeyedValue.value
+                    ? (props.modelValue as { [key: string]: any })[currentKey.value].toString()
+                    : props.modelValue.toString()
+            );
+            copied.value = true;
+
+            if (_copiedResetTimeout.value) window.clearTimeout(_copiedResetTimeout.value);
+            _copiedResetTimeout.value = window.setTimeout(() => {
+                copied.value = false;
+            }, 500);
+        }
+
+        return {
+            value$,
+            valueContainer$,
+
+            currentKey,
+            fontSize,
+            copied,
+        };
     }
-}
+})
 </script>
 
 <style scoped>
