@@ -1,13 +1,13 @@
 <template>
-    <div class="copyable" :class="{ copied }" @click="copy" tabindex="0">
+    <div class="copyable" :class="{ copied }" @click="copy" tabindex="0" :ref="root$">
         <div class="background"></div>
         <slot></slot>
-        <div class="tooltip" ref="tooltip">{{ $t('Copied') }}</div>
+        <div class="tooltip" :ref="tooltip$">{{ $t('Copied') }}</div>
     </div>
 </template>
 
 <script lang="ts">
-import { Component, Mixins, Prop } from 'vue-property-decorator';
+import { defineComponent, onBeforeUnmount, onMounted, ref } from '@vue/runtime-core';
 import { Clipboard } from '@nimiq/utils';
 import I18nMixin from '../i18n/I18nMixin';
 
@@ -22,49 +22,56 @@ import I18nMixin from '../i18n/I18nMixin';
  *
  * **text** {string} [optional] - A specific text to be copied to the clipboard on click
  */
-@Component({ name: 'Copyable' })
-export default class Copyable extends Mixins(I18nMixin) {
-    private static readonly DISPLAY_TIME = 800;
 
-    @Prop(String)
-    public text?: string;
+export const COPYABLE_DISPLAY_TIME = 800;
 
-    private copied: boolean = false;
-    private _copiedResetTimeout: number | null = null;
+export default defineComponent({
+    name: 'Copyable',
+    extends: I18nMixin,
+    props: {
+        text: String,
+    },
+    setup(props, context) {
+        const root$ = ref<HTMLDivElement | null>(null);
+        const tooltip$ = ref<HTMLDivElement | null>(null);
 
-    public copy() {
-        let text = this.text;
-        if (!text) {
-            const copiedLabel = (this.$refs.tooltip as HTMLElement).textContent;
-            text = (this.$el as HTMLElement).innerText.replace(new RegExp(`\\s*${copiedLabel}$`), '');
+        const copied = ref(false);
+        const _copiedResetTimeout = ref<number | null>(null);
+
+        function copy() {
+            let text = props.text;
+
+            if (!text && root$.value && tooltip$.value) {
+                const copiedLabel = tooltip$.value.textContent;
+                text = root$.value.innerText.replace(new RegExp(`\\s*${copiedLabel}$`), '');
+            }
+            if (text) Clipboard.copy(text);
+
+            window.clearTimeout(_copiedResetTimeout.value!);
+            copied.value = true;
+            _copiedResetTimeout.value = window.setTimeout(() => {
+                copied.value = false;
+            }, COPYABLE_DISPLAY_TIME);
         }
-        Clipboard.copy(text);
 
-        window.clearTimeout(this._copiedResetTimeout!);
-        this.copied = true;
-        this._copiedResetTimeout = window.setTimeout(() => {
-            this.copied = false;
-        }, Copyable.DISPLAY_TIME);
-    }
-
-    private onKeyDown(event: KeyboardEvent) {
-        if (event.key === ' ' /* Space */ || event.key === 'Enter') {
-            this.copy();
+        function onKeyDown(event: KeyboardEvent) {
+            if (event.key === ' ' /* Space */ || event.key === 'Enter') {
+                copy();
+            }
         }
-    }
 
-    public created() {
-        this.onKeyDown = this.onKeyDown.bind(this);
-    }
+        onMounted(() => root$.value!.addEventListener('keydown', onKeyDown));
+        onBeforeUnmount(() => root$.value!.removeEventListener('keydown', onKeyDown));
 
-    public mounted() {
-        this.$el.addEventListener('keydown', this.onKeyDown as (event: Event) => void);
-    }
+        return {
+            root$,
+            tooltip$,
 
-    public beforeDestroy() {
-        this.$el.removeEventListener('keydown', this.onKeyDown as (event: Event) => void);
+            copied,
+            copy,
+        };
     }
-}
+})
 </script>
 
 <style scoped>
