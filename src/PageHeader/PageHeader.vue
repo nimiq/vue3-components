@@ -13,26 +13,42 @@
 </template>
 
 <script lang="ts">
-    import { Component, Mixins, Prop } from 'vue-property-decorator';
-    import { ArrowLeftIcon } from './Icons';
-    import I18nMixin from '../i18n/I18nMixin';
+import { computed, defineComponent } from '@vue/runtime-core';
+import { ArrowLeftIcon } from './Icons';
+import I18nMixin from '../i18n/I18nMixin';
 
-    @Component({
-        name: 'PageHeader',
-        components: { ArrowLeftIcon },
-    })
-    export default class PageHeader extends Mixins(I18nMixin) {
-        @Prop({type: Boolean, default: false}) private backArrow!: boolean;
-        @Prop({type: Boolean, default: false}) private progressIndicator!: boolean;
-        @Prop({type: Number, default: 6}) private numberSteps!: number;
-        @Prop({type: Number, default: 1}) private step!: number;
-
-        get progressSteps() {
+export default defineComponent({
+    name: 'PageHeader',
+    extends: I18nMixin,
+    props: {
+        backArrow: {
+            type: Boolean,
+            default: false,
+        },
+        progressIndicator: {
+            type: Boolean,
+            default: false,
+        },
+        numberSteps: {
+            type: Number,
+            default: 6,
+        },
+        step: {
+            type: Number,
+            default: 1,
+        },
+    },
+    setup(props) {
+        const progressSteps = computed(() => {
             const list = [];
-            for (let i = 1; i <= this.numberSteps; i++) list.push(i);
+            for (let i = 1; i <= props.numberSteps; i++) list.push(i);
             return list;
-        }
-    }
+        });
+
+        return { progressSteps };
+    },
+    components: { ArrowLeftIcon },
+})
 </script>
 
 <style scoped>
