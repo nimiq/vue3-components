@@ -5,10 +5,7 @@
 </template>
 
 <script lang="ts">
-    import {Component, Vue} from 'vue-property-decorator';
-
-    @Component
-    export default class PageBody extends Vue {}
+export default {}
 </script>
 
 <style scoped>
