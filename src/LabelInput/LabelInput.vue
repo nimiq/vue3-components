@@ -1,88 +1,118 @@
 <template>
-    <form class="label-input" @submit.prevent="onBlur" :class="{disabled}">
-        <span class="width-finder width-placeholder" ref="widthPlaceholder">{{
+    <form class="label-input" @submit.prevent="onBlur" :class="{ disabled }">
+        <span class="width-finder width-placeholder" :ref="widthPlaceholder$">{{
             placeholder || $t('Name your address')
         }}</span>
-        <span class="width-finder width-value" ref="widthValue">{{liveValue}}</span>
-        <input type="text" class="nq-input" :class="{'vanishing': vanishing}"
+        <span class="width-finder width-value" :ref="widthValue$">{{ liveValue }}</span>
+        <input type="text" class="nq-input" :class="{ 'vanishing': vanishing }"
             :placeholder="placeholder || $t('Name your address')"
-            :style="{width: `${this.width}px`}"
+            :style="{ width: `${width}px` }"
             v-model="liveValue"
             :disabled="disabled"
             @input="onInput"
             @blur="onBlur"
             @paste="$emit('paste', $event)"
-            ref="input">
+            :ref="input$">
     </form>
 </template>
 
 <script lang="ts">
-import { Component, Mixins, Prop, Vue, Watch } from 'vue-property-decorator';
+import { defineComponent, nextTick, ref, watch } from '@vue/runtime-core';
 import { Utf8Tools } from '@nimiq/utils';
 import I18nMixin from '../i18n/I18nMixin';
 
-@Component({ name: 'LabelInput' })
-export default class LabelInput extends Mixins(I18nMixin) {
-    @Prop(Number) protected maxBytes?: number;
-    @Prop({type: String, default: ''}) private value!: string;
-    @Prop({type: String}) private placeholder?: string;
-    @Prop({type: Boolean, default: false}) private vanishing!: boolean;
-    @Prop({type: Boolean, default: false}) private disabled!: boolean;
+export default defineComponent({
+    name: 'LabelInput',
+    extends: I18nMixin,
+    props: {
+        maxBytes: Number, // was a `protected` prop with vue2 class component
+        modelValue: {
+            type: String,
+            default: '',
+        },
+        placeholder: String,
+        vanishing: {
+            type: Boolean,
+            default: false,
+        },
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
+    },
+    setup(props, context) {
+        const input$ = ref<HTMLInputElement | null>(null);
+        const widthPlaceholder$ = ref<HTMLSpanElement | null>(null);
+        const widthValue$ = ref<HTMLSpanElement | null>(null);
 
-    private liveValue: string = '';
-    private lastValue: string = '';
-    private lastEmittedValue: string = '';
-    private width = 50;
+        const liveValue = ref('');
+        const lastValue = ref('');
+        const lastEmittedValue = ref('');
+        const width = ref(50);
 
-    public focus() {
-        (this.$refs.input as HTMLInputElement).focus();
-    }
-
-    private onInput() {
-        if (this.maxBytes) {
-            const lengthInBytes = Utf8Tools.stringToUtf8ByteArray(this.liveValue!).byteLength;
-            if (lengthInBytes > this.maxBytes) {
-                this.liveValue = this.lastValue;
-                return;
-            }
-            this.lastValue = this.liveValue;
+        function focus() {
+            if (input$.value) input$.value.focus();
         }
-        this.$emit('input', this.liveValue);
-    }
+        context.expose({ focus });
 
-    private onBlur() {
-        if (this.liveValue === this.lastEmittedValue) return;
-        this.$emit('changed', this.liveValue);
-        this.lastEmittedValue = this.liveValue;
-        (this.$refs.input as HTMLInputElement).blur();
-    }
+        function onInput() {
+            if (props.maxBytes) {
+                const lengthInBytes = Utf8Tools.stringToUtf8ByteArray(liveValue.value!).byteLength;
+                if (lengthInBytes > props.maxBytes) {
+                    liveValue.value = lastValue.value;
+                    return;
+                }
+                lastValue.value = liveValue.value;
+            }
+            context.emit('input', liveValue.value);
+        }
 
-    @Watch('value', {immediate: true})
-    private updateValue(newValue: string) {
-        this.liveValue = newValue;
-        this.lastValue = this.liveValue;
-        this.lastEmittedValue = this.lastValue;
-    }
+        function onBlur() {
+            if (liveValue.value === lastEmittedValue.value) return;
+            context.emit('changed', liveValue.value);
+            lastEmittedValue.value = liveValue.value;
+            if (input$.value) input$.value.blur();
+        }
 
-    @Watch('liveValue', {immediate: true})
-    private async updateWidth() {
-        await Vue.nextTick(); // Await updated DOM
-        if (!this.$refs.widthPlaceholder) return;
+        watch(() => props.modelValue, updateValue, { immediate: true })
+        function updateValue(newValue: string) {
+            liveValue.value = newValue;
+            lastValue.value = liveValue.value;
+            lastEmittedValue.value = lastValue.value;
+        }
 
-        const placeholderWidth = (this.$refs.widthPlaceholder as HTMLSpanElement).offsetWidth;
-        const valueWidth = (this.$refs.widthValue as HTMLSpanElement).offsetWidth;
+        watch(liveValue, updateWidth, { immediate: true });
+        async function updateWidth() {
+            await nextTick(); // Await updated DOM
+            if (!widthPlaceholder$.value || !widthValue$.value || !input$.value) return;
 
-        // Add an additional padding, so entering new letters does not flicker the input before width is adjusted
-        //
-        // A third of the font-size was found to be a good compromise between not adding too big a gap and
-        // still resonably supporting wide letters (it still jumps for W at bigger font-sizes, but that's why
-        // it's called a compromise).
-        const fontSize = parseFloat(window.getComputedStyle((this.$refs.input as HTMLInputElement), null)
-            .getPropertyValue('font-size'));
+            const placeholderWidth = widthPlaceholder$.value.offsetWidth;
+            const valueWidth = widthValue$.value.offsetWidth;
 
-        this.width = (this.liveValue.length ? valueWidth : placeholderWidth) + fontSize / 3;
-    }
-}
+            // Add an additional padding, so entering new letters does not flicker the input before width is adjusted
+            //
+            // A third of the font-size was found to be a good compromise between not adding too big a gap and
+            // still resonably supporting wide letters (it still jumps for W at bigger font-sizes, but that's why
+            // it's called a compromise).
+            const fontSize = parseFloat(window.getComputedStyle(input$.value, null)
+                .getPropertyValue('font-size'));
+
+            width.value = (liveValue.value.length ? valueWidth : placeholderWidth) + fontSize / 3;
+        }
+
+        return {
+            input$,
+            widthPlaceholder$,
+            widthValue$,
+
+            liveValue,
+            width,
+
+            onInput,
+            onBlur,
+        };
+    },
+})
 </script>
 
 <style scoped>
