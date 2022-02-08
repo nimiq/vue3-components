@@ -1,9 +1,9 @@
 <template>
-    <div class="info-line" :class="{ 'inverse-theme': theme === constructor.Themes.INVERSE }">
+    <div class="info-line" :class="{ 'inverse-theme': theme === PaymentInfoLineThemes.INVERSE }">
         <div class="amounts"
-            @mouseenter="$refs['price-tooltip'] && $refs['price-tooltip'].show()"
-            @mouseleave="$refs['price-tooltip'] && $refs['price-tooltip'].hide()"
-            @click="$refs['price-tooltip'] && Date.now() - lastTooltipToggle > 200 && $refs['price-tooltip'].toggle()"
+            @mouseenter="priceTooltip$ && priceTooltip$.show()"
+            @mouseleave="priceTooltip$ && priceTooltip$.hide()"
+            @click="priceTooltip$ && Date.now() - lastTooltipToggle > 200 && priceTooltip$.toggle()"
         >
             <Amount
                 :currency="cryptoAmount.currency"
@@ -12,7 +12,7 @@
                 :minDecimals="0"
                 :maxDecimals="Math.min(4, cryptoAmount.decimals)"
             />
-            <Tooltip ref="price-tooltip"
+            <Tooltip ref="priceTooltip$"
                 v-if="fiatAmount"
                 :container="$parent"
                 preferredPosition="bottom left"
@@ -25,7 +25,7 @@
                 :theme="theme"
                 @show="onPriceTooltipToggle(true)"
                 @hide="onPriceTooltipToggle(false)"
-                @click.native.stop
+                @click.stop
                 class="price-tooltip"
             >
                 <template #trigger>
@@ -96,7 +96,7 @@
         <Account :address="address" :image="shopLogoUrl" :label="originDomain" />
         <Timer
             v-if="startTime && endTime"
-            ref="timer"
+            ref="timer$"
             :startTime="startTime"
             :endTime="endTime"
             :theme="theme"
@@ -112,7 +112,7 @@
 // this imports only the type without bundling the library
 type BigInteger = import ('big-integer').BigInteger;
 
-import { Component, Mixins, Prop, Watch } from 'vue-property-decorator';
+import { computed, defineComponent, nextTick, onMounted, onUnmounted, ref, watch } from '@vue/runtime-core';
 import { FiatApiSupportedFiatCurrency, FiatApiSupportedCryptoCurrency, getExchangeRates } from '@nimiq/utils';
 import Account from './Account.vue';
 import Timer from './Timer.vue';
@@ -147,8 +147,208 @@ function fiatAmountInfoValidator(value: any) {
         && typeof value.currency === 'string';
 }
 
-@Component({
+const PAYMENT_INFO_LINE_REFERENCE_RATE_UPDATE_INTERVAL = 60000; // every minute
+const PAYMENT_INFO_LINE_RATE_DEVIATION_THRESHOLD = .1;
+
+export enum PaymentInfoLineThemes {
+    NORMAL = 'normal',
+    INVERSE = 'inverse',
+}
+
+export default defineComponent({
     name: 'PaymentInfoLine',
+    extends: I18nMixin,
+    props: {
+        cryptoAmount: {
+            type: Object,
+            required: true,
+            validator: cryptoAmountInfoValidator,
+        },
+        fiatAmount: {
+            type: Object,
+            validator: fiatAmountInfoValidator,
+        },
+        // Note that vendorMarkup and networkFee have no effect if fiatAmount is not set, as the tooltip in which they
+        // appear is only visible when fiatAmount is set. As the fiatAmount was only introduced in the v2 checkout request
+        // in the Hub, the tooltip and vendorMarkup and networkFee are thus never visible for v1 checkout requests. This
+        // should be ok though as the vendorMarkup also only exists in v2 and the free-service-info doesn't make too much
+        // sense for nimiq.shop or the nimiq voting app which are currently the main apps using the v1 checkout.
+        vendorMarkup: {
+            type: Number,
+            validator: (value: any) => value > -1
+        },
+        networkFee: {
+            type: Number as () => number | bigint | BigInteger,
+            validator: amountValidator,
+        },
+        origin: {
+            type: String,
+            required: true,
+        },
+        address: String,
+        shopLogoUrl: String,
+        startTime: Number,
+        endTime: Number,
+        theme: {
+            type: String,
+            validator: (value: any) => Object.values(PaymentInfoLineThemes).includes(value),
+            default: 'normal',
+        }
+    },
+    setup(props, context) {
+        const timer$ = ref<typeof Timer | null>(null);
+        const priceTooltip$ = ref<typeof Tooltip | null>(null);
+
+        const referenceRate = ref<number | null>(null);
+        const referenceRateUpdateTimeout = ref(-1);
+        const lastTooltipToggle = ref(-1);
+
+        onMounted(() => updateReferenceRate());
+        onUnmounted(() => window.clearTimeout(referenceRateUpdateTimeout.value));
+
+        async function setTime(time: number) {
+            await nextTick(); // let vue update in case the timer was just added
+            if (!timer$.value) return;
+            timer$.value.synchronize(time);
+        }
+
+        context.expose({ setTime });
+
+        const originDomain = computed(() => {
+            return props.origin.split('://')[1];
+        });
+
+        const effectiveRate = computed(() => {
+            if (!props.fiatAmount) return null;
+            // Fiat/crypto rate. Higher fiat/crypto rate means user is paying less crypto for the requested fiat amount
+            // and is therefore better for the user. Note: precision loss should be acceptable here.
+            return props.fiatAmount.amount / (Number(props.cryptoAmount.amount) / (10 ** props.cryptoAmount.decimals));
+        });
+
+        const formattedVendorMarkup = computed(() => {
+            if (typeof props.vendorMarkup !== 'number') return null;
+            // Convert to percent and round to two decimals. Always ceil to avoid displaying a lower fee than charged or
+            // larger discount than applied. Subtract a small epsilon to avoid that numbers get rounded up as a result of
+            // floating point imprecision after multiplication. Otherwise formatting for example .07 would result in 7.01%.
+            return `${props.vendorMarkup >= 0 ? '+' : ''}${Math.ceil(props.vendorMarkup * 100 * 100 - 1e-10) / 100}%`;
+        });
+
+        const isFormattedNetworkFeeZero = computed(() => {
+            if (props.networkFee === null || props.networkFee === undefined) return true;
+            // Note: While we use the Amount component which does formatting itself, we manually format here to check
+            // whether the formatted value is 0. Precision loss should be acceptable here.
+            const networkFeeBaseCurrency = Number(props.networkFee) / (10 ** props.cryptoAmount.decimals);
+            // Round to maxDecimals used above in the template
+            const maxDecimals = Math.min(6, props.cryptoAmount.decimals);
+            const roundingFactor = 10 ** maxDecimals;
+            return Math.round(networkFeeBaseCurrency * roundingFactor) / roundingFactor === 0;
+        });
+
+        const rateDeviation = computed(() => {
+            // Compare rates. Convert them from fiat/crypto to crypto/fiat as the user will be paying crypto in the end and
+            // the flipped rates can therefore be compared more intuitively. Negative rate deviation is better for the user.
+            if (effectiveRate.value === null || referenceRate.value === null) return null;
+            const flippedEffectiveRate = 1 / effectiveRate.value;
+            const flippedReferenceRate = 1 / referenceRate.value;
+            return (flippedEffectiveRate - flippedReferenceRate) / flippedReferenceRate;
+        });
+
+        const isBadRate = computed(() => {
+            if (rateDeviation.value === null) return false;
+            return rateDeviation.value >= PAYMENT_INFO_LINE_RATE_DEVIATION_THRESHOLD
+                || (props.vendorMarkup
+                    && props.vendorMarkup < 0 // verify promised discount
+                    && rateDeviation.value >= props.vendorMarkup + PAYMENT_INFO_LINE_RATE_DEVIATION_THRESHOLD
+                );
+        });
+
+        const formattedRateDeviation = computed(() => {
+            if (rateDeviation.value === null) return null;
+            // Converted to absolute percent, rounded to one decimal
+            return `${Math.round(Math.abs(rateDeviation.value) * 100 * 10) / 10}%`;
+        });
+
+        function rateInfo() {
+            // Note: this method is not a getter / computed property to update on language changes
+            if (rateDeviation.value === null
+                || (Math.abs(rateDeviation.value) < PAYMENT_INFO_LINE_RATE_DEVIATION_THRESHOLD && !isBadRate.value)) {
+                return null;
+            }
+            if (rateDeviation.value < 0 && isBadRate.value) {
+                // False discount
+                return context.$t(
+                    'Your actual discount is approx. {formattedRateDeviation} compared '
+                    + 'to the current market rate (coingecko.com).',
+                    { formattedRateDeviation: formattedRateDeviation.value },
+                );
+            }
+
+            if (rateDeviation.value > 0) {
+                return context.$t(
+                    'You are paying approx. {formattedRateDeviation} more '
+                    + 'than at the current market rate (coingecko.com).',
+                    { formattedRateDeviation: formattedRateDeviation.value },
+                );
+            } else {
+                return context.$t(
+                    'You are paying approx. {formattedRateDeviation} less '
+                    + 'than at the current market rate (coingecko.com).',
+                    { formattedRateDeviation: formattedRateDeviation.value },
+                );
+            }
+
+        }
+
+        watch(() => props.cryptoAmount.currency, updateReferenceRate);
+        watch(() => props.fiatAmount && props.fiatAmount.currency, updateReferenceRate);
+        async function updateReferenceRate() {
+            window.clearTimeout(referenceRateUpdateTimeout.value);
+            const cryptoCurrency = props.cryptoAmount.currency.toLowerCase() as FiatApiSupportedCryptoCurrency;
+            const fiatCurrency = props.fiatAmount
+                ? props.fiatAmount.currency.toLowerCase() as FiatApiSupportedFiatCurrency
+                : null;
+
+            if (!props.fiatAmount || !fiatCurrency
+                || !Object.values(FiatApiSupportedFiatCurrency).includes(fiatCurrency)
+                || !Object.values(FiatApiSupportedCryptoCurrency).includes(cryptoCurrency)
+            ) {
+                referenceRate.value = null;
+                return;
+            } else {
+                const { [cryptoCurrency]: { [fiatCurrency]: newReferenceRate }} = await getExchangeRates([cryptoCurrency], [fiatCurrency]);
+                referenceRate.value = newReferenceRate || null;
+            }
+
+            referenceRateUpdateTimeout.value = window.setTimeout(
+                () => updateReferenceRate(),
+                PAYMENT_INFO_LINE_REFERENCE_RATE_UPDATE_INTERVAL,
+            );
+        }
+
+        function onPriceTooltipToggle(isShow: boolean) {
+            lastTooltipToggle.value = Date.now(); // record last toggle to avoid second toggle on click just after mouseover
+            if (!isShow) return;
+            updateReferenceRate();
+        }
+
+        return {
+            PaymentInfoLineThemes,
+
+            timer$,
+            priceTooltip$,
+
+            lastTooltipToggle,
+
+            originDomain,
+            effectiveRate,
+            formattedVendorMarkup,
+            isFormattedNetworkFeeZero,
+            isBadRate,
+
+            rateInfo,
+            onPriceTooltipToggle,
+        };
+    },
     components: {
         Account,
         Timer,
@@ -160,174 +360,6 @@ function fiatAmountInfoValidator(value: any) {
         I18n,
     },
 })
-class PaymentInfoLine extends Mixins(I18nMixin) {
-    private static readonly REFERENCE_RATE_UPDATE_INTERVAL = 60000; // every minute
-    private static readonly RATE_DEVIATION_THRESHOLD = .1;
-
-    @Prop({type: Object, required: true, validator: cryptoAmountInfoValidator}) public cryptoAmount!: CryptoAmountInfo;
-    @Prop({type: Object, validator: fiatAmountInfoValidator}) public fiatAmount?: FiatAmountInfo;
-    // Note that vendorMarkup and networkFee have no effect if fiatAmount is not set, as the tooltip in which they
-    // appear is only visible when fiatAmount is set. As the fiatAmount was only introduced in the v2 checkout request
-    // in the Hub, the tooltip and vendorMarkup and networkFee are thus never visible for v1 checkout requests. This
-    // should be ok though as the vendorMarkup also only exists in v2 and the free-service-info doesn't make too much
-    // sense for nimiq.shop or the nimiq voting app which are currently the main apps using the v1 checkout.
-    @Prop({ type: Number, validator: (value: unknown) => value > -1 }) public vendorMarkup?: number;
-    @Prop({validator: amountValidator}) public networkFee?: number | bigint | BigInteger;
-    @Prop({type: String, required: true}) public origin!: string;
-    @Prop(String) public address?: string;
-    @Prop(String) public shopLogoUrl?: string;
-    @Prop(Number) public startTime?: number;
-    @Prop(Number) public endTime?: number;
-    @Prop({
-        type: String,
-        validator: (value: any) => Object.values(PaymentInfoLine.Themes).includes(value),
-        default: 'normal',
-    })
-    public theme!: string;
-    private referenceRate: number | null = null;
-    private referenceRateUpdateTimeout: number = -1;
-    private lastTooltipToggle: number = -1;
-
-    protected created() {
-        this.updateReferenceRate();
-    }
-
-    protected destroyed() {
-        window.clearTimeout(this.referenceRateUpdateTimeout);
-    }
-
-    public async setTime(time: number) {
-        await this.$nextTick(); // let vue update in case the timer was just added
-        if (!this.$refs.timer) return;
-        (this.$refs.timer as Timer).synchronize(time);
-    }
-
-    private get originDomain() {
-        return this.origin.split('://')[1];
-    }
-
-    private get effectiveRate() {
-        if (!this.fiatAmount) return null;
-        // Fiat/crypto rate. Higher fiat/crypto rate means user is paying less crypto for the requested fiat amount
-        // and is therefore better for the user. Note: precision loss should be acceptable here.
-        return this.fiatAmount.amount / (Number(this.cryptoAmount.amount) / (10 ** this.cryptoAmount.decimals));
-    }
-
-    private get formattedVendorMarkup() {
-        if (typeof this.vendorMarkup !== 'number') return null;
-        // Convert to percent and round to two decimals. Always ceil to avoid displaying a lower fee than charged or
-        // larger discount than applied. Subtract a small epsilon to avoid that numbers get rounded up as a result of
-        // floating point imprecision after multiplication. Otherwise formatting for example .07 would result in 7.01%.
-        return `${this.vendorMarkup >= 0 ? '+' : ''}${Math.ceil(this.vendorMarkup * 100 * 100 - 1e-10) / 100}%`;
-    }
-
-    private get isFormattedNetworkFeeZero() {
-        if (this.networkFee === null || this.networkFee === undefined) return true;
-        // Note: While we use the Amount component which does formatting itself, we manually format here to check
-        // whether the formatted value is 0. Precision loss should be acceptable here.
-        const networkFeeBaseCurrency = Number(this.networkFee) / (10 ** this.cryptoAmount.decimals);
-        // Round to maxDecimals used above in the template
-        const maxDecimals = Math.min(6, this.cryptoAmount.decimals);
-        const roundingFactor = 10 ** maxDecimals;
-        return Math.round(networkFeeBaseCurrency * roundingFactor) / roundingFactor === 0;
-    }
-
-    private get rateDeviation() {
-        // Compare rates. Convert them from fiat/crypto to crypto/fiat as the user will be paying crypto in the end and
-        // the flipped rates can therefore be compared more intuitively. Negative rate deviation is better for the user.
-        if (this.effectiveRate === null || this.referenceRate === null) return null;
-        const flippedEffectiveRate = 1 / this.effectiveRate;
-        const flippedReferenceRate = 1 / this.referenceRate;
-        return (flippedEffectiveRate - flippedReferenceRate) / flippedReferenceRate;
-    }
-
-    private get isBadRate() {
-        if (this.rateDeviation === null) return false;
-        return this.rateDeviation >= PaymentInfoLine.RATE_DEVIATION_THRESHOLD
-            || (this.vendorMarkup
-                && this.vendorMarkup < 0 // verify promised discount
-                && this.rateDeviation >= this.vendorMarkup + PaymentInfoLine.RATE_DEVIATION_THRESHOLD
-            );
-    }
-
-    private get formattedRateDeviation() {
-        if (this.rateDeviation === null) return null;
-        // Converted to absolute percent, rounded to one decimal
-        return `${Math.round(Math.abs(this.rateDeviation) * 100 * 10) / 10}%`;
-    }
-
-    private rateInfo() {
-        // Note: this method is not a getter / computed property to update on language changes
-        if (this.rateDeviation === null
-            || (Math.abs(this.rateDeviation) < PaymentInfoLine.RATE_DEVIATION_THRESHOLD && !this.isBadRate)) {
-            return null;
-        }
-        if (this.rateDeviation < 0 && this.isBadRate) {
-            // False discount
-            return this.$t(
-                'Your actual discount is approx. {formattedRateDeviation} compared '
-                + 'to the current market rate (coingecko.com).',
-                { formattedRateDeviation: this.formattedRateDeviation },
-            );
-        }
-
-        if (this.rateDeviation > 0) {
-            return this.$t(
-                'You are paying approx. {formattedRateDeviation} more '
-                + 'than at the current market rate (coingecko.com).',
-                { formattedRateDeviation: this.formattedRateDeviation },
-            );
-        } else {
-            return this.$t(
-                'You are paying approx. {formattedRateDeviation} less '
-                + 'than at the current market rate (coingecko.com).',
-                { formattedRateDeviation: this.formattedRateDeviation },
-            );
-        }
-
-    }
-
-    @Watch('cryptoAmount.currency')
-    @Watch('fiatAmount.currency')
-    private async updateReferenceRate() {
-        window.clearTimeout(this.referenceRateUpdateTimeout);
-        const cryptoCurrency = this.cryptoAmount.currency.toLowerCase() as FiatApiSupportedCryptoCurrency;
-        const fiatCurrency = this.fiatAmount
-            ? this.fiatAmount.currency.toLowerCase() as FiatApiSupportedFiatCurrency
-            : null;
-        if (!this.fiatAmount
-            || !Object.values(FiatApiSupportedFiatCurrency).includes(fiatCurrency)
-            || !Object.values(FiatApiSupportedCryptoCurrency).includes(cryptoCurrency)
-        ) {
-            this.referenceRate = null;
-            return;
-        }
-
-        const { [cryptoCurrency]: { [fiatCurrency]: referenceRate }} =
-            await getExchangeRates([cryptoCurrency], [fiatCurrency]);
-        this.referenceRate = referenceRate || null;
-
-        this.referenceRateUpdateTimeout = window.setTimeout(
-            () => this.updateReferenceRate(),
-            PaymentInfoLine.REFERENCE_RATE_UPDATE_INTERVAL,
-        );
-    }
-
-    private onPriceTooltipToggle(isShow: boolean) {
-        this.lastTooltipToggle = Date.now(); // record last toggle to avoid second toggle on click just after mouseover
-        if (!isShow) return;
-        this.updateReferenceRate();
-    }
-}
-
-namespace PaymentInfoLine { // tslint:disable-line no-namespace
-    export enum Themes {
-        NORMAL = 'normal',
-        INVERSE = 'inverse',
-    }
-}
-
-export default PaymentInfoLine;
 </script>
 
 <style scoped>
