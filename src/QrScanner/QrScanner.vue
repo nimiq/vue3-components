@@ -1,7 +1,7 @@
 <template>
-    <div class="qr-scanner nq-blue-bg">
+    <div class="qr-scanner nq-blue-bg" ref="root$">
         <video ref="video" muted autoplay playsinline width="600" height="600"></video>
-        <div ref="overlay" class="overlay" :class="{ inactive: cameraAccessFailed }">
+        <div ref="overlay$" class="overlay" :class="{ inactive: cameraAccessFailed }">
             <slot>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 238 238">
                     <path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M31.3 2H10a8 8 0 0 0-8 8v21.3M206.8 2H228a8 8 0 0 1 8 8v21.3m0 175.4V228a8 8 0 0 1-8 8h-21.3m-175.4 0H10a8 8 0 0 1-8-8v-21.3"/>
@@ -58,135 +58,149 @@
 <script lang="ts">
 // TODO could use IntersectionObserver api to start scanner when visible
 
-import { Component, Mixins, Prop } from 'vue-property-decorator';
+import { defineComponent, onMounted, onUnmounted, ref } from '@vue/runtime-core';
 import QrScannerLib from 'qr-scanner';
 import { BrowserDetection } from '@nimiq/utils';
 import I18nMixin from '../i18n/I18nMixin';
 import I18n from '../i18n/I18n.vue';
 
-@Component({
+export const enum QrScannerEvents {
+    RESULT = 'result',
+    CANCEL = 'cancel',
+    ERROR = 'error',
+}
+
+export default defineComponent({
     name: 'QrScanner',
+    extends: I18nMixin,
+    props: {
+        reportFrequency: {
+            type: Number,
+            default: 7000
+        },
+        validate: Function, // as (scanResult: string) => boolean
+    },
+    setup(props, context) {
+        const root$ = ref<HTMLDivElement | null>(null);
+        const video$ = ref<HTMLVideoElement | null>(null);
+        const overlay$ = ref<HTMLDivElement | null>(null);
+
+        const cameraAccessFailed = ref(false);
+        const hasCamera = ref(true);
+
+        const isMobileOrTablet: boolean = BrowserDetection.isMobile();
+        const browser: BrowserDetection.Browser = BrowserDetection.detectBrowser();
+
+        let _scanner: QrScannerLib | null = null;
+        let _lastResult: string = '';
+        let _lastResultTime: number = 0;
+        let _cameraRetryTimer: number | null = null;
+
+        onMounted(async () => {
+            // this.repositionOverlay = this.repositionOverlay.bind(this); // TODO: is this still necessary?
+            _scanner = new QrScannerLib(video$.value!, (result) => _onResult(result), {});
+            video$.value!.addEventListener('canplay', () => video$.value!.classList.add('ready'));
+            window.addEventListener('resize', repositionOverlay);
+
+            QrScannerLib.hasCamera().then((newHasCamera) => hasCamera.value = newHasCamera);
+
+            if (_isVisible()) {
+                start();
+                repositionOverlay();
+            }
+        });
+
+        onUnmounted(() => {
+            stop();
+            if (_scanner) _scanner.destroy();
+            window.removeEventListener('resize', repositionOverlay);
+        })
+
+        async function start() {
+            try {
+                await _scanner!.start();
+                cameraAccessFailed.value = false;
+                if (_cameraRetryTimer) {
+                    window.clearInterval(_cameraRetryTimer);
+                    _cameraRetryTimer = null;
+                }
+            } catch (e) {
+                cameraAccessFailed.value = true;
+                context.emit(QrScannerEvents.ERROR, e);
+                if (!_cameraRetryTimer) {
+                    _cameraRetryTimer = window.setInterval(() => start(), 3000);
+                }
+            }
+            return !cameraAccessFailed.value;
+        }
+
+        function stop() {
+            if (!_scanner) return;
+            _scanner.stop();
+            if (_cameraRetryTimer) {
+                window.clearInterval(_cameraRetryTimer);
+                _cameraRetryTimer = null;
+            }
+        }
+
+        function setGrayscaleWeights(red: number, green: number, blue: number) {
+            if (_scanner) _scanner.setGrayscaleWeights(red, green, blue);
+        }
+
+        function setInversionMode(inversionMode: QrScannerLib.InversionMode) {
+            if (_scanner) _scanner.setInversionMode(inversionMode);
+        }
+
+        function repositionOverlay() {
+            requestAnimationFrame(() => {
+                if (!root$.value || !overlay$.value) return;
+
+                const scannerHeight = root$.value.offsetHeight;
+                const scannerWidth = root$.value.offsetWidth;
+                const smallerDimension = Math.min(scannerHeight, scannerWidth);
+                if (smallerDimension === 0) return; // component not visible or destroyed
+                const overlaySize = Math.ceil(2 / 3 * smallerDimension);
+                // not always the accurate size of the sourceRect for QR detection in QrScannerLib (e.g. if video is
+                // landscape and screen portrait) but looks nicer in the UI.
+                overlay$.value.style.width = overlaySize + 'px';
+                overlay$.value.style.height = overlaySize + 'px';
+                overlay$.value.style.top = ((scannerHeight - overlaySize) / 2) + 'px';
+                overlay$.value.style.left = ((scannerWidth - overlaySize) / 2) + 'px';
+            });
+        }
+
+        context.expose({ start, stop, setGrayscaleWeights, setInversionMode, repositionOverlay });
+
+        function _isVisible() {
+            return !!root$.value && root$.value.offsetWidth > 0;
+        }
+
+        function _cancel() {
+            context.emit(QrScannerEvents.CANCEL);
+        }
+
+        function _onResult(result: QrScannerLib.ScanResult) {
+            if ((result === _lastResult && Date.now() - _lastResultTime < props.reportFrequency)
+                || (props.validate && !props.validate(result))) return;
+            _lastResult = result;
+            _lastResultTime = Date.now();
+            context.emit(QrScannerEvents.RESULT, result);
+        }
+
+        return {
+            video$,
+
+            cameraAccessFailed,
+            hasCamera,
+
+            isMobileOrTablet,
+            browser,
+
+            _cancel,
+        };
+    },
     components: { I18n },
 })
-class QrScanner extends Mixins(I18nMixin) {
-    @Prop({ type: Number, default: 7000 }) public reportFrequency!: number;
-    @Prop(Function) public validate?: (scanResult: string) => boolean;
-
-    private cameraAccessFailed: boolean = false;
-    private hasCamera: boolean = true;
-    private isMobileOrTablet: boolean = BrowserDetection.isMobile();
-    private browser: BrowserDetection.Browser = BrowserDetection.detectBrowser();
-    private _scanner!: QrScannerLib;
-    private _lastResult?: string;
-    private _lastResultTime: number = 0;
-    private _cameraRetryTimer?: number;
-
-    private async mounted() {
-        // Use file-loader to copy the worker to dist and set the path to where the file is located. Instead of a normal
-        // import use a dynamic import at creation time of a QrScanner to give apps the opportunity to adapt the base
-        // path via setAssetPublicPath before the path is being determined. Using webpackMode: 'eager' to avoid creating
-        // an additional chunk and to let the import resolve immediately.
-        ({ default: QrScannerLib.WORKER_PATH } = await import(
-            /* webpackMode: 'eager' */
-            '!!file-loader?name=[name].[hash:8].[ext]!../../node_modules/qr-scanner/qr-scanner-worker.min.js'));
-
-        this.repositionOverlay = this.repositionOverlay.bind(this);
-        const $video = this.$refs.video as HTMLVideoElement;
-        this._scanner = new QrScannerLib($video, (result) => this._onResult(result));
-        $video.addEventListener('canplay', () => $video.classList.add('ready'));
-        window.addEventListener('resize', this.repositionOverlay);
-
-        QrScannerLib.hasCamera().then((hasCamera) => this.hasCamera = hasCamera);
-
-        if (this._isVisible()) {
-            this.start();
-            this.repositionOverlay();
-        }
-    }
-
-    private destroyed() {
-        this.stop();
-        this._scanner.destroy();
-        window.removeEventListener('resize', this.repositionOverlay);
-    }
-
-    public async start() {
-        try {
-            await this._scanner.start();
-            this.cameraAccessFailed = false;
-            if (this._cameraRetryTimer) {
-                window.clearInterval(this._cameraRetryTimer);
-                this._cameraRetryTimer = null;
-            }
-        } catch (e) {
-            this.cameraAccessFailed = true;
-            this.$emit(QrScanner.Events.ERROR, e);
-            if (!this._cameraRetryTimer) {
-                this._cameraRetryTimer = window.setInterval(() => this.start(), 3000);
-            }
-        }
-        return !this.cameraAccessFailed;
-    }
-
-    public stop() {
-        this._scanner.stop();
-        if (this._cameraRetryTimer) {
-            window.clearInterval(this._cameraRetryTimer);
-            this._cameraRetryTimer = null;
-        }
-    }
-
-    public setGrayscaleWeights(red, green, blue) {
-        this._scanner.setGrayscaleWeights(red, green, blue);
-    }
-
-    public setInversionMode(inversionMode: QrScannerLib.InversionMode) {
-        this._scanner.setInversionMode(inversionMode);
-    }
-
-    public repositionOverlay() {
-        requestAnimationFrame(() => {
-            const scannerHeight = (this.$el as HTMLElement).offsetHeight;
-            const scannerWidth = (this.$el as HTMLElement).offsetWidth;
-            const smallerDimension = Math.min(scannerHeight, scannerWidth);
-            if (smallerDimension === 0) return; // component not visible or destroyed
-            const overlaySize = Math.ceil(2 / 3 * smallerDimension);
-            // not always the accurate size of the sourceRect for QR detection in QrScannerLib (e.g. if video is
-            // landscape and screen portrait) but looks nicer in the UI.
-            const $qrOverlay = this.$refs.overlay as HTMLElement;
-            $qrOverlay.style.width = overlaySize + 'px';
-            $qrOverlay.style.height = overlaySize + 'px';
-            $qrOverlay.style.top = ((scannerHeight - overlaySize) / 2) + 'px';
-            $qrOverlay.style.left = ((scannerWidth - overlaySize) / 2) + 'px';
-        });
-    }
-
-    private _isVisible() {
-        return (this.$el as HTMLElement).offsetWidth > 0;
-    }
-
-    private _cancel() {
-        this.$emit(QrScanner.Events.CANCEL);
-    }
-
-    private _onResult(result) {
-        if ((result === this._lastResult && Date.now() - this._lastResultTime < this.reportFrequency)
-            || (this.validate && !this.validate(result))) return;
-        this._lastResult = result;
-        this._lastResultTime = Date.now();
-        this.$emit(QrScanner.Events.RESULT, result);
-    }
-}
-
-namespace QrScanner { // tslint:disable-line no-namespace
-    export const enum Events {
-        RESULT = 'result',
-        CANCEL = 'cancel',
-        ERROR = 'error',
-    }
-}
-
-export default QrScanner;
 </script>
 
 <style scoped>
