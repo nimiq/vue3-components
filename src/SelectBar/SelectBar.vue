@@ -1,57 +1,64 @@
 <template>
     <div class="select-bar">
-        <div v-for="option of options" :key="option.value">
+        <div v-for="option of sortedOptions" :key="option.value">
             <input :value="option" type="radio" :name="name" :id="option.value" v-model="selectedOption">
-            <label :for="option.value" class="nq-label" :class="getColor(option)">{{option.text}}</label>
+            <label :for="option.value" class="nq-label" :class="getColor(option)">{{ option.text }}</label>
         </div>
     </div>
 </template>
 
 <script lang="ts">
-import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
+import { computed, defineComponent, watch } from '@vue/runtime-core';
 
-@Component
-class SelectBar extends Vue {
-    @Prop(String) public name!: string;
-    @Prop(Array) public options!: SelectBar.SelectBarOption[];
-    @Prop(Number) public selectedValue?: number;
-
-    private selectedOption: SelectBar.SelectBarOption | null = null;
-
-    private created() {
-        this.options = this.options.sort((a, b) => a.index - b.index);
-
-        this.selectedOption = this.selectedValue
-            ? this.options.find((val) => val.value === this.selectedValue)!
-            : this.options[0];
-    }
-
-    public get value() {
-        return this.selectedOption!.value;
-    }
-
-    private getColor(option: SelectBar.SelectBarOption) {
-        if (option.index <= this.selectedOption!.index) {
-            return this.selectedOption!.color;
-        } else return 'nq-highlight-bg';
-    }
-
-    @Watch('selectedOption')
-    private onChanged(option: SelectBar.SelectBarOption) {
-        this.$emit('changed', option.value);
-    }
+export interface SelectBarOption {
+    color: string;
+    value: number;
+    text: string;
+    index: number;
 }
 
-namespace SelectBar {
-    export interface SelectBarOption {
-        color: string;
-        value: number;
-        text: string;
-        index: number;
-    }
-}
+export default defineComponent({
+    name: 'SelectBar',
+    props: {
+        name: {
+            type: String,
+            required: true,
+        },
+        options: {
+            type: Array as () => SelectBarOption[],
+            required: true,
+        },
+        selectedValue: Number,
+    },
+    setup(props, context) {
+        const value = computed(() => selectedOption.value?.value);
+        const sortedOptions = computed(() => props.options.sort((a, b) => a.index - b.index));
+        const selectedOption = computed(() => props.selectedValue
+                ? sortedOptions.value.find((val) => val.value === props.selectedValue)!
+                : sortedOptions.value[0]);
 
-export default SelectBar;
+        function getColor(option: SelectBarOption) {
+            if (option.index <= selectedOption.value!.index) {
+                return selectedOption.value!.color;
+            } else return 'nq-highlight-bg';
+        }
+
+        watch(selectedOption, onChanged);
+        function onChanged(option: SelectBarOption | null) {
+            if (!option) return;
+            context.emit('changed', option.value);
+        }
+
+        context.expose({ value });
+
+        return {
+            sortedOptions,
+            selectedOption,
+
+            getColor,
+        };
+    },
+})
 </script>
 
 <style scoped>
