@@ -1,8 +1,8 @@
 <template>
-    <Tooltip class="timer"
+    <Tooltip class="timer" ref="root$"
         v-bind="{
             preferredPosition: 'bottom right',
-            theme: theme === constructor.Themes.INVERSE || theme  === constructor.Themes.WHITE ? 'inverse' : 'normal',
+            theme: theme === TimerThemes.INVERSE || theme  === TimerThemes.WHITE ? 'inverse' : 'normal',
             ...tooltipProps,
             styles: {
                 width: '18.25rem',
@@ -15,8 +15,8 @@
         :class="{
             'time-shown': detailsShown || alwaysShowTime,
             'little-time-left': _progress >= .75,
-            'inverse-theme': theme === constructor.Themes.INVERSE,
-            'white-theme': theme === constructor.Themes.WHITE,
+            'inverse-theme': theme === TimerThemes.INVERSE,
+            'white-theme': theme === TimerThemes.WHITE,
         }"
     >
         <template #trigger>
@@ -36,21 +36,22 @@
                         <rect x="12" y="12.5" width="2" height="4.5" rx="1" />
                     </g>
                     <text v-else class="countdown" x="50%" y="50%">
-                        {{ _timeLeft | _toSimplifiedTime(false, maxUnit) }}
+                        {{  _toSimplifiedTime(_timeLeft, false, maxUnit) }}
                     </text>
                 </transition>
             </svg>
         </template>
         <template #default>
             <I18n path="This offer expires in {timer}.">
-                <template #timer>{{ _timeLeft | _toSimplifiedTime(true, maxUnit) }}</template>
+                <template #timer>{{ _toSimplifiedTime(_timeLeft, true, maxUnit) }}</template>
             </I18n>
         </template>
     </Tooltip>
 </template>
 
 <script lang="ts">
-import { Component, Mixins, Prop, Watch } from 'vue-property-decorator';
+import { computed, defineComponent, onMounted, onUnmounted, ref, watch } from '@vue/runtime-core';
+
 import { Tweenable } from '@nimiq/utils';
 import Tooltip from './Tooltip.vue';
 import I18nMixin from '../i18n/I18nMixin';
@@ -102,230 +103,237 @@ function _toSimplifiedTime(millis: number, includeUnit: boolean = true, maxUnit?
     }
 }
 
-@Component({
+const TIMER_REM_FACTOR = 8; // size of 1rem
+const TIMER_BASE_SIZE = 3.25 * TIMER_REM_FACTOR;
+const TIMER_BASE_RADIUS = TIMER_REM_FACTOR;
+const TIMER_RADIUS_GROWTH_FACTOR = 1.5;
+
+export enum TimerEvents {
+    END = 'end',
+}
+
+export enum TimerThemes {
+    NORMAL = 'normal',
+    INVERSE = 'inverse',
+    WHITE = 'white',
+}
+
+export default defineComponent({
     name: 'Timer',
-    filters: { _toSimplifiedTime },
+    // extends: I18nMixin,
+    props: {
+        startTime: Number,
+        endTime: Number,
+        alwaysShowTime: {
+            type: Boolean,
+            default: true,
+        },
+        theme: {
+            type: String,
+            default: 'normal',
+            validator: (value: any) => Object.values(TimerThemes).includes(value),
+        },
+        strokeWidth: {
+            type: Number,
+            default: 2,
+        },
+        tooltipProps: Object,
+        maxUnit: {
+            type: String,
+            required: false,
+            validator: (value: any) => [undefined, 'second', 'minute', 'hour', 'day'].includes(value),
+        },
+    },
+    setup(props, context) {
+        const root$ = ref<typeof Tooltip | null>(null);
+
+        const timeOffset = ref(0);
+        const sampledTime = ref(0);
+        const detailsShown = ref(false);
+        // While the radius r of the circle and the values stroke-dasharray, stroke-dashoffset and stroke-width that depend
+        // on the radius can be transitioned via css, the behavior on value update during an ongoing transition is not
+        // consistent (e.g. time update while animating on user hover or quick hover and unhover). Therefore animate via JS.
+        const radius: Tweenable = new Tweenable(detailsShown.value || props.alwaysShowTime
+            ? TIMER_BASE_RADIUS * TIMER_RADIUS_GROWTH_FACTOR
+            : TIMER_BASE_RADIUS);
+        const fullCircleLength = ref(2 * Math.PI * radius.currentValue);
+        const timeoutId = ref<number | null>(null);
+        const updateTimeoutId = ref<number | null>(null);
+        const requestAnimationFrameId = ref<number | null>(null);
+        const size = ref(TIMER_BASE_SIZE);
+
+        function synchronize(referenceTime: number) {
+            timeOffset.value = referenceTime - Date.now();
+        }
+
+        context.expose({ synchronize });
+
+        onMounted(() => {
+            requestAnimationFrame(() => size.value = root$.value!.offsetWidth); // in rAF to avoid forced reflow
+            // this._onResize = this._onResize.bind(this); // TODO: do we still need this?
+            window.addEventListener('resize', _onResize);
+        });
+
+        onUnmounted(() => {
+            if (timeoutId.value) clearTimeout(timeoutId.value);
+            if (updateTimeoutId.value) clearTimeout(updateTimeoutId.value);
+            if (requestAnimationFrameId.value) cancelAnimationFrame(requestAnimationFrameId.value);
+            window.removeEventListener('resize', this._onResize);
+        });
+
+        const _totalTime = computed(() => {
+            if (props.startTime === undefined || props.endTime === undefined) {
+                return 0;
+            } else {
+                return Math.max(0, props.endTime - props.startTime);
+            }
+        });
+
+        const _timeLeft = computed(() => {
+            if (props.startTime === undefined || props.endTime === undefined) {
+                return 0;
+            } else {
+                return Math.max(0, Math.min(_totalTime.value, props.endTime - sampledTime.value));
+            }
+        });
+
+        const _progress = computed(() => {
+            if (props.startTime === undefined || props.endTime === undefined || _totalTime.value === 0) {
+                return 0;
+            } else {
+                return 1 - _timeLeft.value / _totalTime.value;
+            }
+        });
+
+        const _timeCircleInfo = computed<CircleInfo>(() => {
+            // Have a max length to make it more recognizable that this is a timer by never rendering a full circle.
+            // The rounded stroke ending rendered with radius strokeWidth/2 does not count towards the stroke length,
+            // therefore to get the desired gap of 1.5 strokeWidths, we use 2.5 strokeWidths.
+            const maxLength = fullCircleLength.value - 2.5 * props.strokeWidth;
+            const length = Math.min(maxLength, (1 - _progress.value) * fullCircleLength.value);
+            const lengthWithLineCaps = length + props.strokeWidth; // add line caps with strokeWidth/2 radius
+            const gap = fullCircleLength.value - length;
+            // The path grows clockwise starting on the right side. Offset by 90 degrees and gap to let path start with gap
+            // and end on top.
+            const offset = fullCircleLength.value / 4 - gap;
+            return { length, lengthWithLineCaps, gap, offset, strokeWidth: props.strokeWidth };
+        });
+
+        const _fillerCircleInfo = computed<CircleInfo>(() => {
+            // Filler circle should be rendered in the gap left by the time circle with a margin of strokeWidth. If there
+            // is not enough space, compensate by reducing the filler circle stroke width.
+            const availableSpace = fullCircleLength.value - _timeCircleInfo.value.lengthWithLineCaps - 2 * props.strokeWidth;
+            const lengthWithLineCaps = Math.max(0, availableSpace);
+            const strokeWidth = Math.min(props.strokeWidth, lengthWithLineCaps);
+            const length = Math.max(0, lengthWithLineCaps - strokeWidth); // subtract rounded line caps
+            const gap = fullCircleLength.value - length;
+            const offset = fullCircleLength.value / 4 // rotate by 90 degrees
+                - props.strokeWidth / 2 // skip rounded line cap of time circle
+                - props.strokeWidth // margin
+                - strokeWidth / 2; // account for our own line cap
+            return { length, lengthWithLineCaps, gap, offset, strokeWidth };
+        });
+
+        function _calculateUpdateInterval(): number {
+            // Not a getter / computed prop to avoid unnecessary updates when not needed.
+            const scaleFactor = size.value / TIMER_BASE_SIZE;
+            const circleLengthPixels = fullCircleLength.value * scaleFactor;
+            const steps = circleLengthPixels * 3; // update every .33 pixel change for smooth transitions
+            const minInterval = 1000 / 60; // up to 60 fps
+            // Constrain interval such that we don't skip time steps in the countdown for the respective time unit.
+            const timeLeft = _timeLeft.value;
+            const totalTime = _totalTime.value;
+            const updatesPerTimeStep = 2; // multiple updates per time step to avoid skipping a step by a delayed interval
+            let timeStep = 1000; // starting with seconds
+            let maxInterval = timeStep / updatesPerTimeStep;
+            for (const { factor } of TIME_STEPS) {
+                const nextTimeStep = timeStep * factor;
+                const nextMaxInterval = nextTimeStep / updatesPerTimeStep;
+                const nextInterval = Math.min(nextMaxInterval, Math.max(minInterval, totalTime / steps));
+                if ((timeLeft - nextInterval) / nextTimeStep < 1) {
+                    // If the time left after nextInterval can't be expressed in nextTimeStep as a value >=1, stop. We check
+                    // for the time after the next interval to avoid jumping for example from 70s (displayed as 1 minute)
+                    // directly to 50s if the interval is 20s. Note that the behavior here resembles the one in
+                    // _toSimplifiedTime.
+                    if (timeLeft / nextTimeStep > 1) {
+                        // If the value before the interval is still >1 in the next time unit still allow a larger jump than
+                        // at the smaller time unit but set the maxInterval such that we jump no further than where the
+                        // switch to the smaller unit happens, for example jump from 70s to 60s if the interval is 20s.
+                        maxInterval = timeLeft - nextTimeStep;
+                    }
+                    break;
+                }
+                timeStep = nextTimeStep;
+                maxInterval = nextMaxInterval;
+            }
+
+            return Math.min(maxInterval, Math.max(minInterval, _totalTime.value / steps));
+        }
+
+        watch(detailsShown, _setRadius, { immediate: true });
+        watch(() => props.alwaysShowTime, _setRadius);
+
+        function _setRadius() {
+            radius.tweenTo(detailsShown.value || props.alwaysShowTime
+                ? TIMER_RADIUS_GROWTH_FACTOR * TIMER_BASE_RADIUS
+                : TIMER_BASE_RADIUS, 300);
+            _rerender();
+        }
+
+        watch(() => props.startTime, _setTimer, { immediate: true });
+        watch(() => props.endTime, _setTimer);
+        watch(timeOffset, _setTimer);
+
+        function _setTimer() {
+            sampledTime.value = Date.now() + timeOffset.value;
+            if (timeoutId.value) clearTimeout(timeoutId.value);
+            if (props.startTime && props.endTime) {
+                timeoutId.value = window.setTimeout(() => context.emit(TimerEvents.END, props.endTime),
+                    props.endTime - sampledTime.value);
+                _rerender();
+            }
+        }
+
+        function _rerender() {
+            sampledTime.value = Date.now() + timeOffset.value;
+            fullCircleLength.value = 2 * Math.PI * radius.currentValue;
+
+            if (_timeLeft.value === 0 && radius.finished) return;
+
+            if (updateTimeoutId.value) clearTimeout(updateTimeoutId.value);
+            if (requestAnimationFrameId.value) cancelAnimationFrame(requestAnimationFrameId.value);
+
+            if (!radius.finished) {
+                // animate radius with high frame rate
+                requestAnimationFrameId.value = requestAnimationFrame(() => _rerender());
+            } else {
+                // update with low frame rate
+                updateTimeoutId.value = window.setTimeout(() => _rerender(), _calculateUpdateInterval());
+            }
+        }
+
+        function _onResize() {
+            if (root$.value) size.value = root$.value.offsetWidth;
+        }
+
+        return {
+            _toSimplifiedTime,
+
+            TimerThemes,
+
+            root$,
+
+            detailsShown,
+            radius,
+
+            _timeLeft,
+            _progress,
+            _timeCircleInfo,
+            _fillerCircleInfo,
+        };
+    },
     components: { Tooltip, I18n },
 })
-class Timer extends Mixins(I18nMixin) {
-    private static readonly REM_FACTOR = 8; // size of 1rem
-    private static readonly BASE_SIZE = 3.25 * Timer.REM_FACTOR;
-    private static readonly BASE_RADIUS = Timer.REM_FACTOR;
-    private static readonly RADIUS_GROWTH_FACTOR = 1.5;
-
-    @Prop(Number)
-    public startTime?: number;
-
-    @Prop(Number)
-    public endTime?: number;
-
-    @Prop({
-        type: Boolean,
-        default: true,
-    })
-    public alwaysShowTime!: boolean;
-
-    @Prop({
-        type: String,
-        default: 'normal',
-        validator: (value: any) => Object.values(Timer.Themes).includes(value),
-    })
-    public theme!: string;
-
-    @Prop({
-        type: Number,
-        default: 2,
-    })
-    public strokeWidth!: number;
-
-    @Prop(Object) public tooltipProps?: object;
-
-    @Prop({
-        type: String,
-        required: false,
-        validator: (value: any) => [undefined, 'second', 'minute', 'hour', 'day'].includes(value),
-    })
-    public maxUnit?: string;
-
-    public synchronize(referenceTime: number) {
-        this.timeOffset = referenceTime - Date.now();
-    }
-
-    private timeOffset: number = 0;
-    private sampledTime: number = 0;
-    private detailsShown: boolean = false;
-    // While the radius r of the circle and the values stroke-dasharray, stroke-dashoffset and stroke-width that depend
-    // on the radius can be transitioned via css, the behavior on value update during an ongoing transition is not
-    // consistent (e.g. time update while animating on user hover or quick hover and unhover). Therefore animate via JS.
-    private radius: Tweenable = new Tweenable(this.detailsShown || this.alwaysShowTime
-        ? Timer.BASE_RADIUS * Timer.RADIUS_GROWTH_FACTOR
-        : Timer.BASE_RADIUS);
-    private fullCircleLength: number = 2 * Math.PI * this.radius.currentValue;
-    private timeoutId: number | null = null;
-    private updateTimeoutId: number | null = null;
-    private requestAnimationFrameId: number | null = null;
-    private size: number = Timer.BASE_SIZE;
-
-    private mounted() {
-        requestAnimationFrame(() => this.size = (this.$el as HTMLElement).offsetWidth); // in rAF to avoid forced reflow
-        this._onResize = this._onResize.bind(this);
-        window.addEventListener('resize', this._onResize);
-    }
-
-    private destroyed() {
-        clearTimeout(this.timeoutId);
-        clearTimeout(this.updateTimeoutId);
-        cancelAnimationFrame(this.requestAnimationFrameId);
-        window.removeEventListener('resize', this._onResize);
-    }
-
-    private get _totalTime(): number {
-        if (this.startTime === undefined || this.endTime === undefined) {
-            return 0;
-        } else {
-            return Math.max(0, this.endTime - this.startTime);
-        }
-    }
-
-    private get _timeLeft(): number {
-        if (this.startTime === undefined || this.endTime === undefined) {
-            return 0;
-        } else {
-            return Math.max(0, Math.min(this._totalTime, this.endTime - this.sampledTime));
-        }
-    }
-
-    private get _progress(): number {
-        if (this.startTime === undefined || this.endTime === undefined || this._totalTime === 0) {
-            return 0;
-        } else {
-            return 1 - this._timeLeft / this._totalTime;
-        }
-    }
-
-    private get _timeCircleInfo(): CircleInfo {
-        // Have a max length to make it more recognizable that this is a timer by never rendering a full circle.
-        // The rounded stroke ending rendered with radius strokeWidth/2 does not count towards the stroke length,
-        // therefore to get the desired gap of 1.5 strokeWidths, we use 2.5 strokeWidths.
-        const maxLength = this.fullCircleLength - 2.5 * this.strokeWidth;
-        const length = Math.min(maxLength, (1 - this._progress) * this.fullCircleLength);
-        const lengthWithLineCaps = length + this.strokeWidth; // add line caps with strokeWidth/2 radius
-        const gap = this.fullCircleLength - length;
-        // The path grows clockwise starting on the right side. Offset by 90 degrees and gap to let path start with gap
-        // and end on top.
-        const offset = this.fullCircleLength / 4 - gap;
-        return { length, lengthWithLineCaps, gap, offset, strokeWidth: this.strokeWidth };
-    }
-
-    private get _fillerCircleInfo(): CircleInfo {
-        // Filler circle should be rendered in the gap left by the time circle with a margin of strokeWidth. If there
-        // is not enough space, compensate by reducing the filler circle stroke width.
-        const availableSpace = this.fullCircleLength - this._timeCircleInfo.lengthWithLineCaps - 2 * this.strokeWidth;
-        const lengthWithLineCaps = Math.max(0, availableSpace);
-        const strokeWidth = Math.min(this.strokeWidth, lengthWithLineCaps);
-        const length = Math.max(0, lengthWithLineCaps - strokeWidth); // subtract rounded line caps
-        const gap = this.fullCircleLength - length;
-        const offset = this.fullCircleLength / 4 // rotate by 90 degrees
-            - this.strokeWidth / 2 // skip rounded line cap of time circle
-            - this.strokeWidth // margin
-            - strokeWidth / 2; // account for our own line cap
-        return { length, lengthWithLineCaps, gap, offset, strokeWidth };
-    }
-
-    private _calculateUpdateInterval(): number {
-        // Not a getter / computed prop to avoid unnecessary updates when not needed.
-        const scaleFactor = this.size / Timer.BASE_SIZE;
-        const circleLengthPixels = this.fullCircleLength * scaleFactor;
-        const steps = circleLengthPixels * 3; // update every .33 pixel change for smooth transitions
-        const minInterval = 1000 / 60; // up to 60 fps
-        // Constrain interval such that we don't skip time steps in the countdown for the respective time unit.
-        const timeLeft = this._timeLeft;
-        const totalTime = this._totalTime;
-        const updatesPerTimeStep = 2; // multiple updates per time step to avoid skipping a step by a delayed interval
-        let timeStep = 1000; // starting with seconds
-        let maxInterval = timeStep / updatesPerTimeStep;
-        for (const { factor } of TIME_STEPS) {
-            const nextTimeStep = timeStep * factor;
-            const nextMaxInterval = nextTimeStep / updatesPerTimeStep;
-            const nextInterval = Math.min(nextMaxInterval, Math.max(minInterval, totalTime / steps));
-            if ((timeLeft - nextInterval) / nextTimeStep < 1) {
-                // If the time left after nextInterval can't be expressed in nextTimeStep as a value >=1, stop. We check
-                // for the time after the next interval to avoid jumping for example from 70s (displayed as 1 minute)
-                // directly to 50s if the interval is 20s. Note that the behavior here resembles the one in
-                // _toSimplifiedTime.
-                if (timeLeft / nextTimeStep > 1) {
-                    // If the value before the interval is still >1 in the next time unit still allow a larger jump than
-                    // at the smaller time unit but set the maxInterval such that we jump no further than where the
-                    // switch to the smaller unit happens, for example jump from 70s to 60s if the interval is 20s.
-                    maxInterval = timeLeft - nextTimeStep;
-                }
-                break;
-            }
-            timeStep = nextTimeStep;
-            maxInterval = nextMaxInterval;
-        }
-
-        return Math.min(maxInterval, Math.max(minInterval, this._totalTime / steps));
-    }
-
-    @Watch('detailsShown', { immediate: true })
-    @Watch('alwaysShowTime')
-    private _setRadius() {
-        this.radius.tweenTo(this.detailsShown || this.alwaysShowTime
-            ? Timer.RADIUS_GROWTH_FACTOR * Timer.BASE_RADIUS
-            : Timer.BASE_RADIUS, 300);
-        this._rerender();
-    }
-
-    @Watch('startTime', { immediate: true })
-    @Watch('endTime')
-    @Watch('timeOffset')
-    private _setTimer() {
-        this.sampledTime = Date.now() + this.timeOffset;
-        clearTimeout(this.timeoutId);
-        if (this.startTime && this.endTime) {
-            this.timeoutId = window.setTimeout(() => this.$emit(Timer.Events.END, this.endTime),
-                this.endTime - this.sampledTime);
-            this._rerender();
-        }
-    }
-
-    private _rerender() {
-        this.sampledTime = Date.now() + this.timeOffset;
-        this.fullCircleLength = 2 * Math.PI * this.radius.currentValue;
-
-        if (this._timeLeft === 0 && this.radius.finished) return;
-
-        clearTimeout(this.updateTimeoutId);
-        cancelAnimationFrame(this.requestAnimationFrameId);
-
-        if (!this.radius.finished) {
-            // animate radius with high frame rate
-            this.requestAnimationFrameId = requestAnimationFrame(() => this._rerender());
-        } else {
-            // update with low frame rate
-            this.updateTimeoutId = window.setTimeout(() => this._rerender(), this._calculateUpdateInterval());
-        }
-    }
-
-    private _onResize() {
-        this.size = (this.$el as HTMLElement).offsetWidth;
-    }
-}
-
-namespace Timer { // tslint:disable-line no-namespace
-    export enum Events {
-        END = 'end',
-    }
-
-    export enum Themes {
-        NORMAL = 'normal',
-        INVERSE = 'inverse',
-        WHITE = 'white',
-    }
-}
-
-export default Timer;
 </script>
 
 <style scoped>
