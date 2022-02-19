@@ -30,7 +30,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Mixins, Prop } from 'vue-property-decorator';
+import { computed, defineComponent } from '@vue/runtime-core';
 import AccountRing from './AccountRing.vue';
 import Amount from './Amount.vue';
 import Identicon from './Identicon.vue';
@@ -38,8 +38,71 @@ import { AlertTriangleIcon, MenuDotsIcon, ArrowRightSmallIcon } from './Icons';
 import I18nMixin from '../i18n/I18nMixin';
 
 /** @deprecated */
-@Component({
+export default defineComponent({
     name: 'Wallet',
+    extends: I18nMixin,
+    props: {
+        wallet: {
+            type: Object as () => ({
+                id: string,
+                label: string,
+                accounts: any[],
+                type: number,
+                fileExported: boolean,
+                wordsExported: boolean,
+                balance?: number,
+            }),
+            required: true,
+        }
+    },
+    setup(props) {
+        const addresses = computed((): string[] => {
+            return props.wallet.accounts
+                .reduce((addresses: string[], account: any) => addresses.concat(account.address), []);
+        });
+
+        const isLegacy = computed(() => {
+            return props.wallet.type === 1 /* LEGACY */;
+        });
+
+        const isBip39 = computed(() => {
+            return props.wallet.type === 2 /* BIP39 */;
+        });
+
+        const isLedger = computed(() => {
+            return props.wallet.type === 3 /* LEDGER */;
+        })
+
+        const isKeyguard = computed(() => {
+            return isLegacy.value || isBip39.value;
+        })
+
+        const isMultiAddress = computed(() => {
+            return isBip39.value || isLedger.value;
+        });
+
+        const fileMissing = computed(() => {
+            return isBip39.value && !props.wallet.fileExported;
+        });
+
+        const wordsMissing = computed(() => {
+            return (isBip39.value || isLegacy.value) && !props.wallet.wordsExported;
+        });
+
+        const exportMissing = computed(() => {
+            return fileMissing.value || wordsMissing.value;
+        });
+
+        return {
+            addresses,
+            isBip39,
+            isKeyguard,
+            isMultiAddress,
+            fileMissing,
+            wordsMissing,
+            exportMissing,
+        };
+    },
     components: {
         AccountRing,
         Amount,
@@ -49,54 +112,6 @@ import I18nMixin from '../i18n/I18nMixin';
         ArrowRightSmallIcon,
     },
 })
-export default class Wallet extends Mixins(I18nMixin) {
-    @Prop(Object) private wallet!: {
-        id: string,
-        label: string,
-        accounts: any[],
-        type: number,
-        fileExported: boolean,
-        wordsExported: boolean,
-        balance?: number,
-    };
-
-    get addresses(): string[] {
-        return this.wallet.accounts
-            .reduce((addresses: string[], account: any) => addresses.concat(account.address), []);
-    }
-
-    get isLegacy(): boolean {
-        return this.wallet.type === 1 /* LEGACY */;
-    }
-
-    get isBip39(): boolean {
-        return this.wallet.type === 2 /* BIP39 */;
-    }
-
-    get isLedger(): boolean {
-        return this.wallet.type === 3 /* LEDGER */;
-    }
-
-    get isKeyguard(): boolean {
-        return this.isLegacy || this.isBip39;
-    }
-
-    get isMultiAddress(): boolean {
-        return this.isBip39 || this.isLedger;
-    }
-
-    get fileMissing(): boolean {
-        return this.isBip39 && !this.wallet.fileExported;
-    }
-
-    get wordsMissing(): boolean {
-        return (this.isBip39 || this.isLegacy) && !this.wallet.wordsExported;
-    }
-
-    get exportMissing(): boolean {
-        return this.fileMissing || this.wordsMissing;
-    }
-}
 </script>
 
 <style scoped>
