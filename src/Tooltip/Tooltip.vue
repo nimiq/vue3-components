@@ -1,15 +1,15 @@
 <template>
-    <span class="tooltip"
+    <span class="tooltip" ref="root$"
         :class="[verticalPosition, {
             shown: isShown,
             'transition-position': transitionPosition,
-            'inverse-theme': theme === constructor.Themes.INVERSE,
+            'inverse-theme': theme === TooltipThemes.INVERSE,
         }]"
         @mouseenter="mouseOver(true)"
         @mouseleave="mouseOver(false)"
     >
         <a href="javascript:void(0);"
-            ref="tooltipTrigger"
+            ref="tooltipTrigger$"
             @focus.stop="show()"
             @blur.stop="hide()"
             @click="onClick()"
@@ -23,7 +23,7 @@
             <slot v-if="$slots.icon && !$slots.trigger" name="icon"></slot>
         </a>
         <transition name="transition-fade">
-            <div ref="tooltipBox"
+            <div ref="tooltipBox$"
                 v-if="isShown"
                 class="tooltip-box"
                 :style="tooltipBoxStyles">
@@ -34,340 +34,346 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { computed, defineComponent, nextTick, onMounted, onUnmounted, ref, watch } from '@vue/runtime-core';
+import { VueElement } from '@vue/runtime-dom';
 import { AlertTriangleIcon } from './Icons';
 
-@Component({ components: { AlertTriangleIcon }})
-class Tooltip extends Vue {
-    /**
-     * Container within which the tooltip should be positioned if possible.
-     */
-    @Prop(Object) public container?: Vue | {$el: HTMLElement};
-    @Prop(Boolean) public disabled?: boolean;
-    @Prop(Boolean) public noFocus?: boolean;
+export enum TooltipVerticalPosition {
+    TOP = 'top',
+    BOTTOM = 'bottom',
+}
 
-    /**
-     * Preferred tooltip position as "[vertical] [horizontal]" or "[vertical]".
-     */
-    @Prop({
-        type: String,
-        default: 'top right',
-        validator: (value: unknown) => {
-            if (typeof value !== 'string') return false;
-            const [vertical, horizontal] = value.split(' ');
-            return Object.values(Tooltip.VerticalPosition).includes(vertical as Tooltip.VerticalPosition)
-                && (!horizontal || Object.values(Tooltip.HorizontalPosition)
-                    .includes(horizontal as Tooltip.HorizontalPosition));
+export enum TooltipHorizontalPosition {
+    LEFT = 'left',
+    RIGHT = 'right',
+}
+
+export enum TooltipThemes {
+    NORMAL = 'normal',
+    INVERSE = 'inverse',
+}
+
+export default defineComponent({
+    name: 'Tooltip',
+    props: {
+        /**
+        * Container within which the tooltip should be positioned if possible.
+        */
+        container: Object as () => (VueElement | { $el: HTMLElement }),
+        disabled: Boolean,
+        noFocus: Boolean,
+        /**
+        * Preferred tooltip position as "[vertical] [horizontal]" or "[vertical]".
+        */
+        preferredPosition: {
+            type: String,
+            default: 'top right',
+            validator: (value: unknown) => {
+                if (typeof value !== 'string') return false;
+                const [vertical, horizontal] = value.split(' ');
+                return Object.values(TooltipVerticalPosition).includes(vertical as TooltipVerticalPosition)
+                    && (!horizontal || Object.values(TooltipHorizontalPosition)
+                        .includes(horizontal as TooltipHorizontalPosition));
+            },
         },
-    }) public preferredPosition!: string;
+        /**
+        * Margin to maintain to container. If no container is set, this prop has no effect. For omitted values, the
+        * container's padding is used as margin.
+        */
+        margin: {
+            type: Object as () => Partial<Record<TooltipVerticalPosition | TooltipHorizontalPosition, number>>,
+            validator: (value: any) => typeof value === 'object'
+                && Object.entries(value).every(([position, margin]) => typeof margin === 'number'
+                    && (Object.values(TooltipVerticalPosition).includes(position as TooltipVerticalPosition)
+                        || Object.values(TooltipHorizontalPosition).includes(position as TooltipHorizontalPosition))),
+        },
+        /**
+        * Sets the tooltip's width to the container's width minus margin. If no container is set, this prop has no effect.
+        */
+        autoWidth: {
+            type: Boolean,
+            default: false,
+        },
+        theme: {
+            type: String as () => TooltipThemes,
+            default: 'normal' as TooltipThemes.NORMAL,
+            validator: (value: any) => Object.values(TooltipThemes).includes(value),
+        },
+        /**
+        * Styles to apply on the tooltip box without the need to use deep css selectors.
+        */
+        styles: Object as () => Partial<CSSStyleDeclaration>,
+        /** @deprecated */
+        reference: Object as () => VueElement | { $el: HTMLElement },
+    },
+    setup(props, context) {
+        const tooltipTrigger$ = ref<HTMLAnchorElement | null>(null);
+        const tooltipBox$ = ref<HTMLDivElement | null>(null);
+        const root$ = ref<HTMLElement | null>(null);
 
-    /**
-     * Margin to maintain to container. If no container is set, this prop has no effect. For omitted values, the
-     * container's padding is used as margin.
-     */
-    @Prop({
-        type: Object,
-        validator: (value: unknown) => typeof value === 'object'
-            && Object.entries(value).every(([position, margin]) => typeof margin === 'number'
-                && (Object.values(Tooltip.VerticalPosition).includes(position as Tooltip.VerticalPosition)
-                    || Object.values(Tooltip.HorizontalPosition).includes(position as Tooltip.HorizontalPosition))),
-    }) public margin?: Partial<Record<Tooltip.VerticalPosition | Tooltip.HorizontalPosition, number>>;
+        const verticalPosition = ref<TooltipVerticalPosition | null>(null);
+        const tooltipToggled = ref(false);
+        const transitionPosition = ref(false); // do not transition on show but on position updates while shown
+        const mousedOver = ref(false);
+        const mouseOverTimeout = ref<number | null>(null);
+        const lastToggle = ref(-1);
 
-    /**
-     * Sets the tooltip's width to the container's width minus margin. If no container is set, this prop has no effect.
-     */
-    @Prop({
-        type: Boolean,
-        default: false,
-    }) public autoWidth!: boolean;
+        const height = ref(0);
+        const width = ref(0);
+        const maxWidth = ref(0);
+        const left = ref(0);
+        const top = ref(0);
 
-    @Prop({
-        type: String,
-        default: 'normal' as Tooltip.Themes.NORMAL,
-        validator: (value: any) => Object.values(Tooltip.Themes).includes(value),
-    })
-    public theme!: Tooltip.Themes;
+        const isShown = computed(() => {
+            return (tooltipToggled.value || mousedOver.value) && !props.disabled;
+        });
 
-    /**
-     * Styles to apply on the tooltip box without the need to use deep css selectors.
-     */
-    @Prop(Object) public styles?: Partial<CSSStyleDeclaration>;
-
-    /** @deprecated */
-    @Prop(Object) public reference?: Vue | {$el: HTMLElement};
-
-    // Typing of $refs and $el, in order to not having to cast it everywhere.
-    public $refs!: {
-        tooltipTrigger: HTMLAnchorElement,
-    } & ({} | {
-        // tooltipBox is optional but can not be types as such with a ? as 'undefined' is not assignable to type
-        // 'Element | Element[] | Vue | Vue[]'
-        tooltipBox: HTMLDivElement,
-    });
-    public $el: HTMLElement;
-
-    private verticalPosition: Tooltip.VerticalPosition | null = null;
-    private tooltipToggled: boolean = false;
-    private transitionPosition: boolean = false; // do not transition on show but on position updates while shown
-    private mousedOver: boolean = false;
-    private mouseOverTimeout: number;
-    private lastToggle: number = -1;
-
-    private height: number = 0;
-    private width: number = 0;
-    private maxWidth: number = 0;
-    private left: number = 0;
-    private top: number = 0;
-
-    public get isShown() {
-        return (this.tooltipToggled || this.mousedOver) && !this.disabled;
-    }
-
-    private get effectiveContainer(): Vue | {$el: HTMLElement} | undefined {
-        if (this.reference) {
-            console.warn('Tooltip: Prop `reference` is deprecated and support will be removed in the future.'
-                + ' Use prop `container` instead.');
-        }
-        return this.container || this.reference;
-    }
-
-    private get tooltipBoxStyles() {
-        // note that we let the browser calculate height automatically
-        return {
-            ...this.styles,
-            top: this.top + 'px',
-            left: this.left + 'px',
-            width: this.effectiveContainer && this.autoWidth ? this.width + 'px' : (this.styles || {}).width,
-            maxWidth: this.effectiveContainer ? this.maxWidth + 'px' : (this.styles || {}).maxWidth,
-        };
-    }
-
-    private created() {
-        this.updatePosition = this.updatePosition.bind(this);
-    }
-
-    private mounted() {
-        if ('icon' in this.$slots) {
-            console.warn('Tooltip: Slot `icon` is deprecated and support will be removed in the future.'
-                + ' Use slot `trigger` instead.');
-        }
-        // Manually trigger an update instead of using immediate watchers to avoid unnecessary initial double updates
-        this.setContainer(this.effectiveContainer);
-    }
-
-    private destroyed() {
-        if (this.effectiveContainer && this.effectiveContainer.$el) {
-            this.effectiveContainer.$el.removeEventListener('scroll', this.updatePosition);
-        }
-    }
-
-    public show() {
-        this.tooltipToggled = true;
-    }
-
-    public hide(force: boolean = false) {
-        this.tooltipToggled = false;
-        this.$refs.tooltipTrigger.blur();
-        if (!force) return;
-        this.mousedOver = false;
-    }
-
-    public toggle(force: boolean = false) {
-        if (this.tooltipToggled || this.mousedOver) {
-            this.hide(force);
-        } else {
-            this.show();
-        }
-    }
-
-    @Watch('isShown')
-    public async update(newWatcherValue?: boolean) {
-        // updates dimensions and repositions tooltip
-        if (!this.isShown) {
-            this.transitionPosition = false; // when shown next time, render immediately at correct position
-            if (newWatcherValue === false) {
-                this.lastToggle = Date.now();
-                this.$emit('hide');
+        const effectiveContainer = computed((): VueElement | { $el: HTMLElement } | undefined => {
+            if (props.reference) {
+                console.warn('Tooltip: Prop `reference` is deprecated and support will be removed in the future.'
+                    + ' Use prop `container` instead.');
             }
-            return; // no need to update as tooltip not visible
-        } else if (newWatcherValue === true) {
-            this.lastToggle = Date.now();
-            this.$emit('show');
-        }
-        if (!this.$el) {
-            // wait until we're mounted
-            await new Promise((resolve) => this.$once('hook:mounted', resolve));
-        }
+            return props.container || props.reference;
+        });
 
-        const container = this.effectiveContainer;
-        if (container) {
-            if (!container.$el && container instanceof Vue) {
-                // wait until container is mounted if it's a Vue instance
-                await new Promise((resolve) => (container as Vue).$once('hook:mounted', resolve));
-                if (container !== this.effectiveContainer) return; // container changed; update was called again
+        const tooltipBoxStyles = computed(() => {
+            // note that we let the browser calculate height automatically
+            return {
+                ...props.styles,
+                top: top.value + 'px',
+                left: left.value + 'px',
+                width: effectiveContainer.value && props.autoWidth ? width.value + 'px' : (props.styles || {}).width,
+                maxWidth: effectiveContainer.value ? maxWidth.value + 'px' : (props.styles || {}).maxWidth,
+            };
+        });
+
+        onMounted(() => {
+            if ('icon' in context.slots) {
+                console.warn('Tooltip: Slot `icon` is deprecated and support will be removed in the future.'
+                    + ' Use slot `trigger` instead.');
             }
+            // Manually trigger an update instead of using immediate watchers to avoid unnecessary initial double updates
+            setContainer(effectiveContainer.value);
+        });
 
-            await new Promise((resolve) => requestAnimationFrame(() => {
-                // avoid potential forced layouting / reflow by taking measurements within a requestAnimationFrame
-                // (see https://gist.github.com/paulirish/5d52fb081b3570c81e3a#appendix)
-                const leftMargin = this.getMargin(Tooltip.HorizontalPosition.LEFT);
-                const rightMargin = this.getMargin(Tooltip.HorizontalPosition.RIGHT);
+        onUnmounted(() => {
+            if (effectiveContainer.value && effectiveContainer.value.$el) {
+                effectiveContainer.value.$el.removeEventListener('scroll', updatePosition);
+            }
+        });
 
-                this.maxWidth = (container.$el as HTMLElement).offsetWidth - leftMargin - rightMargin;
-                if (this.autoWidth) this.width = this.maxWidth;
-                resolve();
-            }));
+        function show() {
+            tooltipToggled.value = true;
         }
 
-        // make sure that tooltipBox is created, then update measurements
-        await Vue.nextTick();
-        if (!this.isShown || !('tooltipBox' in this.$refs && this.$refs.tooltipBox)) return; // not visible anymore?
-        // here we need the quick reflow to avoid that the visible tooltip gets rendered at the wrong position,
-        // potentially causing scroll bars
-        this.height = this.$refs.tooltipBox.offsetHeight;
-        this.width = this.$refs.tooltipBox.offsetWidth;
+        function hide(force: boolean = false) {
+            tooltipToggled.value = false;
+            if (tooltipTrigger$.value) tooltipTrigger$.value.blur();
+            if (!force) return;
+            mousedOver.value = false;
+        }
 
-        this.updatePosition();
-
-        // wait for updated position to be effective and rendered, then enable transitions
-        await Vue.nextTick();
-        await new Promise((resolve) => requestAnimationFrame(resolve));
-        this.transitionPosition = true;
-    }
-
-    @Watch('preferredPosition')
-    private updatePosition() {
-        if (!this.isShown) return;
-        // Note that in his method we do not need to use requestAnimationFrame to avoid reflows, as the method is
-        // already called as a scroll event listener or manually in update after a reflow.
-        // tslint:disable-next-line:prefer-const
-        let [preferredVerticalPosition, preferredHorizontalPosition] = this.preferredPosition.split(' ');
-        preferredHorizontalPosition = preferredHorizontalPosition || Tooltip.HorizontalPosition.RIGHT;
-        this.left = preferredHorizontalPosition === Tooltip.HorizontalPosition.RIGHT
-            ? Math.round(this.$refs.tooltipTrigger.offsetWidth / 2 - 25) // offset by 25px according to designs
-            : Math.round(this.$refs.tooltipTrigger.offsetWidth / 2 - this.width + 25);
-
-        const container = this.effectiveContainer;
-        if (container) {
-            if (!container.$el) {
-                // We don't wait here for the container to get mounted, as we expect it to already be mounted when this
-                // private method is called and to do measurements immediately in the scroll event listener
-                console.warn('Tooltip container does not seem to be mounted yet.');
-                return;
-            }
-            // position tooltip such that it best fits container element
-            const triggerBoundingRect = this.$refs.tooltipTrigger.getBoundingClientRect();
-            const containerBoundingRect = container.$el.getBoundingClientRect();
-            const topMargin = this.getMargin(Tooltip.VerticalPosition.TOP);
-            const bottomMargin = this.getMargin(Tooltip.VerticalPosition.BOTTOM);
-            const spaceNeeded = this.height + 16; // 16 for arrow, assuming same height on mobile for simplicity
-            const fitsTop = triggerBoundingRect.top - containerBoundingRect.top - topMargin >= spaceNeeded;
-            const fitsBottom = containerBoundingRect.bottom - triggerBoundingRect.bottom - bottomMargin >= spaceNeeded;
-            if ((preferredVerticalPosition === Tooltip.VerticalPosition.TOP && (fitsTop || !fitsBottom))
-                || (preferredVerticalPosition === Tooltip.VerticalPosition.BOTTOM) && (fitsTop && !fitsBottom)) {
-                this.verticalPosition = Tooltip.VerticalPosition.TOP;
+        function toggle(force: boolean = false) {
+            if (tooltipToggled.value || mousedOver.value) {
+                hide(force);
             } else {
-                this.verticalPosition = Tooltip.VerticalPosition.BOTTOM;
+                show();
             }
-
-            // constrain horizontal position
-            const leftMargin = this.getMargin(Tooltip.HorizontalPosition.LEFT);
-            const rightMargin = this.getMargin(Tooltip.HorizontalPosition.RIGHT);
-            // left and right bound of container, expressed in trigger's coordinate system
-            const leftBound = containerBoundingRect.left + leftMargin - triggerBoundingRect.left;
-            const rightBound = containerBoundingRect.right - rightMargin - triggerBoundingRect.left;
-            this.left = Math.max(
-                leftBound,
-                Math.min(
-                    rightBound - this.width,
-                    this.left,
-                ),
-            );
-        } else {
-            this.verticalPosition = preferredVerticalPosition as Tooltip.VerticalPosition;
         }
 
-        this.top = this.verticalPosition === Tooltip.VerticalPosition.BOTTOM
-            ? this.$refs.tooltipTrigger.offsetHeight
-            : -this.height;
-    }
-
-    @Watch('effectiveContainer')
-    private async setContainer(newContainer: Vue | {$el: HTMLElement}, oldContainer?: Vue | {$el: HTMLElement}) {
-        if (oldContainer && oldContainer.$el) {
-            oldContainer.$el.removeEventListener('scroll', this.updatePosition);
-        }
-
-        if (newContainer) {
-            if (!newContainer.$el && newContainer instanceof Vue) {
-                // wait until container is mounted if it's a Vue instance
-                await new Promise((resolve) => (newContainer as Vue).$once('hook:mounted', resolve));
-                if (newContainer !== this.effectiveContainer) return; // container changed
-            }
-            // In case the container is scrollable add a listener
-            await new Promise((resolve) => requestAnimationFrame(()  => {
-                if (newContainer.$el.scrollHeight !== (newContainer.$el as HTMLElement).offsetHeight) {
-                    newContainer.$el.addEventListener('scroll', this.updatePosition);
+        watch(isShown, update);
+        async function update(newWatcherValue?: boolean) {
+            // updates dimensions and repositions tooltip
+            if (!isShown.value) {
+                transitionPosition.value = false; // when shown next time, render immediately at correct position
+                if (newWatcherValue === false) {
+                    lastToggle.value = Date.now();
+                    context.emit('hide');
                 }
-                resolve();
-            }));
+                return; // no need to update as tooltip not visible
+            } else if (newWatcherValue === true) {
+                lastToggle.value = Date.now();
+                context.emit('show');
+            }
+            if (!root$.value) {
+                // wait until we're mounted
+                // await new Promise((resolve) => this.$once('hook:mounted', resolve));
+                // TODO / FIXME: find a solution for this in vue3 since $once got removed and there's nothing replacing it.
+            }
+
+            const container = effectiveContainer.value;
+            if (container) {
+                if (!container.$el && container instanceof VueElement) {
+                    // wait until container is mounted if it's a Vue instance
+                    // await new Promise((resolve) => (container as Vue).$once('hook:mounted', resolve));
+                    // TODO / FIXME: find a solution for this in vue3 since $once got removed and there's nothing replacing it.
+                    if (container !== effectiveContainer.value) return; // container changed; update was called again
+                }
+
+                await new Promise((resolve) => requestAnimationFrame(() => {
+                    // avoid potential forced layouting / reflow by taking measurements within a requestAnimationFrame
+                    // (see https://gist.github.com/paulirish/5d52fb081b3570c81e3a#appendix)
+                    const leftMargin = getMargin(TooltipHorizontalPosition.LEFT);
+                    const rightMargin = getMargin(TooltipHorizontalPosition.RIGHT);
+
+                    maxWidth.value = (container.$el as HTMLElement).offsetWidth - leftMargin - rightMargin;
+                    if (props.autoWidth) width.value = maxWidth.value;
+                    resolve(null);
+                }));
+            }
+
+            // make sure that tooltipBox is created, then update measurements
+            await nextTick();
+            if (!isShown.value || !tooltipBox$.value) return; // not visible anymore?
+            // here we need the quick reflow to avoid that the visible tooltip gets rendered at the wrong position,
+            // potentially causing scroll bars
+            height.value = tooltipBox$.value.offsetHeight;
+            width.value = tooltipBox$.value.offsetWidth;
+
+            updatePosition();
+
+            // wait for updated position to be effective and rendered, then enable transitions
+            await nextTick();
+            await new Promise((resolve) => requestAnimationFrame(resolve));
+            transitionPosition.value = true;
         }
 
-        await this.update();
-    }
+        @Watch('preferredPosition')
+        watch(() => props.preferredPosition, updatePosition);
+        function updatePosition() {
+            if (!isShown.value || !tooltipTrigger$.value) return;
+            // Note that in his method we do not need to use requestAnimationFrame to avoid reflows, as the method is
+            // already called as a scroll event listener or manually in update after a reflow.
+            // tslint:disable-next-line:prefer-const
+            let [preferredVerticalPosition, preferredHorizontalPosition] = props.preferredPosition.split(' ');
+            preferredHorizontalPosition = preferredHorizontalPosition || TooltipHorizontalPosition.RIGHT;
+            left.value = preferredHorizontalPosition === TooltipHorizontalPosition.RIGHT
+                ? Math.round(tooltipTrigger$.value.offsetWidth / 2 - 25) // offset by 25px according to designs
+                : Math.round(tooltipTrigger$.value.offsetWidth / 2 - width.value + 25);
 
-    private getMargin(position: Tooltip.VerticalPosition | Tooltip.HorizontalPosition) {
-        if (this.margin && this.margin[position] !== undefined) return this.margin[position];
-        const containerEl = this.effectiveContainer && this.effectiveContainer.$el
-            ? this.effectiveContainer.$el as HTMLElement
-            : null;
-        if (!containerEl) return 0;
-        if ((position === Tooltip.VerticalPosition.TOP || position === Tooltip.VerticalPosition.BOTTOM)
-            && containerEl.scrollHeight !== containerEl.offsetHeight) {
-            // If container is scrollable, the padding scrolls with the content. Therefore we consider the whole
-            // offsetHeight as valid area for the tooltip and return a margin of 0.
-            return 0;
+            const container = effectiveContainer.value;
+            if (container) {
+                // TODO - FIXME: vue components no longer have a $el in vue3 since we can have multiple root elements now
+                if (!container.$el) {
+                    // We don't wait here for the container to get mounted, as we expect it to already be mounted when this
+                    // private method is called and to do measurements immediately in the scroll event listener
+                    console.warn('Tooltip container does not seem to be mounted yet.');
+                    return;
+                }
+                // position tooltip such that it best fits container element
+                const triggerBoundingRect = tooltipTrigger$.value.getBoundingClientRect();
+                const containerBoundingRect = container.$el.getBoundingClientRect();
+                const topMargin = getMargin(TooltipVerticalPosition.TOP);
+                const bottomMargin = getMargin(TooltipVerticalPosition.BOTTOM);
+                const spaceNeeded = height.value + 16; // 16 for arrow, assuming same height on mobile for simplicity
+                const fitsTop = triggerBoundingRect.top - containerBoundingRect.top - topMargin >= spaceNeeded;
+                const fitsBottom = containerBoundingRect.bottom - triggerBoundingRect.bottom - bottomMargin >= spaceNeeded;
+                if ((preferredVerticalPosition === TooltipVerticalPosition.TOP && (fitsTop || !fitsBottom))
+                    || (preferredVerticalPosition === TooltipVerticalPosition.BOTTOM) && (fitsTop && !fitsBottom)) {
+                    verticalPosition.value = TooltipVerticalPosition.TOP;
+                } else {
+                    verticalPosition.value = TooltipVerticalPosition.BOTTOM;
+                }
+
+                // constrain horizontal position
+                const leftMargin = getMargin(TooltipHorizontalPosition.LEFT);
+                const rightMargin = getMargin(TooltipHorizontalPosition.RIGHT);
+                // left and right bound of container, expressed in trigger's coordinate system
+                const leftBound = containerBoundingRect.left + leftMargin - triggerBoundingRect.left;
+                const rightBound = containerBoundingRect.right - rightMargin - triggerBoundingRect.left;
+                left.value = Math.max(
+                    leftBound,
+                    Math.min(
+                        rightBound - width.value,
+                        left.value,
+                    ),
+                );
+            } else {
+                verticalPosition.value = preferredVerticalPosition as TooltipVerticalPosition;
+            }
+
+            top.value = verticalPosition.value === TooltipVerticalPosition.BOTTOM
+                ? tooltipTrigger$.value.offsetHeight
+                : -height.value;
         }
-        return parseInt(window.getComputedStyle(containerEl, null).getPropertyValue(`padding-${position}`), 10);
-    }
 
-    private mouseOver(mouseOverTooltip: boolean) {
-        if (!mouseOverTooltip) { // mouseleave
-            this.mouseOverTimeout = window.setTimeout(
-                () => this.mousedOver = false,
-                100,
-            );
-        } else { // mouseenter
-            window.clearTimeout(this.mouseOverTimeout);
-            this.mousedOver = true;
+        watch(effectiveContainer, setContainer);
+        async function setContainer(newContainer: VueElement | { $el: HTMLElement }, oldContainer?: VueElement | {$el: HTMLElement}) {
+            if (oldContainer && oldContainer.$el) {
+                oldContainer.$el.removeEventListener('scroll', updatePosition);
+            }
+
+            if (newContainer) {
+                if (!newContainer.$el && newContainer instanceof VueElement) {
+                    // wait until container is mounted if it's a Vue instance
+                    // await new Promise((resolve) => (newContainer as VueElement).$once('hook:mounted', resolve));
+                    // TODO / FIXME: find a solution for this in vue3 since $once got removed and there's nothing replacing it.
+                    if (newContainer !== effectiveContainer.value) return; // container changed
+                }
+                // In case the container is scrollable add a listener
+                await new Promise((resolve) => requestAnimationFrame(()  => {
+                    if (newContainer.$el.scrollHeight !== (newContainer.$el as HTMLElement).offsetHeight) {
+                        newContainer.$el.addEventListener('scroll', updatePosition);
+                    }
+                    resolve(null);
+                }));
+            }
+
+            await update();
         }
-    }
 
-    private onClick() {
-        if (Date.now() - this.lastToggle < 200) return; // just toggled by mouseover or focus
-        this.toggle(/* force */ true);
-        this.$emit('click');
-    }
-}
+        function getMargin(position: TooltipVerticalPosition | TooltipHorizontalPosition) {
+            if (props.margin && props.margin[position] !== undefined) return props.margin[position];
+            const containerEl = effectiveContainer.value && effectiveContainer.value.$el
+                ? effectiveContainer.value.$el as HTMLElement
+                : null;
+            if (!containerEl) return 0;
+            if ((position === TooltipVerticalPosition.TOP || position === TooltipVerticalPosition.BOTTOM)
+                && containerEl.scrollHeight !== containerEl.offsetHeight) {
+                // If container is scrollable, the padding scrolls with the content. Therefore we consider the whole
+                // offsetHeight as valid area for the tooltip and return a margin of 0.
+                return 0;
+            }
+            return parseInt(window.getComputedStyle(containerEl, null).getPropertyValue(`padding-${position}`), 10);
+        }
 
-namespace Tooltip {
-    export enum VerticalPosition {
-        TOP = 'top',
-        BOTTOM = 'bottom',
-    }
+        function mouseOver(mouseOverTooltip: boolean) {
+            if (!mouseOverTooltip) { // mouseleave
+                mouseOverTimeout.value = window.setTimeout(
+                    () => mousedOver.value = false,
+                    100,
+                );
+            } else { // mouseenter
+                if (mouseOverTimeout.value) window.clearTimeout(mouseOverTimeout.value);
+                mousedOver.value = true;
+            }
+        }
 
-    export enum HorizontalPosition {
-        LEFT = 'left',
-        RIGHT = 'right',
-    }
+        function onClick() {
+            if (Date.now() - lastToggle.value < 200) return; // just toggled by mouseover or focus
+            toggle(/* force */ true);
+            context.emit('click');
+        }
 
-    export enum Themes {
-        NORMAL = 'normal',
-        INVERSE = 'inverse',
-    }
-}
+        context.expose({ show, hide, toggle, update });
 
-export default Tooltip;
+        return {
+            TooltipThemes,
+
+            verticalPosition,
+            transitionPosition,
+
+            isShown,
+            tooltipBoxStyles,
+
+            show,
+            hide,
+            mouseOver,
+            onClick,
+        };
+    },
+    components: { AlertTriangleIcon }
+})
 </script>
 
 <style scoped>
