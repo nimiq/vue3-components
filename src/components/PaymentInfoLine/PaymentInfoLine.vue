@@ -492,14 +492,14 @@ export default defineComponent({
         flex-shrink: 1;
     }
 
-    .account >>> .identicon {
+    .account:v-deep(.identicon) {
         min-width: unset;
         width: 3.375rem;
         height: 3.375rem;
         margin-right: 0;
     }
 
-    .account >>> .account-image {
+    .account:v-deep(.account-image) {
         border-radius: .5rem;
         width: 3rem;
         height: 3rem;
@@ -507,7 +507,7 @@ export default defineComponent({
         margin-bottom: 0;
     }
 
-    .account >>> .label {
+    .account:v-deep(.label) {
         padding-left: .75rem;
         margin-bottom: .25rem;
         font-weight: unset;
@@ -525,7 +525,7 @@ export default defineComponent({
 
     .inverse-theme .amounts .trigger .fiat-amount,
     .inverse-theme .arrow-runway .nq-icon,
-    .inverse-theme .account >>> .label {
+    .inverse-theme .account:v-deep(.label) {
         color: white;
     }
 </style>

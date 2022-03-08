@@ -199,13 +199,13 @@ export default defineComponent({
         text-decoration: none;
     }
 
-    .account-entry >>> .identicon img {
+    .account-entry:v-deep(.identicon img) {
         transform: scale(0.9);
         transition: transform .45s var(--nimiq-ease);
     }
 
-    .account-entry >>> .label,
-    .account-entry >>> .balance {
+    .account-entry:v-deep(.label),
+    .account-entry:v-deep(.balance) {
         transition: opacity .3s var(--nimiq-ease), color .3s var(--nimiq-ease), margin-right .45s var(--nimiq-ease);
     }
 
@@ -244,26 +244,26 @@ export default defineComponent({
         background-color: rgba(31, 35, 72, 0.06); /* Based on Nimiq Blue */
     }
 
-    a.account-entry:hover >>> .identicon img,
-    a.account-entry:focus >>> .identicon img {
+    a.account-entry:hover:v-deep(.identicon img),
+    a.account-entry:focus:v-deep(.identicon img) {
         transform: scale(1);
     }
 
-    a.account-entry:hover >>> .label,
-    a.account-entry:hover >>> .balance,
-    a.account-entry:focus >>> .label,
-    a.account-entry:focus >>> .balance {
+    a.account-entry:hover:v-deep(.label),
+    a.account-entry:hover:v-deep(.balance),
+    a.account-entry:focus:v-deep(.label),
+    a.account-entry:focus:v-deep(.balance) {
         opacity: 1;
     }
 
-    a.account-entry:hover >>> .balance,
-    a.account-entry:focus >>> .balance,
-    .account-entry.has-tooltip >>> .balance {
+    a.account-entry:hover:v-deep(.balance),
+    a.account-entry:focus:v-deep(.balance),
+    .account-entry.has-tooltip:v-deep(.balance) {
         margin-right: 3rem; /* make space for caret or tooltip trigger */
     }
 
-    a.account-entry:hover >>> .balance,
-    a.account-entry:focus >>> .balance {
+    a.account-entry:hover:v-deep(.balance),
+    a.account-entry:focus:v-deep(.balance) {
         color: var(--nimiq-green);
     }
 
@@ -277,13 +277,13 @@ export default defineComponent({
         cursor: not-allowed;
     }
 
-    .account-entry.disabled >>> .identicon,
-    .account-entry.disabled >>> .label,
-    .account-entry.disabled >>> .balance {
+    .account-entry.disabled:v-deep(.identicon),
+    .account-entry.disabled:v-deep(.label),
+    .account-entry.disabled:v-deep(.balance) {
         opacity: 0.2;
     }
 
-    .account-entry.highlight-insufficient-balance >>> .balance {
+    .account-entry.highlight-insufficient-balance:v-deep(.balance) {
         color: var(--nimiq-red);
         opacity: 1;
     }

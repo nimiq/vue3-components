@@ -95,13 +95,13 @@ export default defineComponent({
         align-items: baseline;
     }
 
-    .amount-input >>> input {
+    .amount-input:v-deep(input) {
         padding-top: 0;
         padding-bottom: 0;
     }
 
-    .amount-input.invalid >>> input,
-    .amount-input.invalid >>> .nim {
+    .amount-input.invalid:v-deep(input),
+    .amount-input.invalid:v-deep(.nim) {
         border-color: rgb(216, 65, 51, 0.2); /* Based on Nimiq Red */
         color: var(--nimiq-red) !important;
     }

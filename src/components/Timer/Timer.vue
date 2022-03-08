@@ -352,7 +352,7 @@ export default defineComponent({
         display: block;
     }
 
-    .tooltip >>> .trigger,
+    .tooltip:v-deep(.trigger),
     svg {
         display: block;
         position: absolute;

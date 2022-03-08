@@ -368,8 +368,8 @@ export default defineComponent({
         color: inherit;
     }
 
-    .trigger >>> svg:first-child:last-child,
-    .trigger >>> img:first-child:last-child {
+    .trigger:v-deep(svg:first-child:last-child),
+    .trigger:v-deep(img:first-child:last-child) {
         display: block;
     }
 

@@ -86,33 +86,33 @@ export default defineComponent({
         width: 100%;
     }
 
-    .account >>> .identicon-and-label {
+    .account:v-deep(.identicon-and-label) {
         width: 100%;
     }
 
-    .account >>> .identicon {
+    .account:v-deep(.identicon) {
         width: 18rem;
         height: 18rem;
         margin-bottom: 3rem;
     }
 
-    .account >>> .label {
+    .account:v-deep(.label) {
         font-size: 3rem;
         font-weight: 600;
         opacity: 1;
     }
 
-    .account >>> .wallet-label {
+    .account:v-deep(.wallet-label) {
         margin-top: .5rem;
     }
 
-    .account >>> .label,
-    .account >>> .wallet-label {
+    .account:v-deep(.label),
+    .account:v-deep(.wallet-label) {
         max-width: unset;
         max-height: unset;
     }
 
-    .account >>> .balance {
+    .account:v-deep(.balance) {
         font-size: 3rem;
         margin-top: 3rem;
     }
