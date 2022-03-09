@@ -185,9 +185,8 @@ export default defineComponent({
         },
         tooltipContainer: HTMLElement,
     },
+    methods: { $t: loadI18n('PaymentInfoLine') },
     setup(props, context) {
-        const $t = loadI18n('PaymentInfoLine');
-
         const timer$ = ref<typeof Timer | null>(null);
         const priceTooltip$ = ref<typeof Tooltip | null>(null);
 
@@ -261,6 +260,8 @@ export default defineComponent({
         });
 
         function rateInfo() {
+            const $t = loadI18n('PaymentInfoLine');
+
             // Note: this method is not a getter / computed property to update on language changes
             if (rateDeviation.value === null || formattedRateDeviation.value === null
                 || (Math.abs(rateDeviation.value) < PAYMENT_INFO_LINE_RATE_DEVIATION_THRESHOLD && !isBadRate.value)) {
@@ -324,8 +325,6 @@ export default defineComponent({
         }
 
         return {
-            $t,
-
             PaymentInfoLineThemes,
             TooltipThemes,
 

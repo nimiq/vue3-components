@@ -49,7 +49,6 @@ import AccountList from '../AccountList/AccountList.vue';
 import Tooltip from '../Tooltip/Tooltip.vue';
 import { loadI18n } from '../../i18n/I18nComposable';
 
-
 // This is a reduced list of properties, for convenience
 export interface ContractInfo {
     label: string;
@@ -101,9 +100,8 @@ export default defineComponent({
         disableLedgerAccounts: Boolean,
         highlightBitcoinAccounts: Boolean,
     },
+    methods: { $t: loadI18n('AccountSelector') },
     setup: (props, context) => {
-        const $t = loadI18n('AccountSelector');
-
         const container$ = ref<HTMLElement | null>(null);
         const tooltips$ = ref<Record<string, (typeof Tooltip)>>({});
 
@@ -165,7 +163,7 @@ export default defineComponent({
 
         function _getAccountTypeName(account: WalletInfo): string {
             switch (account.type) {
-                case 1: return $t('Legacy');
+                case 1: return loadI18n('AccountSelector')('Legacy');
                 case 2: return 'Keyguard';
                 case 3: return 'Ledger';
                 default: throw new Error(`Unknown account type ${account.type}`);
@@ -228,7 +226,6 @@ export default defineComponent({
         }
 
         return {
-            $t,
             container$,
             tooltips$,
             tooltipProps,

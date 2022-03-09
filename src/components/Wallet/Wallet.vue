@@ -54,9 +54,8 @@ export default defineComponent({
             required: true,
         }
     },
+    methods: { $t: loadI18n('Wallet') },
     setup(props) {
-        const $t = loadI18n('Wallet');
-
         const addresses = computed((): string[] => {
             return props.wallet.accounts
                 .reduce((addresses: string[], account: any) => addresses.concat(account.address), []);
@@ -95,7 +94,6 @@ export default defineComponent({
         });
 
         return {
-            $t,
             addresses,
             isBip39,
             isKeyguard,

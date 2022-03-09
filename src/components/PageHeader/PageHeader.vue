@@ -37,16 +37,15 @@ export default defineComponent({
             default: 1,
         },
     },
+    methods: { $t: loadI18n('PageHeader') },
     setup(props) {
-        const $t = loadI18n('PageHeader');
-
         const progressSteps = computed(() => {
             const list = [];
             for (let i = 1; i <= props.numberSteps; i++) list.push(i);
             return list;
         });
 
-        return { $t, progressSteps };
+        return { progressSteps };
     },
     components: { ArrowLeftIcon },
 })

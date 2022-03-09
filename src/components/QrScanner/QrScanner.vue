@@ -79,9 +79,8 @@ export default defineComponent({
         },
         validate: Function, // as (scanResult: string) => boolean
     },
+    methods: { $t: loadI18n('QrScanner') },
     setup(props, context) {
-        const $t = loadI18n('QrScanner');
-
         const root$ = ref<HTMLDivElement | null>(null);
         const video$ = ref<HTMLVideoElement | null>(null);
         const overlay$ = ref<HTMLDivElement | null>(null);
@@ -189,8 +188,6 @@ export default defineComponent({
         }
 
         return {
-            $t,
-
             video$,
 
             cameraAccessFailed,

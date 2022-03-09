@@ -38,8 +38,8 @@ export default defineComponent({
         fiatAmount: Number,
         fiatCurrency: String as () => FiatApiSupportedFiatCurrency,
     },
+    methods: { $t: loadI18n('AmountWithFee') },
     setup(props, context) {
-        const $t = loadI18n('AmountWithFee');
         const amountInput$ = ref<(typeof AmountInput) | null>(null);
 
         const liveAmount = ref(props.modelValue.amount);
@@ -68,7 +68,6 @@ export default defineComponent({
         context.expose({ focus });
 
         return {
-            $t,
             amountInput$,
             liveAmount,
             isValid,

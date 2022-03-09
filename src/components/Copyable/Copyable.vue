@@ -30,8 +30,8 @@ export default defineComponent({
     props: {
         text: String,
     },
+    methods: { $t: loadI18n('Copyable') },
     setup(props, context) {
-        const $t = loadI18n('Copyable');
         const root$ = ref<HTMLDivElement | null>(null);
         const tooltip$ = ref<HTMLDivElement | null>(null);
 
@@ -64,8 +64,6 @@ export default defineComponent({
         onBeforeUnmount(() => root$.value!.removeEventListener('keydown', onKeyDown));
 
         return {
-            $t,
-
             root$,
             tooltip$,
 

@@ -77,9 +77,8 @@ export default defineComponent({
         disabled: Boolean,
         tooltipProps: Object,
     },
+    methods: { $t: loadI18n('AccountList') },
     setup: (props, context) => {
-        const $t = loadI18n('AccountList');
-
         const highlightedDisabledAddress = ref<string | null>(null);
         const highlightedDisabledAddressTimeout = ref(-1);
 
@@ -160,7 +159,6 @@ export default defineComponent({
         }
 
         return {
-            $t,
             highlightedDisabledAddress,
             highlightedDisabledAddressTimeout,
             accounts$,

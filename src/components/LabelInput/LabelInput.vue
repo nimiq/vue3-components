@@ -40,9 +40,8 @@ export default defineComponent({
             default: false,
         },
     },
+    methods: { $t: loadI18n('LabelInput') },
     setup(props, context) {
-        const $t = loadI18n('LabelInput');
-
         const input$ = ref<HTMLInputElement | null>(null);
         const widthPlaceholder$ = ref<HTMLSpanElement | null>(null);
         const widthValue$ = ref<HTMLSpanElement | null>(null);
@@ -103,8 +102,6 @@ export default defineComponent({
         }
 
         return {
-            $t,
-
             input$,
             widthPlaceholder$,
             widthValue$,

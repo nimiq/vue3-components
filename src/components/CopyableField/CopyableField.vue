@@ -46,9 +46,8 @@ export default defineComponent({
             default: false,
         },
     },
+    methods: { $t: loadI18n('CopyableField') },
     setup(props) {
-        const $t = loadI18n('CopyableField');
-
         const value$ = ref<HTMLSpanElement | null>(null);
         const valueContainer$ = ref<HTMLDivElement | null>(null);
 
@@ -114,8 +113,6 @@ export default defineComponent({
         }
 
         return {
-            $t,
-
             value$,
             valueContainer$,
 
