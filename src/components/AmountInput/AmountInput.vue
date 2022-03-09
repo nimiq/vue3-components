@@ -1,15 +1,18 @@
 <template>
     <div class="amount-input" :class="{ 'has-value': valueInLuna > 0, 'focussed': isFocussed }">
-        <form class="label-input" @submit.prevent ref="fullWidth">
-            <span class="width-finder width-placeholder" ref="widthPlaceholder">{{ placeholder }}</span>
+        <form class="label-input" @submit.prevent ref="fullWidth$">
+            <span class="width-finder width-placeholder" ref="widthPlaceholder$">{{ placeholder }}</span>
             <div v-if="maxFontSize" class="full-width" :class="{ 'width-finder': maxWidth > 0 }">Width</div>
-            <span class="width-finder width-value" ref="widthValue">{{ formattedValue || '' }}</span>
-            <input type="text" inputmode="decimal" class="nq-input" :class="vanishing"
+            <span class="width-finder width-value" ref="widthValue$">{{ formattedValue || '' }}</span>
+            <input type="text" inputmode="decimal" class="nq-input"
+                ref="input$"
+                :class="{ vanishing }"
                 :placeholder="placeholder"
                 :style="{ width: `${width}px`, fontSize: `${fontSize}rem` }"
+                @focus="isFocussed = true"
+                @blur="isFocussed = false"
                 v-model="formattedValue"
-                @focus="isFocussed = true" @blur="isFocussed = false"
-                ref="input">
+            />
         </form>
         <span class="nim">NIM</span>
     </div>
@@ -20,6 +23,7 @@ import { computed, defineComponent, onMounted, ref, watch, nextTick } from '@vue
 
 export default defineComponent({
     name: 'AmountInput',
+    emits: ['update:modelValue'],
     props: {
         modelValue: Number,
         maxFontSize: {
@@ -90,11 +94,13 @@ export default defineComponent({
                 return liveValue.value;
             },
             set(value: string) {
+                liveValue.value = value;
+
                 if (!value) {
                     liveValue.value = '';
                     lastEmittedValue.value = 0;
                     valueInLuna.value = 0;
-                    context.emit('input', valueInLuna.value);
+                    context.emit('update:modelValue', valueInLuna.value);
                     return;
                 }
 
@@ -106,15 +112,15 @@ export default defineComponent({
                     valueInLuna.value = Number(
                         `${regExpResult[1]}${(regExpResult[2] ? regExpResult[3] : '').padEnd(props.decimals, '0')}`,
                     );
+                } else {
+                    liveValue.value = '';
+                    valueInLuna.value = 0;
                 }
 
                 if (lastEmittedValue.value !== valueInLuna.value) {
-                    context.emit('input', valueInLuna.value);
+                    context.emit('update:modelValue', valueInLuna.value);
                     lastEmittedValue.value = valueInLuna.value;
                 }
-
-                // Trigger a valueChange for the getter.
-                // context.forceUpdate(); // TODO: Does it still need this now ?
             }
         });
 

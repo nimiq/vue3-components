@@ -1,37 +1,44 @@
 import { action } from '@storybook/addon-actions'
+import { ref, watch } from 'vue';
 import AmountInput from './AmountInput.vue';
 
 export default {
-  title: 'AmountInput',
-  component: AmountInput,
+    title: 'AmountInput',
+    component: AmountInput,
+    argTypes: {
+        maxFontSize: { control: { type: 'number' } },
+        placeholder: { control: { type: 'text' } },
+        vanishing: { control: { type: 'boolean' } },
+        decimals: { control: { type: 'number' } },
+        modelValue: { control: { type: 'number' } },
+        modelValue: { table: { disable: true } },
+    },
+    args: {
+        maxFontSize: 8,
+        placeholder: '0',
+        vanishing: false,
+        decimals: 5,
+        modelValue: 0,
+    }
 };
 
-const Template = (args) => ({
-  // Components used in your story `template` are defined in the `components` object
-  components: { AmountInput },
-  // The story's `args` need to be mapped into the template through the `setup()` method
-  setup() {
-    // Story args can be spread into the returned object
-    return { ...args };
-  },
-  // Then, the spread values can be accessed directly in the template
-  template: `<AmountInput
-    :modelValue="modelValue"
-    @update:modelValue="input"
-    :max="max"
-    :placeholder="placeholder"
-    :decimals="decimals"
-    :preserveSign="preserveSign"
-  />`,
-
-  methods: {
-    input: action('update:modelValue')
-  },
+export const Default = (args) => ({
+    // Components used in your story `template` are defined in the `components` object
+    components: { AmountInput },
+    // The story's `args` need to be mapped into the template through the `setup()` method
+    setup() {
+        // Story args can be spread into the returned object
+        return { ...args, action };
+    },
+    // Then, the spread values can be accessed directly in the template
+    template: `
+        <AmountInput
+            v-model="modelValue"
+            @update:modelValue="action('update:modelValue')($event)"
+            :maxFontSize="maxFontSize"
+            :placeholder="placeholder"
+            :vanishing="vanishing"
+            :decimals="decimals"
+        />
+    `,
 });
-
-export const Default = Template.bind({});
-// Default.args = {
-//   max: 1000,
-//   placeholder: '0.00',
-
-// };
