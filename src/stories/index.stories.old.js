@@ -1,6 +1,6 @@
-import {storiesOf} from '@storybook/vue';
-import {action} from '@storybook/addon-actions';
-import {boolean, number, text, object, select, withKnobs} from '@storybook/addon-knobs';
+import { storiesOf } from '@storybook/vue';
+import { action } from '@storybook/addon-actions';
+import { boolean, number, text, object, select, withKnobs } from '@storybook/addon-knobs';
 
 import '@nimiq/style/nimiq-style.min.css';
 
@@ -830,17 +830,17 @@ storiesOf('Components', module)
         return {
             components: {SmallPage, PageHeader, PageBody, PageFooter},
             template: windowTemplate(`
-<small-page>
-    <page-header :backArrow="true">
-        Page header
-        <p slot="more" class="nq-notice info">I am an informative notice!</p>
-    </page-header>
-    <page-body>
-        <p>Some text in the page body.</p>
-    </page-body>
-    <page-footer>Page footer</page-footer>
-</small-page>
-`),
+                <small-page>
+                    <page-header :backArrow="true">
+                        Page header
+                        <p slot="more" class="nq-notice info">I am an informative notice!</p>
+                    </page-header>
+                    <page-body>
+                        <p>Some text in the page body.</p>
+                    </page-body>
+                    <page-footer>Page footer</page-footer>
+                </small-page>
+            `),
         };
     })
     .add('Timer', () => ({
