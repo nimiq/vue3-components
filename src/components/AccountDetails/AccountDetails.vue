@@ -3,7 +3,7 @@
         <CloseButton class="top-right" @click="onClose"/>
         <Account layout="column" :address="address" :image="image" :label="(label && label !== address) ? label : ''"
              :walletLabel="walletLabel" :balance="balance" :editable="editable" :placeholder="placeholder"
-             @changed="onInput" ref="account"/>
+             @changed="onInput" ref="account$"/>
         <AddressDisplay :address="address" copyable />
     </div>
 </template>
@@ -29,13 +29,12 @@ export default defineComponent({
         balance: Number,
         editable: Boolean,
         placeholder: String,
-
     },
     setup: (props, context) => {
-        const account = ref<(typeof Account) | null>(null);
+        const account$ = ref<(typeof Account) | null>(null);
 
         function focus() {
-            if (account.value) account.value.focus();
+            if (account$.value) account$.value.focus();
         }
 
         context.expose({ focus });
@@ -49,7 +48,7 @@ export default defineComponent({
         }
 
         return {
-            account,
+            account$,
             onInput,
             onClose,
         };
