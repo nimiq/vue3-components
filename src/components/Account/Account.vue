@@ -7,10 +7,10 @@
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="white" stroke-linecap="round" stroke-width="2.5"><path d="M40.25 23.25v-.5a6.5 6.5 0 0 0-6.5-6.5h-3.5a6.5 6.5 0 0 0-6.5 6.5v6.5a6.5 6.5 0 0 0 6.5 6.5h2"/><path d="M23.75 40.75v.5a6.5 6.5 0 0 0 6.5 6.5h3.5a6.5 6.5 0 0 0 6.5-6.5v-6.5a6.5 6.5 0 0 0-6.5-6.5h-2"/><path d="M32 11.25v4M32 48.75v4"/></svg>
                 </div>
             </div>
-            <Identicon v-else-if="_isNimiqAddress()" :address="address!"/>
+            <Identicon v-else-if="isNimiqAddress()" :address="address!"/>
 
-            <div v-if="!editable" class="label" :class="{ 'address-font': _isLabelNimiqAddress() }">{{ label }}</div>
-            <div v-else class="label editable" :class="{ 'address-font': _isLabelNimiqAddress() }">
+            <div v-if="!editable" class="label" :class="{ 'address-font': isLabelNimiqAddress() }">{{ label }}</div>
+            <div v-else class="label editable" :class="{ 'address-font': isLabelNimiqAddress() }">
                 <LabelInput :maxBytes="63" :value="label" :placeholder="placeholder" @input="onInput" ref="label$"/>
             </div>
 
@@ -76,19 +76,19 @@
                 showImage.value = !!props.image;
             }, { immediate: true });
 
-            function _isNimiqAddress() {
+            function isNimiqAddress() {
                 return props.address ? ValidationUtils.isValidAddress(props.address) : false;
             }
 
-            function _isLabelNimiqAddress() {
+            function isLabelNimiqAddress() {
                 return ValidationUtils.isValidAddress(props.label);
             }
 
             return {
                 label$,
                 showImage,
-                _isNimiqAddress,
-                _isLabelNimiqAddress,
+                isNimiqAddress,
+                isLabelNimiqAddress,
                 onInput,
             };
         },
