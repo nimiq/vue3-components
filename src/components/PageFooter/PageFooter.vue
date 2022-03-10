@@ -16,7 +16,7 @@ export default {}
         box-sizing: border-box;
     }
 
-    .page-footer:v-deep(.nq-button) {
+    .page-footer:deep(.nq-button) {
         margin: 2rem 4.75rem 3rem;
     }
 </style>

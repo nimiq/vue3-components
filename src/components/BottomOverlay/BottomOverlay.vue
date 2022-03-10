@@ -89,12 +89,12 @@ export default defineComponent({
         right: 1.5rem;
     }
 
-    .green .close-button:v-deep(.nq-icon) {
+    .green .close-button:deep(.nq-icon) {
         opacity: 0.4;
     }
 
-    .green .close-button:hover:v-deep(.nq-icon),
-    .green .close-button:focus:v-deep(.nq-icon) {
+    .green .close-button:hover:deep(.nq-icon),
+    .green .close-button:focus:deep(.nq-icon) {
         opacity: 0.7;
     }
 

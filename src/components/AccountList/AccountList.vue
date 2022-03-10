@@ -197,13 +197,13 @@ export default defineComponent({
         text-decoration: none;
     }
 
-    .account-entry:v-deep(.identicon img) {
+    .account-entry:deep(.identicon img) {
         transform: scale(0.9);
         transition: transform .45s var(--nimiq-ease);
     }
 
-    .account-entry:v-deep(.label),
-    .account-entry:v-deep(.balance) {
+    .account-entry:deep(.label),
+    .account-entry:deep(.balance) {
         transition: opacity .3s var(--nimiq-ease), color .3s var(--nimiq-ease), margin-right .45s var(--nimiq-ease);
     }
 
@@ -242,26 +242,26 @@ export default defineComponent({
         background-color: rgba(31, 35, 72, 0.06); /* Based on Nimiq Blue */
     }
 
-    a.account-entry:hover:v-deep(.identicon img),
-    a.account-entry:focus:v-deep(.identicon img) {
+    a.account-entry:hover:deep(.identicon img),
+    a.account-entry:focus:deep(.identicon img) {
         transform: scale(1);
     }
 
-    a.account-entry:hover:v-deep(.label),
-    a.account-entry:hover:v-deep(.balance),
-    a.account-entry:focus:v-deep(.label),
-    a.account-entry:focus:v-deep(.balance) {
+    a.account-entry:hover:deep(.label),
+    a.account-entry:hover:deep(.balance),
+    a.account-entry:focus:deep(.label),
+    a.account-entry:focus:deep(.balance) {
         opacity: 1;
     }
 
-    a.account-entry:hover:v-deep(.balance),
-    a.account-entry:focus:v-deep(.balance),
-    .account-entry.has-tooltip:v-deep(.balance) {
+    a.account-entry:hover:deep(.balance),
+    a.account-entry:focus:deep(.balance),
+    .account-entry.has-tooltip:deep(.balance) {
         margin-right: 3rem; /* make space for caret or tooltip trigger */
     }
 
-    a.account-entry:hover:v-deep(.balance),
-    a.account-entry:focus:v-deep(.balance) {
+    a.account-entry:hover:deep(.balance),
+    a.account-entry:focus:deep(.balance) {
         color: var(--nimiq-green);
     }
 
@@ -275,13 +275,13 @@ export default defineComponent({
         cursor: not-allowed;
     }
 
-    .account-entry.disabled:v-deep(.identicon),
-    .account-entry.disabled:v-deep(.label),
-    .account-entry.disabled:v-deep(.balance) {
+    .account-entry.disabled:deep(.identicon),
+    .account-entry.disabled:deep(.label),
+    .account-entry.disabled:deep(.balance) {
         opacity: 0.2;
     }
 
-    .account-entry.highlight-insufficient-balance:v-deep(.balance) {
+    .account-entry.highlight-insufficient-balance:deep(.balance) {
         color: var(--nimiq-red);
         opacity: 1;
     }

@@ -284,7 +284,7 @@ export default defineComponent({
         cursor: pointer;
     }
 
-    .carousel > :not(.selected):v-deep(*) {
+    .carousel > :not(.selected):deep(*) {
         pointer-events: none !important;
     }
 </style>
