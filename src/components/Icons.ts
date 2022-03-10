@@ -4,9 +4,7 @@ import { Component, defineComponent, h } from 'vue';
 
 const IconBase = (component: Component) => defineComponent({
     functional: true,
-    render() {
-        return h(component, Object.assign({ class: 'nq-icon' })); // TODO: this may not work with vue 3 actually
-    },
+    render: () => h(component, Object.assign({ class: 'nq-icon' })),
 });
 
 /**
