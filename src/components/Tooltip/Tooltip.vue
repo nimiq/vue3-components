@@ -185,17 +185,6 @@ export default defineComponent({
                 lastToggle.value = Date.now();
                 context.emit('show');
             }
-            if (!root$.value) {
-                // wait until we're mounted
-                await new Promise((resolve) => {
-                    let once = false;
-                    onMounted(() => {
-                        if (once) return;
-                        once = true;
-                        resolve(null);
-                    });
-                });
-            }
 
             if (props.container) {
                 await new Promise((resolve) => requestAnimationFrame(() => {
@@ -334,6 +323,10 @@ export default defineComponent({
 
         return {
             TooltipThemes,
+
+            tooltipTrigger$,
+            tooltipBox$,
+            root$,
 
             verticalPosition,
             transitionPosition,
