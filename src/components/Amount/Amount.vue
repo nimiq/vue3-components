@@ -45,7 +45,7 @@ export default defineComponent({
         },
         currencyDecimals: {
             type: Number,
-            default: 2,
+            default: 5,
         },
     },
     setup(props, context) {
