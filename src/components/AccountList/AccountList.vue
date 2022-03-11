@@ -60,6 +60,7 @@ import { loadI18n } from '../../i18n/I18nComposable';
 
 export default defineComponent({
     name: 'AccountList',
+    emits: ['account-selected', 'account-changed'],
     props: {
         accounts: {
             type: Array as () => Array<AccountInfo | ContractInfo>,
