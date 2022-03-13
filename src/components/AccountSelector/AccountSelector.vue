@@ -78,6 +78,7 @@ export interface WalletInfo {
 
 export default defineComponent({
     name: 'AccountSelector',
+    emits: ['account-selected', 'login'],
     components: { AccountList, Tooltip },
     props: {
         wallets: {
