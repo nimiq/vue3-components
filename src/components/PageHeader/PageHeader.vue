@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from '@vue/runtime-core';
+import { computed, defineComponent } from 'vue';
 import { loadI18n } from '../../i18n/I18nComposable';
 import { ArrowLeftIcon } from '../Icons';
 

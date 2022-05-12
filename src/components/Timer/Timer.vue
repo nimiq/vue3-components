@@ -50,14 +50,13 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, onUnmounted, ref, watch } from '@vue/runtime-core';
-
+import { computed, defineComponent, onMounted, onUnmounted, ref, watch } from 'vue';
 import { Tweenable } from '@nimiq/utils';
 import Tooltip, { TooltipThemes } from '../Tooltip/Tooltip.vue';
 import I18n from '../../i18n/I18n.vue';
 import { loadI18n } from '../../i18n/I18nComposable';
 
-interface CircleInfo {
+export interface CircleInfo {
     length: number;
     lengthWithLineCaps: number;
     gap: number;

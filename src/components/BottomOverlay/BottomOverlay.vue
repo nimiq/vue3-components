@@ -9,7 +9,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch } from '@vue/runtime-core';
+import { defineComponent, ref, watch } from 'vue';
 import CloseButton from '../CloseButton/CloseButton.vue';
 
 enum BottomOverlayEvents {

@@ -4,7 +4,7 @@
         <div class="copyable-field-content" :class="{ 'simple-value': !isKeyedValue, copied }" @click="copy">
             <div ref="valueContainer$" class="value-container" :style="{ fontSize: fontSize+'rem' }">
                 <span ref="value$" class="value">
-                    {{ isKeyedValue ? (modelValue as { [key: string]: any })[currentKey] : modelValue }}
+                    {{ typeof modelValue === 'object' ? modelValue[currentKey] : modelValue }}
                 </span>
             </div>
             <button
@@ -24,7 +24,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, nextTick, onMounted, onUnmounted, ref, watch } from '@vue/runtime-core';
+import { computed, defineComponent, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import { Clipboard } from '@nimiq/utils';
 import { loadI18n } from '../../i18n/I18nComposable';
 

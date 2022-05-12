@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, ref, watch } from '@vue/runtime-core';
+import { computed, defineComponent, onMounted, ref, watch } from 'vue';
 
 import { FiatApiSupportedFiatCurrency } from '@nimiq/utils';
 import Amount from '../Amount/Amount.vue';

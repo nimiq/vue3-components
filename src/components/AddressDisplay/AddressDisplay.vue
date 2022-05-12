@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from '@vue/runtime-core';
+import { computed, defineComponent } from 'vue';
 import Copyable from '../Copyable/Copyable.vue';
 
 export default defineComponent({

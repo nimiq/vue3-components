@@ -113,7 +113,7 @@
 // this imports only the type without bundling the library
 type BigInteger = import('big-integer').BigInteger;
 
-import { computed, defineComponent, nextTick, onMounted, onUnmounted, ref, watch } from '@vue/runtime-core';
+import { computed, defineComponent, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import { FiatApiSupportedFiatCurrency, FiatApiSupportedCryptoCurrency, getExchangeRates } from '@nimiq/utils';
 import Account from '../Account/Account.vue';
 import Timer from '../Timer/Timer.vue';

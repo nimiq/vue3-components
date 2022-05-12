@@ -30,7 +30,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from '@vue/runtime-core';
+import { computed, defineComponent } from 'vue';
 import AccountRing from '../AccountRing/AccountRing.vue';
 import Amount from '../Amount/Amount.vue';
 import Identicon from '../Identicon/Identicon.vue';

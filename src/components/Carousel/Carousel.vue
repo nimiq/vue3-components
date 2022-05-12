@@ -10,7 +10,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, nextTick, onMounted, onUnmounted, ref, watch } from '@vue/runtime-core';
+import { computed, defineComponent, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import { Tweenable } from '@nimiq/utils';
 
 export default defineComponent({
@@ -288,4 +288,3 @@ export default defineComponent({
         pointer-events: none !important;
     }
 </style>
-

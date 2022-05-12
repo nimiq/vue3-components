@@ -7,7 +7,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/runtime-core';
+import { defineComponent } from 'vue';
 import Identicon from '../Identicon/Identicon.vue';
 
 export default defineComponent({
