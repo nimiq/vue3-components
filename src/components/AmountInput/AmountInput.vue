@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, ref, watch, nextTick } from '@vue/runtime-core';
+import { computed, defineComponent, onMounted, ref, watch, nextTick } from 'vue';
 
 export default defineComponent({
     name: 'AmountInput',

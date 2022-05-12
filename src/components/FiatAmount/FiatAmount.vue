@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from '@vue/runtime-core';
+import { computed, defineComponent } from 'vue';
 import { FormattableNumber, CurrencyInfo } from '@nimiq/utils';
 
 const FIAT_AMOUNT_NUMBER_REGEX = /(-)?\D*(\d+)(\.(\d+))?/;

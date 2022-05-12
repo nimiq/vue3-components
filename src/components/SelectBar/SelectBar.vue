@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, watch } from '@vue/runtime-core';
+import { computed, defineComponent, watch } from 'vue';
 
 export interface SelectBarOption {
     color: string;

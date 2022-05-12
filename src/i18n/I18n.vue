@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, h } from '@vue/runtime-core';
+import { defineComponent, h } from 'vue';
 import { loadI18n, I18n$tVariables } from './I18nComposable';
 
 /**

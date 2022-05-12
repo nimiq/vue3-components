@@ -6,7 +6,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, watch } from '@vue/runtime-core';
+import { computed, defineComponent, watch } from 'vue';
 import { FormattableNumber } from '@nimiq/utils';
 
 type BigInteger = import ('big-integer').BigInteger;

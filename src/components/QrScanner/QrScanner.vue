@@ -58,7 +58,7 @@
 <script lang="ts">
 // TODO could use IntersectionObserver api to start scanner when visible
 
-import { defineComponent, onMounted, onUnmounted, ref } from '@vue/runtime-core';
+import { defineComponent, onMounted, onUnmounted, ref } from 'vue';
 import QrScannerLib from 'qr-scanner';
 import { BrowserDetection } from '@nimiq/utils';
 import I18n from '../../i18n/I18n.vue';

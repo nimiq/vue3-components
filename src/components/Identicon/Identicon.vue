@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref, watch } from '@vue/runtime-core';
+import { computed, defineComponent, ref, watch } from 'vue';
 import { ValidationUtils } from '@nimiq/utils';
 // @ts-expect-error Could not find a declaration file for module '@nimiq/identicons/dist/identicons.min.js'.
 import Identicons from '@nimiq/identicons/dist/identicons.min.js';

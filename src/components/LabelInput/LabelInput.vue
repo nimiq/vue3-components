@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, nextTick, ref, watch } from '@vue/runtime-core';
+import { defineComponent, nextTick, ref, watch } from 'vue';
 import { Utf8Tools } from '@nimiq/utils';
 import { loadI18n } from '../../i18n/I18nComposable';
 
