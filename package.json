@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "vite",
     "lint": "vue-tsc --noEmit",
-    "build": "yarn lint && vite build && vue-tsc --emitDeclarationOnly && mv dist/src dist/types",
+    "build": "yarn lint && vite build && vue-tsc --emitDeclarationOnly",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
@@ -13,13 +13,13 @@
   ],
   "main": "./dist/vue3-components.umd.js",
   "module": "./dist/vue3-components.es.js",
+  "types": "./dist/main.d.ts",
   "exports": {
     ".": {
       "import": "./dist/vue3-components.es.js",
       "require": "./dist/vue3-components.umd.js"
     }
   },
-  "types": "./dist/types/index.d.ts",
   "dependencies": {
     "@nimiq/identicons": "^1.6.0",
     "@nimiq/style": "^0.8.3",
