@@ -7,8 +7,8 @@
 <script lang="ts">
 import { computed, defineComponent, ref, watch } from '@vue/runtime-core';
 import { ValidationUtils } from '@nimiq/utils';
-// @ts-expect-error Could not find a declaration file for module '@nimiq/iqons/dist/iqons.min.js'.
-import Iqons from '@nimiq/iqons/dist/iqons.min.js';
+// @ts-expect-error Could not find a declaration file for module '@nimiq/identicons/dist/identicons.min.js'.
+import Identicons from '@nimiq/identicons/dist/identicons.min.js';
 
 export default defineComponent({
     name: 'Identicon',
@@ -43,8 +43,8 @@ export default defineComponent({
         async function computeDataUrl(address: string, oldAddress?: string) {
             if (props.address && isUserFriendlyAddress(props.address)) {
                 // Set svgPath
-                Iqons.svgPath = (await import('@nimiq/iqons/dist/iqons.min.svg?url')).default;
-                dataUrl.value = await Iqons.toDataUrl(formatAddress(props.address));
+                Identicons.svgPath = (await import('@nimiq/identicons/dist/identicons.min.svg?url')).default;
+                dataUrl.value = await Identicons.toDataUrl(formatAddress(props.address));
             } else {
                 dataUrl.value = placeholderDataUrl.value;
             }
