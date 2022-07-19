@@ -10,8 +10,10 @@ export default {
         placeholder: { control: { type: 'text' } },
         vanishing: { control: { type: 'boolean' } },
         decimals: { control: { type: 'number' } },
-        modelValue: { control: { type: 'number' } },
-        modelValue: { table: { disable: true } },
+        modelValue: {
+            control: { type: 'number' },
+            table: { disable: true },
+        },
     },
     args: {
         maxFontSize: 8,
