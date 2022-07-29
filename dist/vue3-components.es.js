@@ -3584,6 +3584,7 @@ function _willBeAddress(value) {
 }
 const _sfc_main$j = defineComponent({
   name: "AddressInput",
+  emits: ["paste", "update:modelValue", "address"],
   props: {
     modelValue: {
       type: String,
@@ -3600,8 +3601,8 @@ const _sfc_main$j = defineComponent({
       if (scrollIntoView)
         textarea$.value.scrollIntoView({ behavior: "smooth", block: "center" });
     }
-    const textarea$ = ref(null);
     const root$ = ref(null);
+    const textarea$ = ref(null);
     const currentValue = ref("");
     const selectionStartBlock = ref(-1);
     const selectionEndBlock = ref(-1);
@@ -3662,7 +3663,7 @@ const _sfc_main$j = defineComponent({
         textarea.selectionStart += 1;
       }
       currentValue.value = _exportValue(textarea$.value.value, props.allowDomains);
-      context.emit("input", currentValue.value);
+      context.emit("update:modelValue", currentValue.value);
       if (_willBeAddress(value)) {
         const isValid = ValidationUtils.isValidAddress(currentValue.value);
         if (isValid)
@@ -3684,8 +3685,8 @@ const _sfc_main$j = defineComponent({
       return selectionStartBlock.value <= blockIndex && blockIndex <= selectionEndBlock.value;
     }
     return {
-      textarea$,
       root$,
+      textarea$,
       currentValue,
       supportsMixBlendMode,
       willBeAddress,
@@ -3701,7 +3702,7 @@ const _sfc_main$j = defineComponent({
     };
   }
 });
-const _hoisted_1$h = /* @__PURE__ */ createStaticVNode('<svg width="210" height="99" viewBox="0 0 210 99" fill="none" xmlns="http://www.w3.org/2000/svg" class="grid" data-v-cb9de6d8><g stroke-width="1.5" stroke-linecap="round" data-v-cb9de6d8><line x1="67.75" y1="0.75" x2="67.75" y2="22.25" data-v-cb9de6d8></line><line x1="67.75" y1="37.75" x2="67.75" y2="60.25" data-v-cb9de6d8></line><line x1="67.75" y1="75.75" x2="67.75" y2="98.25" data-v-cb9de6d8></line><line x1="0.75" y1="30.25" x2="209.25" y2="30.25" data-v-cb9de6d8></line><line x1="0.75" y1="68.25" x2="209.25" y2="68.25" data-v-cb9de6d8></line><line x1="143.75" y1="37.75" x2="143.75" y2="60.25" data-v-cb9de6d8></line><line x1="143.75" y1="0.75" x2="143.75" y2="22.25" data-v-cb9de6d8></line><line x1="143.75" y1="75.75" x2="143.75" y2="98.25" data-v-cb9de6d8></line></g></svg>', 1);
+const _hoisted_1$h = /* @__PURE__ */ createStaticVNode('<svg width="210" height="99" viewBox="0 0 210 99" fill="none" xmlns="http://www.w3.org/2000/svg" class="grid" data-v-69cc6516><g stroke-width="1.5" stroke-linecap="round" data-v-69cc6516><line x1="67.75" y1="0.75" x2="67.75" y2="22.25" data-v-69cc6516></line><line x1="67.75" y1="37.75" x2="67.75" y2="60.25" data-v-69cc6516></line><line x1="67.75" y1="75.75" x2="67.75" y2="98.25" data-v-69cc6516></line><line x1="0.75" y1="30.25" x2="209.25" y2="30.25" data-v-69cc6516></line><line x1="0.75" y1="68.25" x2="209.25" y2="68.25" data-v-69cc6516></line><line x1="143.75" y1="37.75" x2="143.75" y2="60.25" data-v-69cc6516></line><line x1="143.75" y1="0.75" x2="143.75" y2="22.25" data-v-69cc6516></line><line x1="143.75" y1="75.75" x2="143.75" y2="98.25" data-v-69cc6516></line></g></svg>', 1);
 function _sfc_render$i(_ctx, _cache, $props, $setup, $data, $options) {
   return openBlock(), createElementBlock("div", {
     class: normalizeClass(["address-input", { "is-domain": _ctx.isDomain }]),
@@ -3741,7 +3742,7 @@ function _sfc_render$i(_ctx, _cache, $props, $setup, $data, $options) {
     _hoisted_1$h
   ], 2);
 }
-var AddressInput = /* @__PURE__ */ _export_sfc(_sfc_main$j, [["render", _sfc_render$i], ["__scopeId", "data-v-cb9de6d8"]]);
+var AddressInput = /* @__PURE__ */ _export_sfc(_sfc_main$j, [["render", _sfc_render$i], ["__scopeId", "data-v-69cc6516"]]);
 var AmountInput_vue_vue_type_style_index_0_scoped_true_lang = "";
 const _sfc_main$i = defineComponent({
   name: "AmountInput",

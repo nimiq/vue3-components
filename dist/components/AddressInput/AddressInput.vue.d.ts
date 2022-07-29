@@ -8,8 +8,8 @@ declare const _default: import("vue").DefineComponent<{
     autofocus: BooleanConstructor;
     allowDomains: BooleanConstructor;
 }, {
-    textarea$: import("vue").Ref<HTMLTextAreaElement | null>;
     root$: import("vue").Ref<HTMLDivElement | null>;
+    textarea$: import("vue").Ref<HTMLTextAreaElement | null>;
     currentValue: import("vue").Ref<string>;
     supportsMixBlendMode: boolean;
     willBeAddress: import("vue").ComputedRef<boolean>;
@@ -24,14 +24,18 @@ declare const _default: import("vue").DefineComponent<{
     _formatClipboard: () => void;
     _updateSelection: () => void;
     _isBlockFocused: (blockIndex: number) => boolean;
-}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, Record<string, any>, string, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
+}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, ("address" | "paste" | "update:modelValue")[], "address" | "paste" | "update:modelValue", import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
     modelValue: {
         type: StringConstructor;
         default: string;
     };
     autofocus: BooleanConstructor;
     allowDomains: BooleanConstructor;
-}>>, {
+}>> & {
+    onPaste?: ((...args: any[]) => any) | undefined;
+    onAddress?: ((...args: any[]) => any) | undefined;
+    "onUpdate:modelValue"?: ((...args: any[]) => any) | undefined;
+}, {
     autofocus: boolean;
     modelValue: string;
     allowDomains: boolean;
