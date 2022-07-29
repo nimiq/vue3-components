@@ -132,6 +132,7 @@ function _willBeAddress(value: string): boolean {
 
 export default defineComponent({
     name: "AddressInput",
+    emits: ['paste', 'update:modelValue', 'address'],
     props: {
         // value that can be bound to via v-model
         modelValue: {
@@ -149,8 +150,8 @@ export default defineComponent({
             if (scrollIntoView) textarea$.value.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
-        const textarea$ = ref<HTMLTextAreaElement | null>(null);
         const root$ = ref<HTMLDivElement | null>(null);
+        const textarea$ = ref<HTMLTextAreaElement | null>(null);
 
         const currentValue = ref('');
         const selectionStartBlock = ref(-1);
@@ -268,7 +269,7 @@ export default defineComponent({
             }
 
             currentValue.value = _exportValue(textarea$.value.value, props.allowDomains);
-            context.emit('input', currentValue.value); // emit event compatible with v-model
+            context.emit('update:modelValue', currentValue.value); // emit event compatible with v-model
 
             if (_willBeAddress(value)) {
                 const isValid = ValidationUtils.isValidAddress(currentValue.value);
@@ -298,8 +299,8 @@ export default defineComponent({
         }
 
         return {
-            textarea$,
             root$,
+            textarea$,
 
             currentValue,
             supportsMixBlendMode,

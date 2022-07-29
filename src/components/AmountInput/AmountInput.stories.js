@@ -1,5 +1,4 @@
 import { action } from '@storybook/addon-actions'
-import { ref, watch } from 'vue';
 import AmountInput from './AmountInput.vue';
 
 export default {
@@ -10,19 +9,14 @@ export default {
         placeholder: { control: { type: 'text' } },
         vanishing: { control: { type: 'boolean' } },
         decimals: { control: { type: 'number' } },
-        modelValue: { control: { type: 'number' } },
-        modelValue: { table: { disable: true } },
+        modelValue: {
+            control: { type: 'number' },
+            table: { disable: true },
+        },
     },
-    args: {
-        maxFontSize: 8,
-        placeholder: '0',
-        vanishing: false,
-        decimals: 5,
-        modelValue: 0,
-    }
 };
 
-export const Default = (args) => ({
+const Template = (args) => ({
     // Components used in your story `template` are defined in the `components` object
     components: { AmountInput },
     // The story's `args` need to be mapped into the template through the `setup()` method
@@ -42,3 +36,12 @@ export const Default = (args) => ({
         />
     `,
 });
+
+export const Default = Template.bind({});
+Default.args = {
+    maxFontSize: 8,
+    placeholder: '0',
+    vanishing: false,
+    decimals: 5,
+    modelValue: 0,
+};
