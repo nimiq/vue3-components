@@ -28,7 +28,7 @@ const Template = (args) => ({
     template: `
         <AmountInput
             v-model="modelValue"
-            @update:modelValue="action('update:modelValue')($event)"
+            @input="action('input')($event.target.value)"
             :maxFontSize="maxFontSize"
             :placeholder="placeholder"
             :vanishing="vanishing"
