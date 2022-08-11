@@ -179,7 +179,7 @@ export default defineComponent({
         startTime: Number,
         endTime: Number,
         theme: {
-            type: String as () => PaymentInfoLineThemes,
+            type: String as PropType<PaymentInfoLineThemes>,
             validator: (value: any) => Object.values(PaymentInfoLineThemes).includes(value),
             default: 'normal',
         },
