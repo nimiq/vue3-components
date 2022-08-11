@@ -43,3 +43,9 @@ Default.args = {
     disabled: false,
     modelValue: '',
 };
+
+export const RestrictedTo63Bytes = Template.bind({});
+RestrictedTo63Bytes.args = {
+    ...Default.args,
+    maxBytes: 63,
+};
