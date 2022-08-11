@@ -113,7 +113,7 @@
 // this imports only the type without bundling the library
 type BigInteger = import('big-integer').BigInteger;
 
-import { computed, defineComponent, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
+import { computed, defineComponent, nextTick, onMounted, onUnmounted, PropType, ref, watch } from 'vue';
 import { FiatApiSupportedFiatCurrency, FiatApiSupportedCryptoCurrency, getExchangeRates } from '@nimiq/utils';
 import Account from '../Account/Account.vue';
 import Timer from '../Timer/Timer.vue';
@@ -149,12 +149,12 @@ export default defineComponent({
     name: 'PaymentInfoLine',
     props: {
         cryptoAmount: {
-            type: Object,
+            type: Object as PropType<{ amount: number, currency: string, decimals: number }>,
             required: true,
             validator: cryptoAmountInfoValidator,
         },
         fiatAmount: {
-            type: Object,
+            type: Object as PropType<{ amount: number, currency: string }>,
             validator: fiatAmountInfoValidator,
         },
         // Note that vendorMarkup and networkFee have no effect if fiatAmount is not set, as the tooltip in which they
