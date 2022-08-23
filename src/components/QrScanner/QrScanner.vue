@@ -1,6 +1,6 @@
 <template>
     <div class="qr-scanner nq-blue-bg" ref="root$">
-        <video ref="video" muted autoplay playsinline width="600" height="600"></video>
+        <video ref="video$" muted autoplay playsinline width="600" height="600"></video>
         <div ref="overlay$" class="overlay" :class="{ inactive: cameraAccessFailed }">
             <slot>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 238 238">
@@ -58,7 +58,7 @@
 <script lang="ts">
 // TODO could use IntersectionObserver api to start scanner when visible
 
-import { defineComponent, onMounted, onUnmounted, ref } from 'vue';
+import { defineComponent, onMounted, onUnmounted, PropType, ref } from 'vue';
 import QrScannerLib from 'qr-scanner';
 import { BrowserDetection } from '@nimiq/utils';
 import I18n from '../../i18n/I18n.vue';
@@ -77,7 +77,7 @@ export default defineComponent({
             type: Number,
             default: 7000
         },
-        validate: Function, // as (scanResult: string) => boolean
+        validate: Function as PropType<(scanResult: string) => boolean>,
     },
     methods: { $t: loadI18n('QrScanner') },
     setup(props, context) {
@@ -181,14 +181,16 @@ export default defineComponent({
 
         function _onResult(result: QrScannerLib.ScanResult) {
             if ((result.data === _lastResult && Date.now() - _lastResultTime < props.reportFrequency)
-                || (props.validate && !props.validate(result))) return;
+                || (props.validate && !props.validate(result.data))) return;
             _lastResult = result.data;
             _lastResultTime = Date.now();
             context.emit(QrScannerEvents.RESULT, result);
         }
 
         return {
+            root$,
             video$,
+            overlay$,
 
             cameraAccessFailed,
             hasCamera,

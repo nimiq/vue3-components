@@ -23,7 +23,7 @@ import { loadI18n } from '../../i18n/I18nComposable';
 
 export default defineComponent({
     name: 'LabelInput',
-    emits: ['input', 'changed', 'paste'],
+    emits: ['update:modelValue', 'changed', 'paste'],
     props: {
         maxBytes: Number, // was a `protected` prop with vue2 class component
         modelValue: {
@@ -65,7 +65,7 @@ export default defineComponent({
                 }
                 lastValue.value = liveValue.value;
             }
-            context.emit('input', liveValue.value);
+            context.emit('update:modelValue', liveValue.value);
         }
 
         function onBlur() {

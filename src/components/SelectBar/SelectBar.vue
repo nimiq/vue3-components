@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, watch } from 'vue';
+import { computed, defineComponent, PropType, ref, watch } from 'vue';
 
 export interface SelectBarOption {
     color: string;
@@ -19,13 +19,14 @@ export interface SelectBarOption {
 
 export default defineComponent({
     name: 'SelectBar',
+    emits: ['changed'],
     props: {
         name: {
             type: String,
             required: true,
         },
         options: {
-            type: Array as () => SelectBarOption[],
+            type: Array as PropType<SelectBarOption[]>,
             required: true,
         },
         selectedValue: Number,
@@ -33,7 +34,8 @@ export default defineComponent({
     setup(props, context) {
         const value = computed(() => selectedOption.value?.value);
         const sortedOptions = computed(() => props.options.sort((a, b) => a.index - b.index));
-        const selectedOption = computed(() => props.selectedValue
+
+        const selectedOption = ref(props.selectedValue
                 ? sortedOptions.value.find((val) => val.value === props.selectedValue)!
                 : sortedOptions.value[0]);
 
@@ -44,8 +46,7 @@ export default defineComponent({
         }
 
         watch(selectedOption, onChanged);
-        function onChanged(option: SelectBarOption | null) {
-            if (!option) return;
+        function onChanged(option: SelectBarOption) {
             context.emit('changed', option.value);
         }
 
