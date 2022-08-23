@@ -181,7 +181,7 @@ export default defineComponent({
 
         function _onResult(result: QrScannerLib.ScanResult) {
             if ((result.data === _lastResult && Date.now() - _lastResultTime < props.reportFrequency)
-                || (props.validate && !props.validate(result))) return;
+                || (props.validate && !props.validate(result.data))) return;
             _lastResult = result.data;
             _lastResultTime = Date.now();
             context.emit(QrScannerEvents.RESULT, result);

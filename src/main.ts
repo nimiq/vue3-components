@@ -29,7 +29,6 @@ export { default as SelectBar } from './components/SelectBar/SelectBar.vue';
 export { default as SmallPage } from './components/SmallPage/SmallPage.vue';
 export { default as Timer } from './components/Timer/Timer.vue';
 export { default as Tooltip } from './components/Tooltip/Tooltip.vue';
-export { default as Wallet } from './components/Wallet/Wallet.vue';
 
 // Comment out unused icons in the components/Icons.ts file
 export * from './components/Icons';
