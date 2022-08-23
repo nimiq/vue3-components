@@ -21,7 +21,7 @@
     }
   },
   "dependencies": {
-    "@nimiq/identicons": "^1.6.0",
+    "@nimiq/identicons": "^1.6.1",
     "@nimiq/style": "^0.8.3",
     "@nimiq/utils": "^0.8.2",
     "input-format": "^0.3.7",

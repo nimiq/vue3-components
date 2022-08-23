@@ -1455,10 +1455,10 @@
     call-me-maybe "^1.0.1"
     glob-to-regexp "^0.3.0"
 
-"@nimiq/identicons@^1.6.0":
-  version "1.6.0"
-  resolved "https://registry.yarnpkg.com/@nimiq/identicons/-/identicons-1.6.0.tgz#34f68a017ef55d4f004958bf06c03bc526ffeb70"
-  integrity sha512-TLVkH/nxDMIAlmAgwjjNFcNr6wwrHCarRulO0e78B2yghM+zCW0RBCjipyPVCMyPTQM0V9dyzCX3an7xQykkdQ==
+"@nimiq/identicons@^1.6.1":
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/@nimiq/identicons/-/identicons-1.6.1.tgz#65c7f7a4019bfb6391547eade97516c70d7a5faf"
+  integrity sha512-OGqhjEqKu5jxEAQxY2dcWfL/PNNzrLutwok+nPIgfNZ4HnGIGAVOoNS4hqBlGETJxjxmiBdvicn28EvbIUO3vw==
   dependencies:
     dom-parser "^0.1.5"
 
