@@ -33,8 +33,8 @@ declare const _default: import("vue").DefineComponent<{
     allowDomains: BooleanConstructor;
 }>> & {
     onPaste?: ((...args: any[]) => any) | undefined;
-    onAddress?: ((...args: any[]) => any) | undefined;
     "onUpdate:modelValue"?: ((...args: any[]) => any) | undefined;
+    onAddress?: ((...args: any[]) => any) | undefined;
 }, {
     autofocus: boolean;
     modelValue: string;

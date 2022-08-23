@@ -1,4 +1,5 @@
 declare type BigInteger = import('big-integer').BigInteger;
+import { PropType } from 'vue';
 import { amountValidator } from '../Amount/Amount.vue';
 import { TooltipThemes } from '../Tooltip/Tooltip.vue';
 declare function cryptoAmountInfoValidator(value: any): boolean;
@@ -9,12 +10,19 @@ export declare enum PaymentInfoLineThemes {
 }
 declare const _default: import("vue").DefineComponent<{
     cryptoAmount: {
-        type: ObjectConstructor;
+        type: PropType<{
+            amount: number;
+            currency: string;
+            decimals: number;
+        }>;
         required: true;
         validator: typeof cryptoAmountInfoValidator;
     };
     fiatAmount: {
-        type: ObjectConstructor;
+        type: PropType<{
+            amount: number;
+            currency: string;
+        }>;
         validator: typeof fiatAmountInfoValidator;
     };
     vendorMarkup: {
@@ -34,7 +42,7 @@ declare const _default: import("vue").DefineComponent<{
     startTime: NumberConstructor;
     endTime: NumberConstructor;
     theme: {
-        type: () => PaymentInfoLineThemes;
+        type: PropType<PaymentInfoLineThemes>;
         validator: (value: any) => boolean;
         default: string;
     };
@@ -263,12 +271,19 @@ declare const _default: import("vue").DefineComponent<{
     $t: (key: string, variablesOrLang?: string | import("../../i18n/I18nComposable").I18n$tVariables | undefined, variables?: import("../../i18n/I18nComposable").I18n$tVariables | undefined) => string;
 }, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, Record<string, any>, string, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
     cryptoAmount: {
-        type: ObjectConstructor;
+        type: PropType<{
+            amount: number;
+            currency: string;
+            decimals: number;
+        }>;
         required: true;
         validator: typeof cryptoAmountInfoValidator;
     };
     fiatAmount: {
-        type: ObjectConstructor;
+        type: PropType<{
+            amount: number;
+            currency: string;
+        }>;
         validator: typeof fiatAmountInfoValidator;
     };
     vendorMarkup: {
@@ -288,7 +303,7 @@ declare const _default: import("vue").DefineComponent<{
     startTime: NumberConstructor;
     endTime: NumberConstructor;
     theme: {
-        type: () => PaymentInfoLineThemes;
+        type: PropType<PaymentInfoLineThemes>;
         validator: (value: any) => boolean;
         default: string;
     };

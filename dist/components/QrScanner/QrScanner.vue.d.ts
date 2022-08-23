@@ -1,3 +1,4 @@
+import { PropType } from 'vue';
 import { BrowserDetection } from '@nimiq/utils';
 export declare const enum QrScannerEvents {
     RESULT = "result",
@@ -9,9 +10,11 @@ declare const _default: import("vue").DefineComponent<{
         type: NumberConstructor;
         default: number;
     };
-    validate: FunctionConstructor;
+    validate: PropType<(scanResult: string) => boolean>;
 }, {
+    root$: import("vue").Ref<HTMLDivElement | null>;
     video$: import("vue").Ref<HTMLVideoElement | null>;
+    overlay$: import("vue").Ref<HTMLDivElement | null>;
     cameraAccessFailed: import("vue").Ref<boolean>;
     hasCamera: import("vue").Ref<boolean>;
     isMobileOrTablet: boolean;
@@ -24,7 +27,7 @@ declare const _default: import("vue").DefineComponent<{
         type: NumberConstructor;
         default: number;
     };
-    validate: FunctionConstructor;
+    validate: PropType<(scanResult: string) => boolean>;
 }>>, {
     reportFrequency: number;
 }>;
