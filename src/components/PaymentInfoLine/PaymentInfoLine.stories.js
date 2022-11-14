@@ -1,3 +1,4 @@
+import { ref } from 'vue';
 import PaymentInfoLine, { PaymentInfoLineThemes } from './PaymentInfoLine.vue';
 
 export default {
@@ -23,12 +24,17 @@ const Template = (args) => ({
     components: { PaymentInfoLine },
     // The story's `args` need to be mapped into the template through the `setup()` method
     setup() {
+        const tooltipContainer$ = ref(null);
+
         // Story args can be spread into the returned object
-        return { ...args };
+        return {
+            ...args,
+            tooltipContainer$,
+        };
     },
     // Then, the spread values can be accessed directly in the template
     template: `
-        <div style="max-width: 420px" :class="{ 'nq-blue-bg': theme === 'inverse' }">
+        <div style="max-width: 420px" :class="{ 'nq-blue-bg': theme === 'inverse' }" ref="tooltipContainer$">
             <PaymentInfoLine
                 :cryptoAmount="cryptoAmount"
                 :fiatAmount="fiatAmount"
@@ -40,7 +46,7 @@ const Template = (args) => ({
                 :startTime="startTime"
                 :endTime="endTime"
                 :theme="theme"
-                :tooltipContainer="tooltipContainer"
+                :tooltipContainer="tooltipContainer$"
             />
         </div>
     `,
@@ -50,9 +56,13 @@ export const Default = Template.bind({});
 Default.args = {
     theme: PaymentInfoLineThemes.NORMAL,
     cryptoAmount: {
-        amount: 199862,
+        amount: 2179598,
         currency: 'NIM',
-        decimals: 5,
+        decimals: 2,
+    },
+    fiatAmount: {
+        amount: 25,
+        currency: 'USD',
     },
     origin: 'https://shop.nimiq.com',
     address: 'NQ07 0000 00000000 0000 0000 0000 0000 0000',
