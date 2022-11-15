@@ -114,7 +114,8 @@ export function $t(
     return message;
 }
 
-export function loadI18n(componentName: string): (key: string, variablesOrLang?: I18n$tVariables | string, variables?: I18n$tVariables) => string {
+export function loadI18n(componentName: string)
+    : (key: string, variablesOrLang?: I18n$tVariables | string, variables?: I18n$tVariables) => string {
     loadComponentLanguageFile(componentName);
 
     // @ts-ignore

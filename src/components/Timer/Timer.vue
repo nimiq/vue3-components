@@ -42,7 +42,7 @@
             </svg>
         </template>
         <template #default>
-            <I18n path="This offer expires in {timer}.">
+            <I18n path="This offer expires in {timer}." componentName="Timer">
                 <template #timer>{{ _toSimplifiedTime(_timeLeft, true, maxUnit) }}</template>
             </I18n>
         </template>
@@ -53,7 +53,7 @@
 import { computed, defineComponent, onMounted, onUnmounted, ref, watch } from 'vue';
 import { Tweenable } from '@nimiq/utils';
 import Tooltip, { TooltipThemes } from '../Tooltip/Tooltip.vue';
-import I18n from '../../i18n/I18n.vue';
+import I18n from '../../i18n/I18n';
 import { loadI18n } from '../../i18n/I18nComposable';
 
 export interface CircleInfo {

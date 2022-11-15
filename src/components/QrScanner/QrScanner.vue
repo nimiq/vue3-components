@@ -21,7 +21,8 @@
                     </div>
                     <div v-if="isMobileOrTablet">
                         <div v-if="browser === 'chrome'">
-                            <I18n path="Click on {icon} and go to\nSettings > Site Settings > Camera" tag="div"
+                            <I18n path="Click on {icon} and go to\nSettings > Site Settings > Camera"
+                                tag="div" componentName="QrScanner"
                                 class="access-denied-instructions">
                                 <template #icon>
                                     <span class="browser-menu-icon"></span>
@@ -36,12 +37,14 @@
                     </div>
                     <div v-else class="access-denied-instructions">
                         <I18n v-if="browser === 'safari'"
-                            path="Click on {safari} and go to\nSettings for this Website > Camera" tag="div">
+                            path="Click on {safari} and go to\nSettings for this Website > Camera"
+                            tag="div" componentName="QrScanner">
                             <template #safari>
                                 <b>Safari</b>
                             </template>
                         </I18n>
-                        <I18n v-else path="Click on {icon} in the URL bar." tag="div">
+                        <I18n v-else path="Click on {icon} in the URL bar."
+                            tag="div" componentName="QrScanner">
                             <template #icon>
                                 <span v-if="browser === 'chrome'" class="camera-icon-chrome"></span>
                                 <span v-else-if="browser === 'firefox'" class="camera-icon-firefox"></span>
@@ -61,7 +64,7 @@
 import { defineComponent, onMounted, onUnmounted, PropType, ref } from 'vue';
 import QrScannerLib from 'qr-scanner';
 import { BrowserDetection } from '@nimiq/utils';
-import I18n from '../../i18n/I18n.vue';
+import I18n from '../../i18n/I18n';
 import { loadI18n } from '../../i18n/I18nComposable';
 
 export const enum QrScannerEvents {
