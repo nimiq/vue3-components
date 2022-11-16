@@ -1,6 +1,6 @@
 <template>
     <div class="amount-with-fee">
-        <AmountInput class="value" v-model="liveAmount" :class="{ invalid: !isValid && liveAmount > 0 }"  ref="amountInput" />
+        <AmountInput class="value" v-model="liveAmount" :class="{ invalid: !isValid && liveAmount > 0 }" ref="amountInput$" />
         <div class="fee-section nq-text-s">
             <div v-if="!isValid && liveAmount" class="nq-red"><slot name="insufficient-balance-error">{{ $t('Insufficient balance') }}</slot></div>
             <div v-else>
