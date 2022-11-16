@@ -1,16 +1,16 @@
 <template>
     <div class="account-list">
-        <component :is="!_isDisabled(account) && !editable ? 'a' : 'div'"
+        <component :is="!isDisabled(account) && !editable ? 'a' : 'div'"
             href="javascript:void(0)"
             class="account-entry"
             v-for="account in accounts"
             :class="{
-                'disabled': _isDisabled(account),
-                'has-tooltip': _hasTooltip(account),
+                'disabled': isDisabled(account),
+                'has-tooltip': hasTooltip(account),
                 'highlight-insufficient-balance': highlightedDisabledAddress === account.userFriendlyAddress
-                    && _hasInsufficientBalance(account)
-                    && !_isDisabledContract(account)
-                    && !_isDisabledAccount(account),
+                    && hasInsufficientBalance(account)
+                    && !isDisabledContract(account)
+                    && !isDisabledAccount(account),
             }"
             @click="accountSelected(account)"
             :key="account.userFriendlyAddress"
@@ -26,9 +26,9 @@
                 @changed="onAccountChanged(account.userFriendlyAddress, $event)"
             />
 
-            <CaretRightSmallIcon v-if="!_isDisabled(account)" class="caret"/>
+            <CaretRightSmallIcon v-if="!isDisabled(account)" class="caret"/>
             <!-- tooltip$ should be of type 'ComponentPublicInstance' imported from ‘vue', but types cannot be passed to template -->
-            <Tooltip v-if="_hasTooltip(account)"
+            <Tooltip v-if="hasTooltip(account)"
                 :ref="(tooltip$: any) => tooltips$[`tooltip-${account.userFriendlyAddress}`] = tooltip$"
                 v-bind="{
                     preferredPosition: 'bottom left',
@@ -41,7 +41,7 @@
                 }"
                 @click.stop=""
             >
-                {{ _isDisabledContract(account)
+                {{ isDisabledContract(account)
                     ? $t('Contracts cannot be used for this operation.')
                     : $t('This address cannot be used for this operation.')
                 }}
@@ -102,21 +102,22 @@ export default defineComponent({
 
             window.clearTimeout(highlightedDisabledAddressTimeout.value);
             if (account.userFriendlyAddress !== highlightedDisabledAddress.value) {
-                _clearHighlightedDisabledAddress();
+                clearHighlightedDisabledAddress();
             }
 
-            const isDisabledContract = _isDisabledContract(account);
-            const isDisabledAccount = _isDisabledAccount(account);
-            if (isDisabledContract
-                || isDisabledAccount
-                || _hasInsufficientBalance(account)) {
+            const isDisabledContractBool = isDisabledContract(account);
+            const isDisabledAccountBool = isDisabledAccount(account);
+
+            if (isDisabledContractBool
+                || isDisabledAccountBool
+                || hasInsufficientBalance(account)) {
                 highlightedDisabledAddress.value = account.userFriendlyAddress;
                 if (tooltips$.value[`tooltip-${highlightedDisabledAddress.value}`]) {
                     tooltips$.value[`tooltip-${highlightedDisabledAddress.value}`].show();
                 }
-                const waitTime = isDisabledContract || isDisabledAccount ? 2000 : 300;
+                const waitTime = isDisabledContractBool || isDisabledAccountBool ? 2000 : 300;
                 highlightedDisabledAddressTimeout.value =
-                    window.setTimeout(() => _clearHighlightedDisabledAddress(), waitTime);
+                    window.setTimeout(() => clearHighlightedDisabledAddress(), waitTime);
             } else {
                 context.emit('account-selected', account.walletId || props.walletId, account.userFriendlyAddress);
             }
@@ -126,31 +127,31 @@ export default defineComponent({
             context.emit('account-changed', address, label);
         }
 
-        function _isDisabled(account: AccountInfo | ContractInfo) {
+        function isDisabled(account: AccountInfo | ContractInfo) {
             return props.disabled || (!props.editable
-                && (_isDisabledContract(account)
-                || _isDisabledAccount(account)
-                || _hasInsufficientBalance(account)));
+                && (isDisabledContract(account)
+                || isDisabledAccount(account)
+                || hasInsufficientBalance(account)));
         }
 
-        function _isDisabledContract(account: AccountInfo | ContractInfo) {
+        function isDisabledContract(account: AccountInfo | ContractInfo) {
             return props.disableContracts && !('path' in account && account.path);
         }
 
-        function _isDisabledAccount(account: AccountInfo | ContractInfo) {
+        function isDisabledAccount(account: AccountInfo | ContractInfo) {
             return props.disabledAddresses.includes(account.userFriendlyAddress);
         }
 
-        function _hasInsufficientBalance(account: AccountInfo | ContractInfo) {
+        function hasInsufficientBalance(account: AccountInfo | ContractInfo) {
             return props.minBalance && (account.balance || 0) < props.minBalance;
         }
 
-        function _hasTooltip(account: AccountInfo | ContractInfo) {
+        function hasTooltip(account: AccountInfo | ContractInfo) {
             return !props.disabled && !props.editable
-                && (_isDisabledContract(account) || _isDisabledAccount(account));
+                && (isDisabledContract(account) || isDisabledAccount(account));
         }
 
-        function _clearHighlightedDisabledAddress() {
+        function clearHighlightedDisabledAddress() {
             if (!highlightedDisabledAddress.value) return;
             if (tooltips$.value[`tooltip-${highlightedDisabledAddress.value}`]) {
                 // Hide tooltip if it's not hovered
@@ -167,12 +168,12 @@ export default defineComponent({
             focus,
             accountSelected,
             onAccountChanged,
-            _isDisabled,
-            _isDisabledContract,
-            _isDisabledAccount,
-            _hasInsufficientBalance,
-            _hasTooltip,
-            _clearHighlightedDisabledAddress,
+            isDisabled,
+            isDisabledContract,
+            isDisabledAccount,
+            hasInsufficientBalance,
+            hasTooltip,
+            clearHighlightedDisabledAddress,
         };
     },
     components: {

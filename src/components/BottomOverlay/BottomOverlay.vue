@@ -32,11 +32,11 @@ export default defineComponent({
             context.emit(BottomOverlayEvents.CLOSE);
         }
 
-        function _onListenerChange() {
+        function onListenerChange() {
             hasCloseButton.value = !!context.attrs.onClose;
         }
 
-        watch(() => context.attrs.onClose, _onListenerChange, { immediate: true });
+        watch(() => context.attrs.onClose, onListenerChange, { immediate: true });
 
         return {
             BottomOverlayEvents,

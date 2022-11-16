@@ -2,8 +2,8 @@
     <div class="carousel" :class="{ disabled }" ref="root$">
         <div v-for="(entry, index) in entries" :ref="(el) => { refs$[entry] = el as HTMLElement }" :key="index"
             :class="{ selected: effectiveSelected === entry }"
-            @click="!disabled && _updateSelection(entry)"
-            @focusin="!disabled && _updateSelection(entry)">
+            @click="!disabled && updateSelection(entry)"
+            @focusin="!disabled && updateSelection(entry)">
             <slot :name="entry"></slot>
         </div>
     </div>
@@ -52,26 +52,26 @@ export default defineComponent({
         const radius: Tweenable = new Tweenable();
         const rotations: Map<string, Tweenable> = new Map(); // map entry -> rotation
 
-        const _hasDummyPosition = computed(() =>{
+        const hasDummyPosition = computed(() =>{
             // add dummy to avoid that second entry is hidden exactly behind selected item on opposite side of circle.
             return props.entries.length <= 2;
         });
 
-        const _totalPositionCount = computed(() => {
-            return props.entries.length + (_hasDummyPosition.value ? 1 : 0);
+        const totalPositionCount = computed(() => {
+            return props.entries.length + (hasDummyPosition.value ? 1 : 0);
         });
 
         onMounted(async () => {
-            // this._onKeydown = this._onKeydown.bind(this); // TODO: is this still necessary?
-            document.addEventListener('keydown', _onKeydown);
+            // this.onKeydown = this.onKeydown.bind(this); // TODO: is this still necessary?
+            document.addEventListener('keydown', onKeydown);
             // trigger these manually instead of via immediate watcher to avoid animating on first render
             await updateDimensions(false);
-            _updateSelection(props.selected);
-            _updateRotations(false);
+            updateSelection(props.selected);
+            updateRotations(false);
         });
 
         onUnmounted(() => {
-            document.removeEventListener('keydown', _onKeydown);
+            document.removeEventListener('keydown', onKeydown);
             if (requestAnimationFrameId.value === null) return;
             cancelAnimationFrame(requestAnimationFrameId.value);
         });
@@ -92,22 +92,22 @@ export default defineComponent({
             // Choose radius big enough such that two items can be rendered side by side without overlapping.
             // Calculate on a right triangle formed by radius, half distance and perpendicular from center point
             // to distance line.
-            const centerAngle = 2 * Math.PI / _totalPositionCount.value / 2; // angle at circle center point
+            const centerAngle = 2 * Math.PI / totalPositionCount.value / 2; // angle at circle center point
             const newRadius = (largestMinDistance / 2) / Math.sin(centerAngle);
             radius.tweenTo(newRadius, tween ? props.animationDuration : 0);
             if (root$.value) root$.value.style.minHeight = `${largestHeight}px`;
-            _rerender();
+            rerender();
         }
 
-        watch(() => props.entries, _onEntriesChange);
-        async function _onEntriesChange() {
+        watch(() => props.entries, onEntriesChange);
+        async function onEntriesChange() {
             await updateDimensions();
-            _updateSelection(effectiveSelected.value); // re-validate
-            _updateRotations();
+            updateSelection(effectiveSelected.value); // re-validate
+            updateRotations();
         }
 
-        watch(() => props.selected, _updateSelection);
-        function _updateSelection(newSelection: string | undefined) {
+        watch(() => props.selected, updateSelection);
+        function updateSelection(newSelection: string | undefined) {
             if (newSelection === undefined) return;
 
             const oldSelection = effectiveSelected.value;
@@ -125,9 +125,9 @@ export default defineComponent({
             }
         }
 
-        watch(effectiveSelected, _updateRotations);
-        watch(() => props.disabled, _updateRotations);
-        function _updateRotations(newWatcherValueOrTween: string | boolean = true, previousWatcherValue?: string | boolean) {
+        watch(effectiveSelected, updateRotations);
+        watch(() => props.disabled, updateRotations);
+        function updateRotations(newWatcherValueOrTween: string | boolean = true, previousWatcherValue?: string | boolean) {
             const tween = typeof newWatcherValueOrTween === 'boolean' && typeof previousWatcherValue === 'undefined'
                 ? newWatcherValueOrTween // specified whether to tween
                 : true; // did not specify whether to tween or method was called as a watcher (default to true)
@@ -141,10 +141,10 @@ export default defineComponent({
             for (const entry of props.entries) {
                 const rotation = rotations.get(entry) || new Tweenable();
                 const tweenTime = tween ? props.animationDuration : 0;
-                rotation.tweenTo(_calculateTargetRotation(entry, rotation.currentValue), tweenTime);
+                rotation.tweenTo(calculateTargetRotation(entry, rotation.currentValue), tweenTime);
                 rotations.set(entry, rotation);
             }
-            _rerender();
+            rerender();
         }
 
         /**
@@ -152,25 +152,25 @@ export default defineComponent({
          * @param currentRotation - Rotation in radians
          * @private
          */
-        function _calculateTargetRotation(entry: string, currentRotation: number): number {
+        function calculateTargetRotation(entry: string, currentRotation: number): number {
             if (props.disabled && entry !== effectiveSelected.value) {
                 // hide not selected entries at other end of circle
-                return currentRotation + _calculateRotationInClosestDirection(currentRotation, Math.PI);
+                return currentRotation + calculateRotationInClosestDirection(currentRotation, Math.PI);
             }
-            const stepSize = 2 * Math.PI / _totalPositionCount.value;
+            const stepSize = 2 * Math.PI / totalPositionCount.value;
             const entryIndex = props.entries.indexOf(entry);
             const selectedIndex = props.entries.indexOf(effectiveSelected.value);
             let offset = entryIndex - selectedIndex;
-            if (_hasDummyPosition.value && offset > _totalPositionCount.value / 2) {
+            if (hasDummyPosition.value && offset > totalPositionCount.value / 2) {
                 // skip dummy position
                 offset += 1;
             }
-            return currentRotation + _calculateRotationInClosestDirection(currentRotation, offset * stepSize);
+            return currentRotation + calculateRotationInClosestDirection(currentRotation, offset * stepSize);
         }
 
         // @Watch('hideBackgroundEntries')
-        watch(() => props.hideBackgroundEntries, _rerender);
-        function _rerender() {
+        watch(() => props.hideBackgroundEntries, rerender);
+        function rerender() {
             if (requestAnimationFrameId.value !== null) return;
             requestAnimationFrameId.value = requestAnimationFrame(() => {
                 const zCoordinatesForEntries: Array<[string, number]> = [];
@@ -182,7 +182,7 @@ export default defineComponent({
                     const z = Math.cos(currentRotation) * currentRadius - currentRadius;
                     const el = refs$.value[entry];
                     el.style.transform = `translate3d(calc(${x}px - 50%),-50%,${z}px)`;
-                    el.style.display = _shouldHide(entry) ? 'none' : '';
+                    el.style.display = shouldHide(entry) ? 'none' : '';
                     zCoordinatesForEntries.push([entry, z]);
                     finished = finished && rotation.finished;
                 }
@@ -196,11 +196,11 @@ export default defineComponent({
                 }
 
                 requestAnimationFrameId.value = null;
-                if (!finished) _rerender();
+                if (!finished) rerender();
             });
         }
 
-        function _calculateRotationInClosestDirection(fromAngle: number, toAngle: number): number {
+        function calculateRotationInClosestDirection(fromAngle: number, toAngle: number): number {
             // angle offset modulo full rotations
             const rotation = (toAngle - fromAngle) % (2 * Math.PI);
             // determine rotation in opposite direction (subtracting or adding a full circle depending on direction (sign))
@@ -215,12 +215,12 @@ export default defineComponent({
             }
         }
 
-        function _shouldHide(entry: string): boolean {
+        function shouldHide(entry: string): boolean {
             const rotation = rotations.get(entry);
 
             if (!rotation || (!props.disabled && !props.hideBackgroundEntries)) return false;
 
-            const absoluteRotation = Math.abs(_calculateRotationInClosestDirection(0, rotation.currentValue));
+            const absoluteRotation = Math.abs(calculateRotationInClosestDirection(0, rotation.currentValue));
 
             if (props.disabled) {
                 // Hide disabled elements once they reached the opposite end of the circle, also to avoid that they are
@@ -229,14 +229,14 @@ export default defineComponent({
                 return Math.abs(absoluteRotation - Math.PI) < 1e-10;
             } else if (props.hideBackgroundEntries) {
                 // Hide entries in the back part of the circle as these will not be visible behind the front entries
-                const stepSize = 2 * Math.PI / _totalPositionCount.value;
-                const threshold = Math.PI / 2 + stepSize / (_totalPositionCount.value - 1); // just a heuristic but works ok
+                const stepSize = 2 * Math.PI / totalPositionCount.value;
+                const threshold = Math.PI / 2 + stepSize / (totalPositionCount.value - 1); // just a heuristic but works ok
                 return absoluteRotation > threshold;
             }
             return false; // TODO/FIXME: the function needs to always return a boolean, so added this but not sure if it's correct
         }
 
-        function _onKeydown(event: KeyboardEvent) {
+        function onKeydown(event: KeyboardEvent) {
             const target = event.target as HTMLElement;
             if (props.disabled
                 || target.tagName === 'INPUT'
@@ -252,14 +252,14 @@ export default defineComponent({
             } else {
                 return;
             }
-            _updateSelection(props.entries[newIndex]);
+            updateSelection(props.entries[newIndex]);
         }
 
         return {
             root$,
             refs$,
             effectiveSelected,
-            _updateSelection,
+            updateSelection,
         };
     }
 })

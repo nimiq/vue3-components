@@ -1,6 +1,6 @@
 <template>
     <span class="fiat-amount">
-        {{ _currencyString }}
+        {{ currencyString }}
     </span>
 </template>
 
@@ -35,8 +35,8 @@ export default defineComponent({
         locale: String,
     },
     setup(props) {
-        const _currencyString = computed(() => {
-            const positioningLocale = _getPositioningLocale(props.currency);
+        const currencyString = computed(() => {
+            const positioningLocale = getPositioningLocale(props.currency);
             // Only create CurrencyInfo for a specific locale if a locale was requested, otherwise use default behavior.
             // Don't use positioningLocale as it's just a rough guess for a language typical for a country where the
             // currency is used and might result in using a language that the user does not understand.
@@ -100,7 +100,7 @@ export default defineComponent({
             return formatted.replace(integers, new FormattableNumber(integers).toString(true));
         });
 
-        function _getPositioningLocale(currency: string) {
+        function getPositioningLocale(currency: string) {
             // Try to guess a locale which positions the currency symbol in a way typical for countries, where the currency
             // is used, e.g. 1.00€ for eur; $1.00 for usd.
             currency = currency.toLowerCase();
@@ -123,7 +123,7 @@ export default defineComponent({
             }
         }
 
-        return { _currencyString };
+        return { currencyString };
     }
 })
 </script>

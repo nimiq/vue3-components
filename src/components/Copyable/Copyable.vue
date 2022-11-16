@@ -36,7 +36,7 @@ export default defineComponent({
         const tooltip$ = ref<HTMLDivElement | null>(null);
 
         const copied = ref(false);
-        const _copiedResetTimeout = ref<number | null>(null);
+        const copiedResetTimeout = ref<number | null>(null);
 
         function copy() {
             let text = props.text;
@@ -47,9 +47,9 @@ export default defineComponent({
             }
             if (text) Clipboard.copy(text);
 
-            window.clearTimeout(_copiedResetTimeout.value!);
+            window.clearTimeout(copiedResetTimeout.value!);
             copied.value = true;
-            _copiedResetTimeout.value = window.setTimeout(() => {
+            copiedResetTimeout.value = window.setTimeout(() => {
                 copied.value = false;
             }, COPYABLE_DISPLAY_TIME);
         }
