@@ -23,30 +23,19 @@ const Template = (args) => ({
     setup() {
         const accountDetails$ = ref(null);
 
-        const label = computed(() => args.label || args.origin.split('://')[1]);
-
-        async function focus() {
+        function focus() {
             if (accountDetails$.value) accountDetails$.value.focus();
         }
 
         // Story args can be spread into the returned object
-        return { ...args, label, accountDetails$, focus, action };
+        return { args, accountDetails$, focus, action };
     },
     // Then, the spread values can be accessed directly in the template
     template: `
         <button class="nq-button-s" @click="focus">Focus (editable: true)</button>
         <br />
         <br />
-        <AccountDetails
-            ref="accountDetails$"
-
-            :address="address"
-            :label="label"
-            :balance="balance"
-            :walletLabel="walletLabel"
-            :image="image"
-            :editable="editable"
-
+        <AccountDetails ref="accountDetails$" v-bind="args"
             @changed="action('changed')($event)"
             @close="action('close')($event)"
         />

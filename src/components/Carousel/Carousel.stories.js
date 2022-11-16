@@ -24,7 +24,7 @@ const Template = (args) => ({
     components: { Carousel, SmallPage },
     // The story's `args` need to be mapped into the template through the `setup()` method
     setup() {
-        const entries = computed(() => new Array(parseInt(args.entryCount)).fill('Card-').map((v, i) => `${v}${i}`));
+        const entries = computed(() => args.entries || new Array(parseInt(args.entryCount)).fill('Card-').map((v, i) => `${v}${i}`));
 
         function onSelect(entry) {
             action('select')(entry);
@@ -32,13 +32,12 @@ const Template = (args) => ({
         }
 
         // Story args can be spread into the returned object
-        return { ...args, action, entries: args.entries || entries, onSelect };
+        return { args: { ...args, entries }, action, onSelect };
     },
     // Then, the spread values can be accessed directly in the template
     template: `
         <div>
-            <Carousel :entries="entries" :selected="selected" @select="onSelect"
-                :hideBackgroundEntries="hideBackgroundEntries" :disabled="disabled">
+            <Carousel v-bind="args" @select="onSelect">
                 <template v-for="entry in entries" v-slot:[entry]>
                     <SmallPage style="margin: 0; width: 50rem">{{ entry }}</SmallPage>
                 </template>

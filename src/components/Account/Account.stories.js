@@ -32,21 +32,11 @@ export const Default = (args) => ({
     // The story's `args` need to be mapped into the template through the `setup()` method
     setup() {
         // Story args can be spread into the returned object
-        return { ...args, action };
+        return { args, action };
     },
     // Then, the spread values can be accessed directly in the template
     template: `
-        <Account ref="account"
-            :label="label"
-            :displayAsCashlink="displayAsCashlink"
-            :decimals="decimals"
-            :layout="layout"
-            :address="address"
-            :image="image"
-            :placeholder="placeholder"
-            :walletLabel="walletLabel"
-            :balance="balance"
-            :editable="editable"
+        <Account v-bind="args"
             @changed="action('changed')($event)"
         />
     `,

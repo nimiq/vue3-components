@@ -23,22 +23,11 @@ const Template = (args) => ({
     // The story's `args` need to be mapped into the template through the `setup()` method
     setup() {
         // Story args can be spread into the returned object
-        return { ...args, action };
+        return { args, action };
     },
     // Then, the spread values can be accessed directly in the template
     template: `
-        <AccountList
-            walletId="helloworld1"
-
-            :accounts="accounts"
-            :decimals="decimals"
-            :editable="editable"
-            :disabled="disabled"
-            :minBalance="minBalance"
-            :tooltipProps="tooltipProps"
-            :disableContracts="disableContracts"
-            :disabledAddresses="disabledAddresses"
-
+        <AccountList v-bind="args"
             @account-changed="action('account-changed')($event)"
             @account-selected="action('account-selected')($event)"
         />

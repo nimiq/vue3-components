@@ -16,16 +16,16 @@ const Template = (args) => ({
     // The story's `args` need to be mapped into the template through the `setup()` method
     setup() {
         // Story args can be spread into the returned object
-        return { ...args, action };
+        return { args, action };
     },
     // Then, the spread values can be accessed directly in the template
     template: `
         <div>
             Atomatic width/height:<br/><br/>
-            <AccountRing :addresses="addresses" :animate="animate"/>
+            <AccountRing v-bind="args"/>
 
             <br/>300px width/height:<br/><br/>
-            <AccountRing style="width: 300px;" :addresses="addresses" :animate="animate"/>
+            <AccountRing style="width: 300px;" v-bind="args"/>
         </div>
     `,
 });

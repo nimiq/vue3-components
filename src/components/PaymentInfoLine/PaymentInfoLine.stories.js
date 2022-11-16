@@ -27,25 +27,12 @@ const Template = (args) => ({
         const tooltipContainer$ = ref(null);
 
         // Story args can be spread into the returned object
-        return {
-            ...args,
-            tooltipContainer$,
-        };
+        return { args, tooltipContainer$ };
     },
     // Then, the spread values can be accessed directly in the template
     template: `
-        <div style="max-width: 420px" :class="{ 'nq-blue-bg': theme === 'inverse' }" ref="tooltipContainer$">
-            <PaymentInfoLine
-                :cryptoAmount="cryptoAmount"
-                :fiatAmount="fiatAmount"
-                :vendorMarkup="vendorMarkup"
-                :networkFee="networkFee"
-                :origin="origin"
-                :address="address"
-                :shopLogoUrl="shopLogo"
-                :startTime="startTime"
-                :endTime="endTime"
-                :theme="theme"
+        <div style="max-width: 420px" :class="{ 'nq-blue-bg': args.theme === 'inverse' }" ref="tooltipContainer$">
+            <PaymentInfoLine v-bind="args"
                 :tooltipContainer="tooltipContainer$"
             />
         </div>
