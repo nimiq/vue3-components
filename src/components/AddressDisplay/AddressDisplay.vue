@@ -12,8 +12,14 @@ export default defineComponent({
     name: 'AddressDisplay',
     components: { Copyable },
     props: {
-        address: { type: String, required: true },
-        copyable: { type: Boolean, default: false },
+        address: {
+            type: String,
+            required: true,
+        },
+        copyable: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props) {
         const chunks = computed(() => {
