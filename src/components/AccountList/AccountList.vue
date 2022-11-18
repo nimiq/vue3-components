@@ -58,9 +58,14 @@ import Tooltip from '../Tooltip/Tooltip.vue';
 import { CaretRightSmallIcon } from '../Icons';
 import { loadI18n } from '../../i18n/I18nComposable';
 
+export enum AccountListEvent {
+    ACCOUNT_SELECTED = 'account-selected',
+    ACCOUNT_CHANGED = 'account-changed',
+}
+
 export default defineComponent({
     name: 'AccountList',
-    emits: ['account-selected', 'account-changed'],
+    emits: Object.values(AccountListEvent),
     props: {
         accounts: {
             type: Array as () => Array<AccountInfo | ContractInfo>,
@@ -70,12 +75,21 @@ export default defineComponent({
             type: Array as () => string[],
             default: () => [],
         },
+        editable: {
+            type: Boolean,
+            default: false,
+        },
+        disableContracts: {
+            type: Boolean,
+            default: false,
+        },
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
         walletId: String,
-        editable: Boolean,
         decimals: Number,
         minBalance: Number,
-        disableContracts: Boolean,
-        disabled: Boolean,
         tooltipProps: Object,
     },
     methods: { $t: loadI18n('AccountList') },
@@ -86,16 +100,16 @@ export default defineComponent({
         const accounts$ = ref<Record<string, (typeof Account)>>({});
         const tooltips$ = ref<Record<string, (typeof Tooltip)>>({});
 
+        onBeforeUpdate(() => {
+            accounts$.value = {};
+            tooltips$.value = {};
+        });
+
         function focus(address: string) {
             if (props.editable && accounts$.value.hasOwnProperty(address)) {
                 (accounts$.value[address] as (typeof Account)).focus();
             }
         }
-
-        onBeforeUpdate(() => {
-            accounts$.value = {};
-            tooltips$.value = {};
-        });
 
         function accountSelected(account: AccountInfo | ContractInfo) {
             if (props.disabled || props.editable) return;
@@ -119,12 +133,12 @@ export default defineComponent({
                 highlightedDisabledAddressTimeout.value =
                     window.setTimeout(() => clearHighlightedDisabledAddress(), waitTime);
             } else {
-                context.emit('account-selected', account.walletId || props.walletId, account.userFriendlyAddress);
+                context.emit(AccountListEvent.ACCOUNT_SELECTED, account.walletId || props.walletId, account.userFriendlyAddress);
             }
         }
 
         function onAccountChanged(address: string, label: string) {
-            context.emit('account-changed', address, label);
+            context.emit(AccountListEvent.ACCOUNT_CHANGED, address, label);
         }
 
         function isDisabled(account: AccountInfo | ContractInfo) {
@@ -159,6 +173,8 @@ export default defineComponent({
             }
             highlightedDisabledAddress.value = null;
         }
+
+        context.expose({ focus });
 
         return {
             highlightedDisabledAddress,
