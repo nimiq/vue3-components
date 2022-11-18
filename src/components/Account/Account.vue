@@ -11,7 +11,12 @@
 
             <div v-if="!editable" class="label" :class="{ 'address-font': isLabelNimiqAddress() }">{{ label }}</div>
             <div v-else class="label editable" :class="{ 'address-font': isLabelNimiqAddress() }">
-                <LabelInput :maxBytes="63" :value="label" :placeholder="placeholder" @update:modelValue="onInput" ref="label$"/>
+                <LabelInput ref="label$"
+                    :maxBytes="63"
+                    :value="label"
+                    :placeholder="placeholder"
+                    @update:modelValue="onModelValueUpdate"
+                />
             </div>
 
             <div v-if="layout === 'column' && walletLabel" class="nq-label wallet-label">{{ walletLabel }}</div>
@@ -22,82 +27,94 @@
 </template>
 
 <script lang="ts">
-    import { defineComponent, Ref, ref, watch } from 'vue'
-    import Identicon from '../Identicon/Identicon.vue';
-    import Amount from '../Amount/Amount.vue';
-    import LabelInput from '../LabelInput/LabelInput.vue';
-    import { ValidationUtils } from '@nimiq/utils';
+import { defineComponent, Ref, ref, watch } from 'vue'
+import Identicon from '../Identicon/Identicon.vue';
+import Amount from '../Amount/Amount.vue';
+import LabelInput from '../LabelInput/LabelInput.vue';
+import { ValidationUtils } from '@nimiq/utils';
 
-    export default defineComponent({
-        name: 'Account',
-        emits: ['changed'],
-        props: {
-            label: {
-                type: String,
-                required: true,
-            },
-            displayAsCashlink: {
-                type: Boolean,
-                default: false,
-            },
-            decimals: {
-                type: Number,
-                default: 2,
-            },
-            layout: {
-                type: String,
-                default: 'row',
-                validator: (layout: any) => ['row', 'column'].indexOf(layout) !== -1,
-            },
-            address: String,
-            image: String,
-            placeholder: String,
-            walletLabel: String,
-            balance: Number,
-            editable: Boolean,
+export enum AccountEvent {
+    CHANGED = 'changed',
+}
+
+export enum AccountLayout {
+    ROW = 'row',
+    COLUMN = 'column',
+}
+
+export default defineComponent({
+    name: 'Account',
+    emits: Object.values(AccountEvent),
+    props: {
+        label: {
+            type: String,
+            required: true,
         },
-        setup: (props, context) => {
-            const label$ = ref<(typeof LabelInput) | null>(null);
-            const showImage: Ref<boolean> = ref(!!props.image);
-
-            function focus() {
-                if (props.editable && label$.value) {
-                    label$.value.focus();
-                }
-            }
-
-            context.expose({ focus });
-
-            function onInput(label: string) {
-                context.emit('changed', label);
-            }
-
-            watch(() => props.image, () => {
-                showImage.value = !!props.image;
-            }, { immediate: true });
-
-            function isNimiqAddress() {
-                return props.address ? ValidationUtils.isValidAddress(props.address) : false;
-            }
-
-            function isLabelNimiqAddress() {
-                return ValidationUtils.isValidAddress(props.label);
-            }
-
-            return {
-                label$,
-                showImage,
-                isNimiqAddress,
-                isLabelNimiqAddress,
-                onInput,
-            };
+        displayAsCashlink: {
+            type: Boolean,
+            default: false,
         },
-        components: {
-            Identicon,
-            Amount,
-            LabelInput
+        decimals: {
+            type: Number,
+            default: 2,
+        },
+        layout: {
+            type: String,
+            default: AccountLayout.ROW,
+            validator: (layout: any) => Object.values(AccountLayout).includes(layout),
+        },
+        editable: {
+            type: Boolean,
+            default: false,
+        },
+        address: String,
+        image: String,
+        placeholder: String,
+        walletLabel: String,
+        balance: Number,
+    },
+    setup: (props, context) => {
+        const label$ = ref<(typeof LabelInput) | null>(null);
+        const showImage: Ref<boolean> = ref(!!props.image);
+
+        function focus() {
+            if (props.editable && label$.value) {
+                label$.value.focus();
+            }
         }
-    })
+
+        function onModelValueUpdate(label: string) {
+            context.emit(AccountEvent.CHANGED, label);
+        }
+
+        watch(() => props.image, () => {
+            showImage.value = !!props.image;
+        }, { immediate: true });
+
+        function isNimiqAddress() {
+            return props.address ? ValidationUtils.isValidAddress(props.address) : false;
+        }
+
+        function isLabelNimiqAddress() {
+            return ValidationUtils.isValidAddress(props.label);
+        }
+
+        context.expose({ focus });
+
+        return {
+            label$,
+            showImage,
+            isNimiqAddress,
+            isLabelNimiqAddress,
+            onModelValueUpdate,
+        };
+    },
+    components: {
+        Identicon,
+        Amount,
+        LabelInput
+    }
+})
 </script>
 
 <style scoped>
