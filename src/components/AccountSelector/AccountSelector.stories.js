@@ -1,10 +1,11 @@
-import { action } from '@storybook/addon-actions';
-import AccountSelector from './AccountSelector.vue';
+import { getEventListenerFromEnum, getEventArgTypeFromEnum } from '../../helpers/storybook/EventHelper';
+import AccountSelector, { AccountSelectorEvent } from './AccountSelector.vue';
 
 export default {
     title: 'AccountSelector',
     component: AccountSelector,
     argTypes: {
+        // Props
         wallets: { control: { type: 'object' } },
         disabledAddresses: { control: { type: 'object' } },
         allowLogin: { control: { type: 'boolean' } },
@@ -15,23 +16,22 @@ export default {
         disableBip39Accounts: { control: { type: 'boolean' } },
         disableLedgerAccounts: { control: { type: 'boolean' } },
         highlightBitcoinAccounts: { control: { type: 'boolean' } },
+
+        // Events
+        ...getEventArgTypeFromEnum(AccountSelectorEvent),
     },
 };
 
 const Template = (args) => ({
-    // Components used in your story `template` are defined in the `components` object
     components: { AccountSelector },
-    // The story's `args` need to be mapped into the template through the `setup()` method
     setup() {
-        // Story args can be spread into the returned object
-        return { args, action };
+        return {
+            events: getEventListenerFromEnum(AccountSelectorEvent),
+            args,
+        };
     },
-    // Then, the spread values can be accessed directly in the template
     template: `
-        <AccountSelector v-bind="args"
-            @account-selected="action('account-selected')($event)"
-            @login="action('login')($event)"
-        />
+        <AccountSelector v-bind="args" v-on="events" />
     `,
 });
 
@@ -67,14 +67,8 @@ SingleAccount.args = {
         },
     ],
     disabledAddresses: ['NQ33 DH76 PHUKJ41Q LX3A U4E0 M0BM QJH9 QQL1'],
-    allowLogin: true,
     minBalance: 500 * 1e5,
     decimals: 2,
-    disableContracts: false,
-    disableLegacyAccounts: false,
-    disableBip39Accounts: false,
-    disableLedgerAccounts: false,
-    highlightBitcoinAccounts: true,
 };
 
 export const MultipleAccounts = Template.bind({});
@@ -138,12 +132,6 @@ MultipleAccounts.args = {
         }
     ],
     disabledAddresses: ['NQ33 DH76 PHUKJ41Q LX3A U4E0 M0BM QJH9 QQL1'],
-    allowLogin: true,
     minBalance: 500 * 1e5,
     decimals: 2,
-    disableContracts: false,
-    disableLegacyAccounts: false,
-    disableBip39Accounts: false,
-    disableLedgerAccounts: false,
-    highlightBitcoinAccounts: true,
 };

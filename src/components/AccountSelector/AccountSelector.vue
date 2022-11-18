@@ -76,9 +76,14 @@ export interface WalletInfo {
     btcXPub?: string;
 }
 
+export enum AccountSelectorEvent {
+    ACCOUNT_SELECTED = 'account-selected',
+    LOGIN = 'login',
+}
+
 export default defineComponent({
     name: 'AccountSelector',
-    emits: ['account-selected', 'login'],
+    emits: Object.values(AccountSelectorEvent),
     components: { AccountList, Tooltip },
     props: {
         wallets: {
@@ -95,11 +100,26 @@ export default defineComponent({
         },
         decimals: Number,
         minBalance: Number,
-        disableContracts: Boolean,
-        disableLegacyAccounts: Boolean,
-        disableBip39Accounts: Boolean,
-        disableLedgerAccounts: Boolean,
-        highlightBitcoinAccounts: Boolean,
+        disableContracts: {
+            type: Boolean,
+            default: false,
+        },
+        disableLegacyAccounts: {
+            type: Boolean,
+            default: false,
+        },
+        disableBip39Accounts: {
+            type: Boolean,
+            default: false,
+        },
+        disableLedgerAccounts: {
+            type: Boolean,
+            default: false,
+        },
+        highlightBitcoinAccounts: {
+            type: Boolean,
+            default: false,
+        },
     },
     methods: { $t: loadI18n('AccountSelector') },
     setup: (props, context) => {
@@ -149,11 +169,11 @@ export default defineComponent({
         });
 
         function onAccountSelected(walletId: string, address: string) {
-            context.emit('account-selected', { walletId, address });
+            context.emit(AccountSelectorEvent.ACCOUNT_SELECTED, { walletId, address });
         }
 
         function onLogin() {
-            context.emit('login');
+            context.emit(AccountSelectorEvent.LOGIN);
         }
 
         function isAccountDisabled(account: WalletInfo): boolean {
