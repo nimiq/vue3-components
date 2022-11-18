@@ -1,42 +1,46 @@
-import { action } from '@storybook/addon-actions'
-import AmountInput from './AmountInput.vue';
+import { ref } from 'vue';
+import { getEventArgTypeFromEnum, getEventListenerFromEnum } from '../../helpers/storybook/EventHelper';
+import AmountInput, { AmountInputEvent } from './AmountInput.vue';
 
 export default {
     title: 'AmountInput',
     component: AmountInput,
     argTypes: {
+        // Props
         maxFontSize: { control: { type: 'number' } },
         placeholder: { control: { type: 'text' } },
         vanishing: { control: { type: 'boolean' } },
         decimals: { control: { type: 'number' } },
-        modelValue: {
-            control: { type: 'number' },
-            table: { disable: true },
-        },
+        modelValue: { control: false },
+
+        // Events
+        ...getEventArgTypeFromEnum(AmountInputEvent),
+
+        // TODO: for some reasons the storybook displays an <undefined> event on the story 🤷
+        // It would be nice to get rid of it in the future if someone find the reason for it
     },
 };
 
-const Template = (args) => ({
-    // Components used in your story `template` are defined in the `components` object
+export const Default = (args) => ({
     components: { AmountInput },
-    // The story's `args` need to be mapped into the template through the `setup()` method
     setup() {
-        // Story args can be spread into the returned object
-        return { args, action };
+        const amountInput$ = ref(null);
+
+        function focus() {
+            if (amountInput$.value) amountInput$.value.focus();
+        }
+
+        return {
+            events: getEventListenerFromEnum(AmountInputEvent),
+            args,
+            amountInput$,
+            focus,
+        };
     },
-    // Then, the spread values can be accessed directly in the template
     template: `
-        <AmountInput v-bind="args" v-model="args.modelValue"
-            @input="action('input')($event.target.value)"
-        />
+        <button class="nq-button-s" @click="focus">Focus</button>
+        <br />
+        <br />
+        <AmountInput ref="amountInput$" v-bind="args" v-model="args.modelValue" v-on="events" />
     `,
 });
-
-export const Default = Template.bind({});
-Default.args = {
-    maxFontSize: 8,
-    placeholder: '0',
-    vanishing: false,
-    decimals: 5,
-    modelValue: 0,
-};

@@ -1,6 +1,6 @@
 <template>
     <div class="amount-input" :class="{ 'has-value': valueInLuna > 0, 'focussed': isFocussed }">
-        <form class="label-input" @submit.prevent ref="fullWidth$">
+        <form class="label-input" @submit.prevent="$emit(AmountInputEvent.SUBMIT, $event)" ref="fullWidth$">
             <span class="width-finder width-placeholder" ref="widthPlaceholder$">{{ placeholder }}</span>
             <div v-if="maxFontSize" class="full-width" :class="{ 'width-finder': maxWidth > 0 }">Width</div>
             <span class="width-finder width-value" ref="widthValue$">{{ formattedValue || '' }}</span>
@@ -11,6 +11,7 @@
                 :style="{ width: `${width}px`, fontSize: `${fontSize}rem` }"
                 @focus="isFocussed = true"
                 @blur="isFocussed = false"
+                @paste="$emit(AmountInputEvent.PASTE, $event)"
                 v-model="formattedValue"
             />
         </form>
@@ -21,9 +22,15 @@
 <script lang="ts">
 import { computed, defineComponent, onMounted, ref, watch, nextTick } from 'vue';
 
+export enum AmountInputEvent {
+    MODELVALUE_UPDATE = 'update:modelValue',
+    PASTE = 'paste',
+    SUBMIT = 'submit',
+}
+
 export default defineComponent({
     name: 'AmountInput',
-    emits: ['update:modelValue'],
+    emits: Object.values(AmountInputEvent),
     props: {
         modelValue: Number,
         maxFontSize: {
@@ -64,11 +71,8 @@ export default defineComponent({
         });
 
         function focus() {
-            if (input$.value) {
-                input$.value.focus();
-            }
+            if (input$.value) input$.value.focus();
         }
-        context.expose({ focus });
 
         function updateValue(newValue: number) {
             if (newValue === valueInLuna.value) return;
@@ -100,7 +104,7 @@ export default defineComponent({
                     liveValue.value = '';
                     lastEmittedValue.value = 0;
                     valueInLuna.value = 0;
-                    context.emit('update:modelValue', valueInLuna.value);
+                    context.emit(AmountInputEvent.MODELVALUE_UPDATE, valueInLuna.value);
                     return;
                 }
 
@@ -118,7 +122,7 @@ export default defineComponent({
                 }
 
                 if (lastEmittedValue.value !== valueInLuna.value) {
-                    context.emit('update:modelValue', valueInLuna.value);
+                    context.emit(AmountInputEvent.MODELVALUE_UPDATE, valueInLuna.value);
                     lastEmittedValue.value = valueInLuna.value;
                 }
             }
@@ -130,6 +134,8 @@ export default defineComponent({
             (newValue: number | undefined) => newValue && updateValue(newValue),
             { immediate: true }
         );
+
+        context.expose({ focus, formattedValue });
 
         return {
             fullWidth$,
@@ -143,6 +149,8 @@ export default defineComponent({
             formattedValue,
             width,
             fontSize,
+
+            AmountInputEvent,
         };
     },
 });
