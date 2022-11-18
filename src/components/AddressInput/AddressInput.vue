@@ -130,9 +130,15 @@ function willBeAddress(value: string): boolean {
     return false;
 }
 
+export enum AddressInputEvent {
+    PASTE = 'paste',
+    MODELVALUE_UPDATE = 'update:modelValue',
+    ADDRESS = 'address',
+}
+
 export default defineComponent({
     name: "AddressInput",
-    emits: ['paste', 'update:modelValue', 'address'],
+    emits: Object.values(AddressInputEvent),
     props: {
         // value that can be bound to via v-model
         modelValue: {
@@ -143,13 +149,6 @@ export default defineComponent({
         allowDomains: Boolean,
     },
     setup(props, context) {
-        function focus(scrollIntoView = false) {
-            if (!textarea$.value) return;
-
-            textarea$.value.focus();
-            if (scrollIntoView) textarea$.value.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-
         const root$ = ref<HTMLDivElement | null>(null);
         const textarea$ = ref<HTMLTextAreaElement | null>(null);
 
@@ -177,6 +176,13 @@ export default defineComponent({
         onUnmounted(() => {
             document.removeEventListener('selectionchange', updateSelection);
         });
+
+        function focus(scrollIntoView = false) {
+            if (!textarea$.value) return;
+
+            textarea$.value.focus();
+            if (scrollIntoView) textarea$.value.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
 
         watch(() => props.modelValue, () => onExternalValueChange());
         function onExternalValueChange() {
@@ -220,7 +226,7 @@ export default defineComponent({
         function onPaste(e: ClipboardEvent) {
             const clipboardData = e.clipboardData;
             const pastedData = clipboardData ? clipboardData.getData('text/plain') : '';
-            context.emit('paste', e, pastedData);
+            context.emit(AddressInputEvent.PASTE, e, pastedData);
 
             inputFormatOnPaste(
                 e,
@@ -269,11 +275,11 @@ export default defineComponent({
             }
 
             currentValue.value = exportValue(textarea$.value.value, props.allowDomains);
-            context.emit('update:modelValue', currentValue.value); // emit event compatible with v-model
+            context.emit(AddressInputEvent.MODELVALUE_UPDATE, currentValue.value); // emit event compatible with v-model
 
             if (willBeAddress(value)) {
                 const isValid = ValidationUtils.isValidAddress(currentValue.value);
-                if (isValid) context.emit('address', currentValue.value);
+                if (isValid) context.emit(AddressInputEvent.ADDRESS, currentValue.value);
 
                 if (root$.value) {
                     // if user entered a full address that is not valid give him a visual feedback
@@ -297,6 +303,8 @@ export default defineComponent({
         function isBlockFocused(blockIndex: number) {
             return selectionStartBlock.value <= blockIndex && blockIndex <= selectionEndBlock.value;
         }
+
+        context.expose({ focus });
 
         return {
             root$,
