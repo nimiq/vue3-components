@@ -8,6 +8,7 @@
     "declaration": true,
     "jsx": "preserve",
     "sourceMap": true,
+    "skipLibCheck": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "importHelpers": true,
