@@ -1,10 +1,10 @@
-import { action } from '@storybook/addon-actions';
 import Amount from './Amount.vue';
 
 export default {
     title: 'Amount',
     component: Amount,
     argTypes: {
+        // Props
         amount: { control: { type: 'number', expanded: true } },
         decimals: { control: { type: 'number' } },
         minDecimals: { control: { type: 'number' } },
@@ -16,18 +16,12 @@ export default {
 };
 
 const Template = (args) => ({
-    // Components used in your story `template` are defined in the `components` object
     components: { Amount },
-    // The story's `args` need to be mapped into the template through the `setup()` method
     setup() {
-        // Story args can be spread into the returned object
-        return { args, action };
+        return { args };
     },
-    // Then, the spread values can be accessed directly in the template
     template: `
-        <div>
-            <Amount v-bind="args" />
-        </div>
+        <Amount v-bind="args" />
     `,
 });
 
