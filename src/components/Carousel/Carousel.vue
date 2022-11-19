@@ -13,8 +13,13 @@
 import { computed, defineComponent, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import { Tweenable } from '@nimiq/utils';
 
+export enum CarouselEvent {
+    SELECT = 'select',
+}
+
 export default defineComponent({
     name: 'Carousel',
+    emits: Object.values(CarouselEvent),
     props: {
         entries: {
             type: Array as () => string[],
@@ -121,7 +126,7 @@ export default defineComponent({
             } // else keep the old selection
 
             if (effectiveSelected.value !== oldSelection) {
-                context.emit('select', effectiveSelected.value);
+                context.emit(CarouselEvent.SELECT, effectiveSelected.value);
             }
         }
 
