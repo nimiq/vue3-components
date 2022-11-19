@@ -11,7 +11,7 @@
             :disabled="disabled"
             @input="onInput"
             @blur="onBlur"
-            @paste="$emit('paste', $event)"
+            @paste="$emit(LabelInputEvent.PASTE, $event)"
             ref="input$">
     </form>
 </template>
@@ -21,9 +21,15 @@ import { defineComponent, nextTick, ref, watch } from 'vue';
 import { Utf8Tools } from '@nimiq/utils';
 import { loadI18n } from '../../i18n/I18nComposable';
 
+export enum LabelInputEvent {
+    MODELVALUE_UPDATE = 'update:modelValue',
+    CHANGED = 'changed',
+    PASTE = 'paste',
+}
+
 export default defineComponent({
     name: 'LabelInput',
-    emits: ['update:modelValue', 'changed', 'paste'],
+    emits: Object.values(LabelInputEvent),
     props: {
         maxBytes: Number, // was a `protected` prop with vue2 class component
         modelValue: {
@@ -54,7 +60,6 @@ export default defineComponent({
         function focus() {
             if (input$.value) input$.value.focus();
         }
-        context.expose({ focus });
 
         function onInput() {
             if (props.maxBytes) {
@@ -65,12 +70,12 @@ export default defineComponent({
                 }
                 lastValue.value = liveValue.value;
             }
-            context.emit('update:modelValue', liveValue.value);
+            context.emit(LabelInputEvent.MODELVALUE_UPDATE, liveValue.value);
         }
 
         function onBlur() {
             if (liveValue.value === lastEmittedValue.value) return;
-            context.emit('changed', liveValue.value);
+            context.emit(LabelInputEvent.CHANGED, liveValue.value);
             lastEmittedValue.value = liveValue.value;
             if (input$.value) input$.value.blur();
         }
@@ -101,6 +106,8 @@ export default defineComponent({
             width.value = (liveValue.value.length ? valueWidth : placeholderWidth) + fontSize / 3;
         }
 
+        context.expose({ focus });
+
         return {
             input$,
             widthPlaceholder$,
@@ -111,6 +118,8 @@ export default defineComponent({
 
             onInput,
             onBlur,
+
+            LabelInputEvent,
         };
     },
 })
