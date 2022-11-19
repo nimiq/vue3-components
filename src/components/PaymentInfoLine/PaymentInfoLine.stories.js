@@ -5,6 +5,7 @@ export default {
     title: 'PaymentInfoLine',
     component: PaymentInfoLine,
     argTypes: {
+        // Props
         cryptoAmount: { control: 'object' },
         fiatAmount: { control: 'object' },
         vendorMarkup: { control: 'number' },
@@ -20,21 +21,15 @@ export default {
 };
 
 const Template = (args) => ({
-    // Components used in your story `template` are defined in the `components` object
     components: { PaymentInfoLine },
-    // The story's `args` need to be mapped into the template through the `setup()` method
     setup() {
         const tooltipContainer$ = ref(null);
 
-        // Story args can be spread into the returned object
         return { args, tooltipContainer$ };
     },
-    // Then, the spread values can be accessed directly in the template
     template: `
         <div style="max-width: 420px" :class="{ 'nq-blue-bg': args.theme === 'inverse' }" ref="tooltipContainer$">
-            <PaymentInfoLine v-bind="args"
-                :tooltipContainer="tooltipContainer$"
-            />
+            <PaymentInfoLine v-bind="args" :tooltipContainer="tooltipContainer$" />
         </div>
     `,
 });
