@@ -17,9 +17,13 @@ export interface SelectBarOption {
     index: number;
 }
 
+export enum SelectBarEvent {
+    CHANGED = 'changed',
+}
+
 export default defineComponent({
     name: 'SelectBar',
-    emits: ['changed'],
+    emits: Object.values(SelectBarEvent),
     props: {
         name: {
             type: String,
@@ -47,7 +51,7 @@ export default defineComponent({
 
         watch(selectedOption, onChanged);
         function onChanged(option: SelectBarOption) {
-            context.emit('changed', option.value);
+            context.emit(SelectBarEvent.CHANGED, option.value);
         }
 
         context.expose({ value });
