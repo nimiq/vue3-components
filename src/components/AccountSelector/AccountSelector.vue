@@ -2,14 +2,14 @@
     <div class="account-selector">
         <div ref="container$" class="container" :class="{'extra-spacing': wallets.length === 1}">
             <div v-for="wallet in sortedWallets" :key="wallet.id">
-                <div v-if="wallets.length > 1 || _isAccountDisabled(wallet)" class="wallet-label">
+                <div v-if="wallets.length > 1 || isAccountDisabled(wallet)" class="wallet-label">
                     <div class="nq-label">
                         {{ wallet.label }}
                         <span v-if="highlightBitcoinAccounts && wallet.btcXPub" class="btc-pill">BTC</span>
                     </div>
                     <!-- tooltip$ should be of type 'ComponentPublicInstance' imported from ‘vue', but types cannot be passed to template -->
                     <Tooltip
-                        v-if="_isAccountDisabled(wallet)"
+                        v-if="isAccountDisabled(wallet)"
                         :ref="(tooltip$: any) => tooltips$[`tooltip-${wallet.id}`] = tooltip$"
                         :margin="tooltipProps.margin"
                         :container="tooltipProps.container || undefined"
@@ -18,7 +18,7 @@
                     >
                         {{ $t(
                             '{type} accounts cannot be used for this operation.',
-                            { type: _getAccountTypeName(wallet)},
+                            { type: getAccountTypeName(wallet)},
                         ) }}
                     </Tooltip>
                 </div>
@@ -29,10 +29,10 @@
                     :minBalance="minBalance"
                     :decimals="decimals"
                     :disableContracts="disableContracts"
-                    :disabled="_isAccountDisabled(wallet)"
+                    :disabled="isAccountDisabled(wallet)"
                     :tooltipProps="tooltipProps"
                     @account-selected="onAccountSelected"
-                    @click="_accountClicked(wallet)"
+                    @click="accountClicked(wallet)"
                 />
             </div>
         </div>
@@ -76,9 +76,14 @@ export interface WalletInfo {
     btcXPub?: string;
 }
 
+export enum AccountSelectorEvent {
+    ACCOUNT_SELECTED = 'account-selected',
+    LOGIN = 'login',
+}
+
 export default defineComponent({
     name: 'AccountSelector',
-    emits: ['account-selected', 'login'],
+    emits: Object.values(AccountSelectorEvent),
     components: { AccountList, Tooltip },
     props: {
         wallets: {
@@ -95,11 +100,26 @@ export default defineComponent({
         },
         decimals: Number,
         minBalance: Number,
-        disableContracts: Boolean,
-        disableLegacyAccounts: Boolean,
-        disableBip39Accounts: Boolean,
-        disableLedgerAccounts: Boolean,
-        highlightBitcoinAccounts: Boolean,
+        disableContracts: {
+            type: Boolean,
+            default: false,
+        },
+        disableLegacyAccounts: {
+            type: Boolean,
+            default: false,
+        },
+        disableBip39Accounts: {
+            type: Boolean,
+            default: false,
+        },
+        disableLedgerAccounts: {
+            type: Boolean,
+            default: false,
+        },
+        highlightBitcoinAccounts: {
+            type: Boolean,
+            default: false,
+        },
     },
     methods: { $t: loadI18n('AccountSelector') },
     setup: (props, context) => {
@@ -126,8 +146,8 @@ export default defineComponent({
 
         const sortedWallets = computed<WalletInfo[]>(() => {
             return props.wallets.slice(0).sort((a: WalletInfo, b: WalletInfo): number => {
-                const aDisabled = _isAccountDisabled(a);
-                const bDisabled = _isAccountDisabled(b);
+                const aDisabled = isAccountDisabled(a);
+                const bDisabled = isAccountDisabled(b);
 
                 if (aDisabled && !bDisabled) return 1;
                 if (!aDisabled && bDisabled) return -1;
@@ -149,20 +169,20 @@ export default defineComponent({
         });
 
         function onAccountSelected(walletId: string, address: string) {
-            context.emit('account-selected', { walletId, address });
+            context.emit(AccountSelectorEvent.ACCOUNT_SELECTED, { walletId, address });
         }
 
         function onLogin() {
-            context.emit('login');
+            context.emit(AccountSelectorEvent.LOGIN);
         }
 
-        function _isAccountDisabled(account: WalletInfo): boolean {
+        function isAccountDisabled(account: WalletInfo): boolean {
             return props.disableLegacyAccounts && account.type === 1 /* LEGACY */
                 || props.disableBip39Accounts && account.type === 2 /* BIP39 */
                 || props.disableLedgerAccounts && account.type === 3 /* LEDGER */;
         }
 
-        function _getAccountTypeName(account: WalletInfo): string {
+        function getAccountTypeName(account: WalletInfo): string {
             switch (account.type) {
                 case 1: return loadI18n('AccountSelector')('Legacy');
                 case 2: return 'Keyguard';
@@ -171,7 +191,7 @@ export default defineComponent({
             }
         }
 
-        function _accountClicked(account: WalletInfo) {
+        function accountClicked(account: WalletInfo) {
             window.clearTimeout(hideTooltipTimeout.value);
 
             const tooltip = tooltips$.value[`tooltip-${account.id}`]
@@ -235,9 +255,9 @@ export default defineComponent({
             onLogin,
             listAccountsAndContracts,
             sortAccountsAndContracts,
-            _isAccountDisabled,
-            _getAccountTypeName,
-            _accountClicked,
+            isAccountDisabled,
+            getAccountTypeName,
+            accountClicked,
         };
     }
 })

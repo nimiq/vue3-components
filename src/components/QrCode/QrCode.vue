@@ -7,6 +7,13 @@ import { defineComponent, watch, nextTick, ref } from 'vue'
 
 import QrCreator from 'qr-creator';
 
+export enum QrCodeErrorCorrection {
+    L = 'L',
+    M = 'M',
+    H = 'H',
+    Q = 'Q',
+}
+
 /**
  * **Nimiq QR Code Component**
  *
@@ -32,9 +39,9 @@ export default defineComponent({
     props: {
         data: String,
         errorCorrection: {
-            type: String as () => 'L' | 'M' | 'H' | 'Q',
-            default: 'M',
-            validator: (value: string) => ['L', 'M', 'H', 'Q'].includes(value)
+            type: String as () => QrCodeErrorCorrection,
+            default: QrCodeErrorCorrection.M,
+            validator: (value: any) => Object.values(QrCodeErrorCorrection).includes(value)
         },
         radius: {
             type: Number,

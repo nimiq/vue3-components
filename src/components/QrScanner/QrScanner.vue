@@ -8,7 +8,7 @@
                 </svg>
             </slot>
         </div>
-        <button class="nq-button-s inverse cancel-button" @click="_cancel">{{ $t('Cancel') }}</button>
+        <button class="nq-button-s inverse cancel-button" @click="cancel">{{ $t('Cancel') }}</button>
 
         <transition name="fade">
             <div v-if="cameraAccessFailed" class="camera-access-failed">
@@ -21,7 +21,8 @@
                     </div>
                     <div v-if="isMobileOrTablet">
                         <div v-if="browser === 'chrome'">
-                            <I18n path="Click on {icon} and go to\nSettings > Site Settings > Camera" tag="div"
+                            <I18n path="Click on {icon} and go to\nSettings > Site Settings > Camera"
+                                tag="div" componentName="QrScanner"
                                 class="access-denied-instructions">
                                 <template #icon>
                                     <span class="browser-menu-icon"></span>
@@ -36,12 +37,14 @@
                     </div>
                     <div v-else class="access-denied-instructions">
                         <I18n v-if="browser === 'safari'"
-                            path="Click on {safari} and go to\nSettings for this Website > Camera" tag="div">
+                            path="Click on {safari} and go to\nSettings for this Website > Camera"
+                            tag="div" componentName="QrScanner">
                             <template #safari>
                                 <b>Safari</b>
                             </template>
                         </I18n>
-                        <I18n v-else path="Click on {icon} in the URL bar." tag="div">
+                        <I18n v-else path="Click on {icon} in the URL bar."
+                            tag="div" componentName="QrScanner">
                             <template #icon>
                                 <span v-if="browser === 'chrome'" class="camera-icon-chrome"></span>
                                 <span v-else-if="browser === 'firefox'" class="camera-icon-firefox"></span>
@@ -61,7 +64,7 @@
 import { defineComponent, onMounted, onUnmounted, PropType, ref } from 'vue';
 import QrScannerLib from 'qr-scanner';
 import { BrowserDetection } from '@nimiq/utils';
-import I18n from '../../i18n/I18n.vue';
+import I18n from '../../i18n/I18n';
 import { loadI18n } from '../../i18n/I18nComposable';
 
 export const enum QrScannerEvents {
@@ -91,20 +94,20 @@ export default defineComponent({
         const isMobileOrTablet: boolean = BrowserDetection.isMobile();
         const browser: BrowserDetection.Browser = BrowserDetection.detectBrowser();
 
-        let _scanner: QrScannerLib | null = null;
-        let _lastResult: string = '';
-        let _lastResultTime: number = 0;
-        let _cameraRetryTimer: number | null = null;
+        let scanner: QrScannerLib | null = null;
+        let lastResult: string = '';
+        let lastResultTime: number = 0;
+        let cameraRetryTimer: number | null = null;
 
         onMounted(async () => {
             // this.repositionOverlay = this.repositionOverlay.bind(this); // TODO: is this still necessary?
-            _scanner = new QrScannerLib(video$.value!, (result) => _onResult(result), {});
+            scanner = new QrScannerLib(video$.value!, (result) => onResult(result), {});
             video$.value!.addEventListener('canplay', () => video$.value!.classList.add('ready'));
             window.addEventListener('resize', repositionOverlay);
 
             QrScannerLib.hasCamera().then((newHasCamera) => hasCamera.value = newHasCamera);
 
-            if (_isVisible()) {
+            if (isVisible()) {
                 start();
                 repositionOverlay();
             }
@@ -112,43 +115,43 @@ export default defineComponent({
 
         onUnmounted(() => {
             stop();
-            if (_scanner) _scanner.destroy();
+            if (scanner) scanner.destroy();
             window.removeEventListener('resize', repositionOverlay);
         })
 
         async function start() {
             try {
-                await _scanner!.start();
+                await scanner!.start();
                 cameraAccessFailed.value = false;
-                if (_cameraRetryTimer) {
-                    window.clearInterval(_cameraRetryTimer);
-                    _cameraRetryTimer = null;
+                if (cameraRetryTimer) {
+                    window.clearInterval(cameraRetryTimer);
+                    cameraRetryTimer = null;
                 }
             } catch (e) {
                 cameraAccessFailed.value = true;
                 context.emit(QrScannerEvents.ERROR, e);
-                if (!_cameraRetryTimer) {
-                    _cameraRetryTimer = window.setInterval(() => start(), 3000);
+                if (!cameraRetryTimer) {
+                    cameraRetryTimer = window.setInterval(() => start(), 3000);
                 }
             }
             return !cameraAccessFailed.value;
         }
 
         function stop() {
-            if (!_scanner) return;
-            _scanner.stop();
-            if (_cameraRetryTimer) {
-                window.clearInterval(_cameraRetryTimer);
-                _cameraRetryTimer = null;
+            if (!scanner) return;
+            scanner.stop();
+            if (cameraRetryTimer) {
+                window.clearInterval(cameraRetryTimer);
+                cameraRetryTimer = null;
             }
         }
 
         function setGrayscaleWeights(red: number, green: number, blue: number) {
-            if (_scanner) _scanner.setGrayscaleWeights(red, green, blue);
+            if (scanner) scanner.setGrayscaleWeights(red, green, blue);
         }
 
         function setInversionMode(inversionMode: QrScannerLib.InversionMode) {
-            if (_scanner) _scanner.setInversionMode(inversionMode);
+            if (scanner) scanner.setInversionMode(inversionMode);
         }
 
         function repositionOverlay() {
@@ -171,19 +174,19 @@ export default defineComponent({
 
         context.expose({ start, stop, setGrayscaleWeights, setInversionMode, repositionOverlay });
 
-        function _isVisible() {
+        function isVisible() {
             return !!root$.value && root$.value.offsetWidth > 0;
         }
 
-        function _cancel() {
+        function cancel() {
             context.emit(QrScannerEvents.CANCEL);
         }
 
-        function _onResult(result: QrScannerLib.ScanResult) {
-            if ((result.data === _lastResult && Date.now() - _lastResultTime < props.reportFrequency)
+        function onResult(result: QrScannerLib.ScanResult) {
+            if ((result.data === lastResult && Date.now() - lastResultTime < props.reportFrequency)
                 || (props.validate && !props.validate(result.data))) return;
-            _lastResult = result.data;
-            _lastResultTime = Date.now();
+            lastResult = result.data;
+            lastResultTime = Date.now();
             context.emit(QrScannerEvents.RESULT, result);
         }
 
@@ -198,7 +201,7 @@ export default defineComponent({
             isMobileOrTablet,
             browser,
 
-            _cancel,
+            cancel,
         };
     },
     components: { I18n },

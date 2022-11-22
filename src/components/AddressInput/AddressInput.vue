@@ -1,12 +1,12 @@
 <template>
     <div class="address-input" :class="{ 'is-domain': isDomain }" ref="root$">
         <textarea ref="textarea$" spellcheck="false" autocomplete="off"
-            :class="{'will-be-address': willBeAddress}"
-            @keydown="_onKeyDown" @input="_onInput" @paste="_onPaste" @cut="_onCut" @copy="_formatClipboard"
-            @click="_updateSelection" @select="_updateSelection" @blur="_updateSelection" @focus="_onFocus"
+            :class="{'will-be-address': willBeAddressBool}"
+            @keydown="onKeyDown" @input="onInput" @paste="onPaste" @cut="onCut" @copy="formatClipboard"
+            @click="updateSelection" @select="updateSelection" @blur="updateSelection" @focus="onFocus"
         ></textarea>
 
-        <template v-if="willBeAddress && supportsMixBlendMode">
+        <template v-if="willBeAddressBool && supportsMixBlendMode">
             <template v-for="row in 3">
                 <template v-for="column in 3" :key="`color-${row}-${column}`">
                     <div class="color-overlay" :style="{
@@ -14,7 +14,7 @@
                         visibility: currentValue ? 'visible' : 'hidden',
                         left: `calc(${column - 1} * (var(--block-width) + var(--block-gap-h)) + var(--block-gap-h) - 0.25rem)`,
                         top: `calc(${row - 1} * (var(--block-height) + var(--block-gap-v)) + var(--block-gap-v) + 0.25rem)`,
-                        background: `var(--nimiq-${_isBlockFocused((row - 1) * 3 + (column - 1)) ? 'light-' : ''}blue)`,
+                        background: `var(--nimiq-${isBlockFocused((row - 1) * 3 + (column - 1)) ? 'light-' : ''}blue)`,
                     }"></div>
                 </template>
             </template>
@@ -50,8 +50,8 @@ export const ADDRESS_MAX_LENGTH_WITHOUT_SPACES = 9 * 4;
 export const ADDRESS_MAX_LENGTH = ADDRESS_MAX_LENGTH_WITHOUT_SPACES + 8;
 
 // definiton of the parse method for input-format (https://github.com/catamphetamine/input-format#usage)
-function _parse(char: string, value: string, allowDomains = false) {
-    if (!allowDomains || _willBeAddress(value + char)) {
+function parse(char: string, value: string, allowDomains = false) {
+    if (!allowDomains || willBeAddress(value + char)) {
         // Handle I, O, W, Z which are the only characters missing in Nimiq's Base 32 address alphabet
         switch (char.toUpperCase()) {
             case 'I': char = '1'; break;
@@ -84,10 +84,10 @@ function _parse(char: string, value: string, allowDomains = false) {
 }
 
 // definiton of the format method for input-format (https://github.com/catamphetamine/input-format#usage)
-function _format(value: string, allowDomains = false) {
-    if (!allowDomains || _willBeAddress(value)) {
+function format(value: string, allowDomains = false) {
+    if (!allowDomains || willBeAddress(value)) {
         if (value !== '' && value.toUpperCase() !== 'N') {
-            value = _stripWhitespace(value)
+            value = stripWhitespace(value)
                 .replace(/.{4}/g, (match, offset) => `${match}${(offset + 4) % 12 ? ' ' : '\n'}`) // form blocks
                 .substring(0, ADDRESS_MAX_LENGTH); // discarding the new line after last block
 
@@ -112,27 +112,33 @@ function _format(value: string, allowDomains = false) {
     }
 }
 
-function _stripWhitespace(value: string) {
+function stripWhitespace(value: string) {
     return value.replace(/\s|\u200B/g, ''); // normal whitespace, tabs, newlines or zero-width whitespace
 }
 
-function _exportValue(value: string, allowDomains = false) {
-    if (!allowDomains || _willBeAddress(value)) {
+function exportValue(value: string, allowDomains = false) {
+    if (!allowDomains || willBeAddress(value)) {
         return value.toUpperCase().replace(/\n/g, ' ').replace(/\u200B/g, '');
     } else {
         return value.replace(/\n/g, '').replace(/\u200B/g, '');
     }
 }
 
-function _willBeAddress(value: string): boolean {
+function willBeAddress(value: string): boolean {
     if (value.length < 3) return false;
     if (value.toUpperCase().startsWith('NQ') && !isNaN(parseInt(value[2], 10))) return true;
     return false;
 }
 
+export enum AddressInputEvent {
+    PASTE = 'paste',
+    MODELVALUE_UPDATE = 'update:modelValue',
+    ADDRESS = 'address',
+}
+
 export default defineComponent({
     name: "AddressInput",
-    emits: ['paste', 'update:modelValue', 'address'],
+    emits: Object.values(AddressInputEvent),
     props: {
         // value that can be bound to via v-model
         modelValue: {
@@ -143,13 +149,6 @@ export default defineComponent({
         allowDomains: Boolean,
     },
     setup(props, context) {
-        function focus(scrollIntoView = false) {
-            if (!textarea$.value) return;
-
-            textarea$.value.focus();
-            if (scrollIntoView) textarea$.value.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-
         const root$ = ref<HTMLDivElement | null>(null);
         const textarea$ = ref<HTMLTextAreaElement | null>(null);
 
@@ -158,108 +157,115 @@ export default defineComponent({
         const selectionEndBlock = ref(-1);
         const supportsMixBlendMode: boolean = CSS.supports('mix-blend-mode', 'screen');
 
-        const willBeAddress = computed(() => !props.allowDomains || _willBeAddress(currentValue.value));
-        const isDomain = computed(() => currentValue.value.length >= 3 && !willBeAddress.value);
+        const willBeAddressBool = computed(() => !props.allowDomains || willBeAddress(currentValue.value));
+        const isDomain = computed(() => currentValue.value.length >= 3 && !willBeAddressBool.value);
 
         onMounted(() => {
             // trigger initial value change. Not using immediate watcher as it already fires before mounted.
-            _onExternalValueChange();
+            onExternalValueChange();
 
             // Bind selectionchange event handler. It has to be registered on document and is unfortunately not fired for
             // selections in textareas in Firefox. Therefore we also bind the listener to focus, blur, select, click.
 
-            // this._updateSelection = this._updateSelection.bind(this);
-            document.addEventListener('selectionchange', _updateSelection);
+            // this.updateSelection = this.updateSelection.bind(this);
+            document.addEventListener('selectionchange', updateSelection);
 
             if (props.autofocus) focus();
         });
 
         onUnmounted(() => {
-            document.removeEventListener('selectionchange', _updateSelection);
+            document.removeEventListener('selectionchange', updateSelection);
         });
 
-        watch(() => props.modelValue, () => _onExternalValueChange());
-        function _onExternalValueChange() {
-            if (_stripWhitespace(props.modelValue) === _stripWhitespace(currentValue.value)) return;
+        function focus(scrollIntoView = false) {
+            if (!textarea$.value) return;
+
+            textarea$.value.focus();
+            if (scrollIntoView) textarea$.value.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        watch(() => props.modelValue, () => onExternalValueChange());
+        function onExternalValueChange() {
+            if (stripWhitespace(props.modelValue) === stripWhitespace(currentValue.value)) return;
 
             // could also be using format-input's parse and format helpers that preserve caret position but as we're not
             // interested in that, we calculate the formatted value manually
             const parsedValue = props.modelValue.split('').reduce((parsed, char) =>
-                parsed + (_parse(char, parsed, props.allowDomains) || ''), '');
+                parsed + (parse(char, parsed, props.allowDomains) || ''), '');
 
             if (textarea$.value) {
-                textarea$.value.value = _format(parsedValue, props.allowDomains).text; // moves the caret to the end
+                textarea$.value.value = format(parsedValue, props.allowDomains).text; // moves the caret to the end
             }
 
-            _afterChange(parsedValue);
+            afterChange(parsedValue);
         }
 
-        function _onKeyDown(e: KeyboardEvent) {
+        function onKeyDown(e: KeyboardEvent) {
             inputFormatOnKeyDown(
                 e,
                 textarea$.value,
-                (char: string, value: string) => _parse(char, value, props.allowDomains),
-                (value: string) => _format(value, props.allowDomains),
-                _afterChange,
+                (char: string, value: string) => parse(char, value, props.allowDomains),
+                (value: string) => format(value, props.allowDomains),
+                afterChange,
             );
-            setTimeout(() => _updateSelection(), 10); // for arrow keys in Firefox
+            setTimeout(() => updateSelection(), 10); // for arrow keys in Firefox
         }
 
-        function _onInput(e: Event & { inputType?: string }) {
+        function onInput(e: Event & { inputType?: string }) {
             if (e.inputType === 'deleteByDrag') return; // we'll handle the subsequent insertFromDrop
             const textarea = textarea$.value;
             inputFormatOnChange(
                 e,
                 textarea,
-                (char: string, value: string) => _parse(char, value, props.allowDomains),
-                (value: string) => _format(value, props.allowDomains),
-                _afterChange,
+                (char: string, value: string) => parse(char, value, props.allowDomains),
+                (value: string) => format(value, props.allowDomains),
+                afterChange,
             );
         }
 
-        function _onPaste(e: ClipboardEvent) {
+        function onPaste(e: ClipboardEvent) {
             const clipboardData = e.clipboardData;
             const pastedData = clipboardData ? clipboardData.getData('text/plain') : '';
-            context.emit('paste', e, pastedData);
+            context.emit(AddressInputEvent.PASTE, e, pastedData);
 
             inputFormatOnPaste(
                 e,
                 textarea$.value,
-                (char: string, value: string) => _parse(char, value, props.allowDomains),
-                (value: string) => _format(value, props.allowDomains),
-                _afterChange,
+                (char: string, value: string) => parse(char, value, props.allowDomains),
+                (value: string) => format(value, props.allowDomains),
+                afterChange,
             );
         }
 
-        function _onCut(e: ClipboardEvent) {
+        function onCut(e: ClipboardEvent) {
             inputFormatOnCut(
                 e,
                 textarea$.value,
-                (char: string, value: string) => _parse(char, value, props.allowDomains),
-                (value: string) => _format(value, props.allowDomains),
-                _afterChange,
+                (char: string, value: string) => parse(char, value, props.allowDomains),
+                (value: string) => format(value, props.allowDomains),
+                afterChange,
             );
-            _formatClipboard();
+            formatClipboard();
         }
 
-        function _onFocus() {
+        function onFocus() {
             // have to add a delay because the textarea is not focused yet at this point
-            setTimeout(() => _updateSelection());
+            setTimeout(() => updateSelection());
         }
 
-        function _formatClipboard() {
+        function formatClipboard() {
             // While it's possible to set the clipboard data via clipboardEvent.clipboardData.setData this requires calling
             // preventDefault() which then results in the need to reimplement the behavior for cutting text and has side
             // effects like the change not being added to the undo history. Therefore we let the browser do the default
             // behavior but overwrite the clipboard afterwards.
-            const text = _exportValue(document.getSelection()!.toString(), props.allowDomains);
+            const text = exportValue(document.getSelection()!.toString(), props.allowDomains);
             setTimeout(() => Clipboard.copy(text));
         }
 
-        function _afterChange(value: string) {
+        function afterChange(value: string) {
             if (!textarea$.value) return;
 
-            // value is the unformatted value (i.e. the concatenation of characters returned by _parse)
+            // value is the unformatted value (i.e. the concatenation of characters returned by parse)
             const textarea = textarea$.value;
 
             // if selection is a caret in front of a space or new line move caret behind it
@@ -268,12 +274,12 @@ export default defineComponent({
                 textarea.selectionStart += 1; // this also moves the selectionEnd as they were equal
             }
 
-            currentValue.value = _exportValue(textarea$.value.value, props.allowDomains);
-            context.emit('update:modelValue', currentValue.value); // emit event compatible with v-model
+            currentValue.value = exportValue(textarea$.value.value, props.allowDomains);
+            context.emit(AddressInputEvent.MODELVALUE_UPDATE, currentValue.value); // emit event compatible with v-model
 
-            if (_willBeAddress(value)) {
+            if (willBeAddress(value)) {
                 const isValid = ValidationUtils.isValidAddress(currentValue.value);
-                if (isValid) context.emit('address', currentValue.value);
+                if (isValid) context.emit(AddressInputEvent.ADDRESS, currentValue.value);
 
                 if (root$.value) {
                     // if user entered a full address that is not valid give him a visual feedback
@@ -282,7 +288,7 @@ export default defineComponent({
             }
         }
 
-        function _updateSelection() {
+        function updateSelection() {
             if (!textarea$.value) return;
 
             const textarea = textarea$.value;
@@ -294,9 +300,11 @@ export default defineComponent({
             selectionEndBlock.value = focused ? Math.floor(textarea.selectionEnd / 5) : -1;
         }
 
-        function _isBlockFocused(blockIndex: number) {
+        function isBlockFocused(blockIndex: number) {
             return selectionStartBlock.value <= blockIndex && blockIndex <= selectionEndBlock.value;
         }
+
+        context.expose({ focus });
 
         return {
             root$,
@@ -304,18 +312,18 @@ export default defineComponent({
 
             currentValue,
             supportsMixBlendMode,
-            willBeAddress,
+            willBeAddressBool,
             isDomain,
 
-            _onKeyDown,
-            _onInput,
-            _onPaste,
-            _onCut,
-            _onFocus,
+            onKeyDown,
+            onInput,
+            onPaste,
+            onCut,
+            onFocus,
 
-            _formatClipboard,
-            _updateSelection,
-            _isBlockFocused,
+            formatClipboard,
+            updateSelection,
+            isBlockFocused,
         };
     }
 })

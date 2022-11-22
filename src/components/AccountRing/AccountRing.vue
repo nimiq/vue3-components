@@ -14,8 +14,14 @@ export default defineComponent({
     name: 'AccountRing',
     components: { Identicon },
     props: {
-        addresses: { default: () => [], type: Array as () => string[] },
-        animate: { default: false, type: Boolean },
+        addresses: {
+            type: Array as () => string[],
+            default: () => []
+        },
+        animate: {
+            type: Boolean,
+            default: false,
+        },
     },
 });
 </script>

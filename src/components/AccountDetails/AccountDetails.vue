@@ -1,9 +1,17 @@
 <template>
     <div class="account-details">
         <CloseButton class="top-right" @click="onClose"/>
-        <Account layout="column" :address="address" :image="image" :label="(label && label !== address) ? label : ''"
-             :walletLabel="walletLabel" :balance="balance" :editable="editable" :placeholder="placeholder"
-             @changed="onInput" ref="account$"/>
+        <Account ref="account$"
+            layout="column"
+            :address="address"
+            :image="image"
+            :label="(label && label !== address) ? label : ''"
+            :walletLabel="walletLabel"
+            :balance="balance"
+            :editable="editable"
+            :placeholder="placeholder"
+            @changed="onChanged"
+        />
         <AddressDisplay :address="address" copyable />
     </div>
 </template>
@@ -15,19 +23,27 @@ import Amount from '../Amount/Amount.vue';
 import AddressDisplay from '../AddressDisplay/AddressDisplay.vue';
 import CloseButton from '../CloseButton/CloseButton.vue';
 
+export enum AccountDetailsEvent {
+    CLOSE = 'close',
+    CHANGED = 'changed',
+}
+
 export default defineComponent({
     name: 'AccountDetails',
-    emits: ['close', 'changed'],
+    emits: Object.values(AccountDetailsEvent),
     props: {
         address: {
             type: String,
             required: true,
         },
+        editable: {
+            type: Boolean,
+            default: false,
+        },
         image: String,
         label: String,
         walletLabel: String,
         balance: Number,
-        editable: Boolean,
         placeholder: String,
     },
     setup: (props, context) => {
@@ -37,19 +53,19 @@ export default defineComponent({
             if (account$.value) account$.value.focus();
         }
 
-        context.expose({ focus });
-
-        function onInput(label: string) {
-            context.emit('changed', label);
+        function onChanged(label: string) {
+            context.emit(AccountDetailsEvent.CHANGED, label);
         }
 
         function onClose() {
-            context.emit('close');
+            context.emit(AccountDetailsEvent.CLOSE);
         }
+
+        context.expose({ focus });
 
         return {
             account$,
-            onInput,
+            onChanged,
             onClose,
         };
     },

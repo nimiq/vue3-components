@@ -74,17 +74,19 @@
                         class="network-fee-info info"
                     >
                         +
-                        <I18n v-if="!isFormattedNetworkFeeZero" path="{amount} suggested network fee">
-                        <template slot="amount">
-                            <Amount
-                                v-if="networkFee"
-                                :currency="cryptoAmount.currency"
-                                :amount="networkFee"
-                                :currencyDecimals="cryptoAmount.decimals"
-                                :minDecimals="0"
-                                :maxDecimals="Math.min(6, cryptoAmount.decimals)"
-                            />
-                        </template>
+                        <I18n v-if="!isFormattedNetworkFeeZero"
+                            path="{amount} suggested network fee"
+                            componentName="PaymentInfoLine">
+                            <template #amount>
+                                <Amount
+                                    v-if="networkFee"
+                                    :currency="cryptoAmount.currency"
+                                    :amount="networkFee"
+                                    :currencyDecimals="cryptoAmount.decimals"
+                                    :minDecimals="0"
+                                    :maxDecimals="Math.min(6, cryptoAmount.decimals)"
+                                />
+                            </template>
                         </I18n>
                         <template v-else>{{ $t('network fee') }}</template>
                     </div>
@@ -121,7 +123,7 @@ import Amount, { amountValidator } from '../Amount/Amount.vue';
 import FiatAmount from '../FiatAmount/FiatAmount.vue';
 import Tooltip, { TooltipThemes } from '../Tooltip/Tooltip.vue';
 import { AlertTriangleIcon, ArrowRightSmallIcon } from '../Icons';
-import I18n from '../../i18n/I18n.vue';
+import I18n from '../../i18n/I18n';
 import { loadI18n } from '../../i18n/I18nComposable';
 
 function cryptoAmountInfoValidator(value: any) {

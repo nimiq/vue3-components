@@ -3,7 +3,7 @@
         <div v-if="progressIndicator" class="progress-indicator">
             <div v-for="thisStep in progressSteps" class="indicator" :class="thisStep <= step ? 'active' : ''" :key="thisStep"></div>
         </div>
-        <a v-if="backArrow" href="#" class="page-header-back-button" @click.prevent="$emit('back')"
+        <a v-if="backArrow" href="#" class="page-header-back-button" @click.prevent="$emit(PageHeaderEvent.BACK)"
             :title="$t('Go back')">
             <ArrowLeftIcon/>
         </a>
@@ -16,6 +16,10 @@
 import { computed, defineComponent } from 'vue';
 import { loadI18n } from '../../i18n/I18nComposable';
 import { ArrowLeftIcon } from '../Icons';
+
+export enum PageHeaderEvent {
+    BACK = 'back',
+}
 
 export default defineComponent({
     name: 'PageHeader',
@@ -45,7 +49,10 @@ export default defineComponent({
             return list;
         });
 
-        return { progressSteps };
+        return {
+            progressSteps,
+            PageHeaderEvent,
+        };
     },
     components: { ArrowLeftIcon },
 })

@@ -2,46 +2,65 @@
     <div class="bottom-overlay" :class="[theme, { 'has-close-button': hasCloseButton }]">
         <slot></slot>
         <CloseButton v-if="hasCloseButton"
-            class="close-button" :class="{'inverse': ['dark', 'green'].includes(theme)}"
+            class="close-button"
+            :class="{ 'inverse': [BottomOverlayTheme.DARK, BottomOverlayTheme.GREEN].includes(theme as any) }"
             @click="onClose"
         />
     </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch } from 'vue';
+import { defineComponent, ref, watch, getCurrentInstance } from 'vue';
 import CloseButton from '../CloseButton/CloseButton.vue';
 
-enum BottomOverlayEvents {
+export enum BottomOverlayEvent {
     CLOSE = 'close',
+}
+
+export enum BottomOverlayTheme {
+    DARK = 'dark',
+    LIGHT = 'light',
+    GREEN = 'green',
 }
 
 export default defineComponent({
     name: 'BottomOverlay',
+    emits: Object.values(BottomOverlayEvent),
     props: {
         theme: {
             type: String,
-            default: 'dark',
-            validator: (theme: any) => typeof theme === 'string' && ['dark', 'light', 'green'].includes(theme),
+            default: BottomOverlayTheme.DARK,
+            validator: (theme: any) => typeof theme === 'string'
+                && Object.values(BottomOverlayTheme).includes(theme as any),
         }
     },
     setup(props, context) {
         const hasCloseButton = ref(false);
 
         function onClose() {
-            context.emit(BottomOverlayEvents.CLOSE);
+            context.emit(BottomOverlayEvent.CLOSE);
         }
 
-        function _onListenerChange() {
-            hasCloseButton.value = !!context.attrs.onClose;
+        async function onListenerChange() {
+            /* This was using `context.attrs.onClose` with vue2 instead of `getCurrentInstance()?.vnode.props?.onClose`,
+            ** but when migrating to vue3 and setting the emits property on the component the onClose attrs stayed empty,
+            ** even though detecting changes to it and triggerring the watcher.
+            **
+            ** Not setting the emits seems to fix the issue, but that is not the recommended way of doing it.
+            ** We thus went with this solution of directly getting the onClose attribute from the vnode instance directly,
+            ** but if we find a better way to do it in the future, it would be preferable over this hacky solution.
+            **
+            ** Previous version: `hasCloseButton.value = !!context.attrs.onClose;`
+            */
+            hasCloseButton.value = !!getCurrentInstance()?.vnode.props?.onClose;
         }
 
-        watch(() => context.attrs.onClose, _onListenerChange, { immediate: true });
+        watch(() => context.attrs.onClose, onListenerChange, { immediate: true });
 
         return {
-            BottomOverlayEvents,
             hasCloseButton,
             onClose,
+            BottomOverlayTheme,
         };
     },
     components: {

@@ -54,15 +54,15 @@ export default defineComponent({
         const currentKey = ref('');
         const fontSize = ref(props.small ? COPYABLE_FIELD_DEFAULT_FONT_SIZE_SMALL : COPYABLE_FIELD_DEFAULT_FONT_SIZE);
         const copied = ref(false);
-        const _copiedResetTimeout = ref<number | null>(null);
+        const copiedResetTimeout = ref<number | null>(null);
 
         onMounted(() => {
-            // this._updateFontSize = this._updateFontSize.bind(this);
-            window.addEventListener('resize', _updateFontSize);
-            _updateFontSize();
+            // this.updateFontSize = this.updateFontSize.bind(this);
+            window.addEventListener('resize', updateFontSize);
+            updateFontSize();
         });
 
-        onUnmounted(() => window.removeEventListener('resize', _updateFontSize));
+        onUnmounted(() => window.removeEventListener('resize', updateFontSize));
 
         const isKeyedValue = computed(() => {
             return typeof props.modelValue !== 'string' && typeof props.modelValue !== 'number';
@@ -72,19 +72,19 @@ export default defineComponent({
             return isKeyedValue.value && Object.keys(props.modelValue).length === 1;
         });
 
-        watch(() => props.modelValue, _onValueChange, { immediate: true });
-        function _onValueChange() {
+        watch(() => props.modelValue, onValueChange, { immediate: true });
+        function onValueChange() {
             const keys = isKeyedValue.value ? Object.keys(props.modelValue) : [];
             if (keys.length > 0 && (!currentKey.value || !keys.includes(currentKey.value))) {
-                currentKey.value = keys[0]; // will also trigger _updateFontSize
+                currentKey.value = keys[0]; // will also trigger updateFontSize
             } else {
-                _updateFontSize(); // trigger manually
+                updateFontSize(); // trigger manually
             }
         }
 
-        watch(currentKey, _updateFontSize);
-        watch(() => props.small, _updateFontSize);
-        async function _updateFontSize() {
+        watch(currentKey, updateFontSize);
+        watch(() => props.small, updateFontSize);
+        async function updateFontSize() {
             await nextTick(); // let Vue render the component first
             if (!valueContainer$.value || !value$.value) return;
 
@@ -106,8 +106,8 @@ export default defineComponent({
             );
             copied.value = true;
 
-            if (_copiedResetTimeout.value) window.clearTimeout(_copiedResetTimeout.value);
-            _copiedResetTimeout.value = window.setTimeout(() => {
+            if (copiedResetTimeout.value) window.clearTimeout(copiedResetTimeout.value);
+            copiedResetTimeout.value = window.setTimeout(() => {
                 copied.value = false;
             }, 500);
         }

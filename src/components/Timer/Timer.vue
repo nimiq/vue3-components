@@ -14,7 +14,7 @@
         @hide="detailsShown = false"
         :class="{
             'time-shown': detailsShown || alwaysShowTime,
-            'little-time-left': _progress >= .75,
+            'little-time-left': progress >= .75,
             'inverse-theme': theme === TimerThemes.INVERSE,
             'white-theme': theme === TimerThemes.WHITE,
         }"
@@ -22,13 +22,13 @@
         <template #trigger>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 26 26">
                 <circle ref="time-circle" class="time-circle" cx="50%" cy="50%" :r="radius.currentValue"
-                    :stroke-dasharray="`${_timeCircleInfo.length} ${_timeCircleInfo.gap}`"
-                    :stroke-dashoffset="_timeCircleInfo.offset"
-                    :stroke-width="_timeCircleInfo.strokeWidth"></circle>
+                    :stroke-dasharray="`${timeCircleInfo.length} ${timeCircleInfo.gap}`"
+                    :stroke-dashoffset="timeCircleInfo.offset"
+                    :stroke-width="timeCircleInfo.strokeWidth"></circle>
                 <circle class="filler-circle" cx="50%" cy="50%" :r="radius.currentValue"
-                    :stroke-dasharray="`${_fillerCircleInfo.length} ${_fillerCircleInfo.gap}`"
-                    :stroke-dashoffset="_fillerCircleInfo.offset"
-                    :stroke-width="_fillerCircleInfo.strokeWidth"></circle>
+                    :stroke-dasharray="`${fillerCircleInfo.length} ${fillerCircleInfo.gap}`"
+                    :stroke-dashoffset="fillerCircleInfo.offset"
+                    :stroke-width="fillerCircleInfo.strokeWidth"></circle>
 
                 <transition name="transition-fade">
                     <g v-if="!detailsShown && !alwaysShowTime" class="info-exclamation-icon">
@@ -36,14 +36,14 @@
                         <rect x="12" y="12.5" width="2" height="4.5" rx="1" />
                     </g>
                     <text v-else class="countdown" x="50%" y="50%">
-                        {{  _toSimplifiedTime(_timeLeft, false, maxUnit) }}
+                        {{  toSimplifiedTime(timeLeftRef, false, maxUnit) }}
                     </text>
                 </transition>
             </svg>
         </template>
         <template #default>
-            <I18n path="This offer expires in {timer}.">
-                <template #timer>{{ _toSimplifiedTime(_timeLeft, true, maxUnit) }}</template>
+            <I18n path="This offer expires in {timer}." componentName="Timer">
+                <template #timer>{{ toSimplifiedTime(timeLeftRef, true, maxUnit) }}</template>
             </I18n>
         </template>
     </Tooltip>
@@ -53,7 +53,7 @@
 import { computed, defineComponent, onMounted, onUnmounted, ref, watch } from 'vue';
 import { Tweenable } from '@nimiq/utils';
 import Tooltip, { TooltipThemes } from '../Tooltip/Tooltip.vue';
-import I18n from '../../i18n/I18n.vue';
+import I18n from '../../i18n/I18n';
 import { loadI18n } from '../../i18n/I18nComposable';
 
 export interface CircleInfo {
@@ -70,9 +70,9 @@ const TIME_STEPS = [
     { unit: 'day', factor: 24 },
 ];
 
-function _toSimplifiedTime(millis: number, includeUnit?: true, maxUnit?: string): string;
-function _toSimplifiedTime(millis: number, includeUnit: false, maxUnit?: string): number;
-function _toSimplifiedTime(millis: number, includeUnit: boolean = true, maxUnit?: string): number | string {
+function toSimplifiedTime(millis: number, includeUnit?: true, maxUnit?: string): string;
+function toSimplifiedTime(millis: number, includeUnit: false, maxUnit?: string): number;
+function toSimplifiedTime(millis: number, includeUnit: boolean = true, maxUnit?: string): number | string {
     // find appropriate unit, starting with second
     let resultTime = millis / 1000;
     let resultUnit = 'second';
@@ -171,18 +171,18 @@ export default defineComponent({
 
         onMounted(() => {
             requestAnimationFrame(() => size.value = root$.value!.offsetWidth); // in rAF to avoid forced reflow
-            // this._onResize = this._onResize.bind(this); // TODO: do we still need this?
-            window.addEventListener('resize', _onResize);
+            // this.onResize = this.onResize.bind(this); // TODO: do we still need this?
+            window.addEventListener('resize', onResize);
         });
 
         onUnmounted(() => {
             if (timeoutId.value) clearTimeout(timeoutId.value);
             if (updateTimeoutId.value) clearTimeout(updateTimeoutId.value);
             if (requestAnimationFrameId.value) cancelAnimationFrame(requestAnimationFrameId.value);
-            window.removeEventListener('resize', _onResize);
+            window.removeEventListener('resize', onResize);
         });
 
-        const _totalTime = computed(() => {
+        const totalTimeRef = computed(() => {
             if (props.startTime === undefined || props.endTime === undefined) {
                 return 0;
             } else {
@@ -190,28 +190,28 @@ export default defineComponent({
             }
         });
 
-        const _timeLeft = computed(() => {
+        const timeLeftRef = computed(() => {
             if (props.startTime === undefined || props.endTime === undefined) {
                 return 0;
             } else {
-                return Math.max(0, Math.min(_totalTime.value, props.endTime - sampledTime.value));
+                return Math.max(0, Math.min(totalTimeRef.value, props.endTime - sampledTime.value));
             }
         });
 
-        const _progress = computed(() => {
-            if (props.startTime === undefined || props.endTime === undefined || _totalTime.value === 0) {
+        const progress = computed(() => {
+            if (props.startTime === undefined || props.endTime === undefined || totalTimeRef.value === 0) {
                 return 0;
             } else {
-                return 1 - _timeLeft.value / _totalTime.value;
+                return 1 - timeLeftRef.value / totalTimeRef.value;
             }
         });
 
-        const _timeCircleInfo = computed<CircleInfo>(() => {
+        const timeCircleInfo = computed<CircleInfo>(() => {
             // Have a max length to make it more recognizable that this is a timer by never rendering a full circle.
             // The rounded stroke ending rendered with radius strokeWidth/2 does not count towards the stroke length,
             // therefore to get the desired gap of 1.5 strokeWidths, we use 2.5 strokeWidths.
             const maxLength = fullCircleLength.value - 2.5 * props.strokeWidth;
-            const length = Math.min(maxLength, (1 - _progress.value) * fullCircleLength.value);
+            const length = Math.min(maxLength, (1 - progress.value) * fullCircleLength.value);
             const lengthWithLineCaps = length + props.strokeWidth; // add line caps with strokeWidth/2 radius
             const gap = fullCircleLength.value - length;
             // The path grows clockwise starting on the right side. Offset by 90 degrees and gap to let path start with gap
@@ -220,10 +220,10 @@ export default defineComponent({
             return { length, lengthWithLineCaps, gap, offset, strokeWidth: props.strokeWidth };
         });
 
-        const _fillerCircleInfo = computed<CircleInfo>(() => {
+        const fillerCircleInfo = computed<CircleInfo>(() => {
             // Filler circle should be rendered in the gap left by the time circle with a margin of strokeWidth. If there
             // is not enough space, compensate by reducing the filler circle stroke width.
-            const availableSpace = fullCircleLength.value - _timeCircleInfo.value.lengthWithLineCaps - 2 * props.strokeWidth;
+            const availableSpace = fullCircleLength.value - timeCircleInfo.value.lengthWithLineCaps - 2 * props.strokeWidth;
             const lengthWithLineCaps = Math.max(0, availableSpace);
             const strokeWidth = Math.min(props.strokeWidth, lengthWithLineCaps);
             const length = Math.max(0, lengthWithLineCaps - strokeWidth); // subtract rounded line caps
@@ -235,15 +235,15 @@ export default defineComponent({
             return { length, lengthWithLineCaps, gap, offset, strokeWidth };
         });
 
-        function _calculateUpdateInterval(): number {
+        function calculateUpdateInterval(): number {
             // Not a getter / computed prop to avoid unnecessary updates when not needed.
             const scaleFactor = size.value / TIMER_BASE_SIZE;
             const circleLengthPixels = fullCircleLength.value * scaleFactor;
             const steps = circleLengthPixels * 3; // update every .33 pixel change for smooth transitions
             const minInterval = 1000 / 60; // up to 60 fps
             // Constrain interval such that we don't skip time steps in the countdown for the respective time unit.
-            const timeLeft = _timeLeft.value;
-            const totalTime = _totalTime.value;
+            const timeLeft = timeLeftRef.value;
+            const totalTime = totalTimeRef.value;
             const updatesPerTimeStep = 2; // multiple updates per time step to avoid skipping a step by a delayed interval
             let timeStep = 1000; // starting with seconds
             let maxInterval = timeStep / updatesPerTimeStep;
@@ -255,7 +255,7 @@ export default defineComponent({
                     // If the time left after nextInterval can't be expressed in nextTimeStep as a value >=1, stop. We check
                     // for the time after the next interval to avoid jumping for example from 70s (displayed as 1 minute)
                     // directly to 50s if the interval is 20s. Note that the behavior here resembles the one in
-                    // _toSimplifiedTime.
+                    // toSimplifiedTime.
                     if (timeLeft / nextTimeStep > 1) {
                         // If the value before the interval is still >1 in the next time unit still allow a larger jump than
                         // at the smaller time unit but set the maxInterval such that we jump no further than where the
@@ -268,57 +268,57 @@ export default defineComponent({
                 maxInterval = nextMaxInterval;
             }
 
-            return Math.min(maxInterval, Math.max(minInterval, _totalTime.value / steps));
+            return Math.min(maxInterval, Math.max(minInterval, totalTimeRef.value / steps));
         }
 
-        watch(detailsShown, _setRadius, { immediate: true });
-        watch(() => props.alwaysShowTime, _setRadius);
+        watch(detailsShown, setRadius, { immediate: true });
+        watch(() => props.alwaysShowTime, setRadius);
 
-        function _setRadius() {
+        function setRadius() {
             radius.tweenTo(detailsShown.value || props.alwaysShowTime
                 ? TIMER_RADIUS_GROWTH_FACTOR * TIMER_BASE_RADIUS
                 : TIMER_BASE_RADIUS, 300);
-            _rerender();
+            rerender();
         }
 
-        watch(() => props.startTime, _setTimer, { immediate: true });
-        watch(() => props.endTime, _setTimer);
-        watch(timeOffset, _setTimer);
+        watch(() => props.startTime, setTimer, { immediate: true });
+        watch(() => props.endTime, setTimer);
+        watch(timeOffset, setTimer);
 
-        function _setTimer() {
+        function setTimer() {
             sampledTime.value = Date.now() + timeOffset.value;
             if (timeoutId.value) clearTimeout(timeoutId.value);
             if (props.startTime && props.endTime) {
                 timeoutId.value = window.setTimeout(() => context.emit(TimerEvents.END, props.endTime),
                     props.endTime - sampledTime.value);
-                _rerender();
+                rerender();
             }
         }
 
-        function _rerender() {
+        function rerender() {
             sampledTime.value = Date.now() + timeOffset.value;
             fullCircleLength.value = 2 * Math.PI * radius.currentValue;
 
-            if (_timeLeft.value === 0 && radius.finished) return;
+            if (timeLeftRef.value === 0 && radius.finished) return;
 
             if (updateTimeoutId.value) clearTimeout(updateTimeoutId.value);
             if (requestAnimationFrameId.value) cancelAnimationFrame(requestAnimationFrameId.value);
 
             if (!radius.finished) {
                 // animate radius with high frame rate
-                requestAnimationFrameId.value = requestAnimationFrame(() => _rerender());
+                requestAnimationFrameId.value = requestAnimationFrame(() => rerender());
             } else {
                 // update with low frame rate
-                updateTimeoutId.value = window.setTimeout(() => _rerender(), _calculateUpdateInterval());
+                updateTimeoutId.value = window.setTimeout(() => rerender(), calculateUpdateInterval());
             }
         }
 
-        function _onResize() {
+        function onResize() {
             if (root$.value) size.value = root$.value.offsetWidth;
         }
 
         return {
-            _toSimplifiedTime,
+            toSimplifiedTime,
 
             TooltipThemes,
             TimerThemes,
@@ -328,10 +328,10 @@ export default defineComponent({
             detailsShown,
             radius,
 
-            _timeLeft,
-            _progress,
-            _timeCircleInfo,
-            _fillerCircleInfo,
+            timeLeftRef,
+            progress,
+            timeCircleInfo,
+            fillerCircleInfo,
         };
     },
     components: { Tooltip, I18n },

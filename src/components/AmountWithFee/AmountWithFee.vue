@@ -1,6 +1,6 @@
 <template>
     <div class="amount-with-fee">
-        <AmountInput class="value" v-model="liveAmount" :class="{ invalid: !isValid && liveAmount > 0 }"  ref="amountInput" />
+        <AmountInput class="value" v-model="liveAmount" :class="{ invalid: !isValid && liveAmount > 0 }" ref="amountInput$" />
         <div class="fee-section nq-text-s">
             <div v-if="!isValid && liveAmount" class="nq-red"><slot name="insufficient-balance-error">{{ $t('Insufficient balance') }}</slot></div>
             <div v-else>
@@ -24,8 +24,13 @@ import AmountInput from '../AmountInput/AmountInput.vue';
 import FiatAmount from '../FiatAmount/FiatAmount.vue';
 import { loadI18n } from '../../i18n/I18nComposable';
 
+export enum AmountWithFeeEvent {
+    MODELVALUE_UPDATE = 'update:modelValue',
+}
+
 export default defineComponent({
     name: 'AmountWithFee',
+    emits: Object.values(AmountWithFeeEvent),
     props: {
         modelValue: {
             type: Object as () => ({ amount: number, fee: number, isValid: boolean }),
@@ -53,12 +58,20 @@ export default defineComponent({
 
         watch(isValid, watchAvailableAmountChange, { immediate: true });
         function watchAvailableAmountChange() {
-            context.emit('input', { amount: liveAmount.value, fee: props.modelValue.fee, isValid: isValid.value });
+            context.emit(AmountWithFeeEvent.MODELVALUE_UPDATE, {
+                amount: liveAmount.value,
+                fee: props.modelValue.fee,
+                isValid: isValid.value,
+            });
         }
 
         watch(liveAmount, watchAmountChange, { immediate: true });
         function watchAmountChange() {
-            context.emit('input', { amount: liveAmount.value, fee: props.modelValue.fee, isValid: isValid.value });
+            context.emit(AmountWithFeeEvent.MODELVALUE_UPDATE, {
+                amount: liveAmount.value,
+                fee: props.modelValue.fee,
+                isValid: isValid.value,
+            });
         }
 
         function focus() {

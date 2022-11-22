@@ -1,38 +1,42 @@
-import { action } from '@storybook/addon-actions';
-import AddressInput from './AddressInput.vue';
+import { ref } from 'vue';
+import { getEventArgTypeFromEnum, getEventListenerFromEnum } from '../../helpers/storybook/EventHelper';
+import AddressInput, { AddressInputEvent } from './AddressInput.vue';
 
 export default {
     title: 'AddressInput',
     component: AddressInput,
     argTypes: {
+        // Props
         autofocus: { control: { type: 'boolean' } },
         allowDomains: { control: { type: 'boolean' } },
-        modelValue: {
-            control: { type: 'text' },
-            table: { disable: true },
-        },
+        modelValue: { control: false },
+
+        // Events
+        ...getEventArgTypeFromEnum(AddressInputEvent)
     },
 };
 
 const Template = (args) => ({
-    // Components used in your story `template` are defined in the `components` object
     components: { AddressInput },
-    // The story's `args` need to be mapped into the template through the `setup()` method
     setup() {
-        // Story args can be spread into the returned object
-        return { ...args, action };
+        const addressInput$ = ref(null);
+
+        function focus() {
+            if (addressInput$.value) addressInput$.value.focus();
+        }
+
+        return {
+            events: getEventListenerFromEnum(AddressInputEvent),
+            args,
+            addressInput$,
+            focus,
+        };
     },
-    // Then, the spread values can be accessed directly in the template
     template: `
-        <div>
-            <AddressInput v-model="modelValue"
-                :allowDomains="allowDomains"
-                :autofocus="autofocus"
-                @update:modelValue="action('update:modelValue')($event)"
-                @address="action('address')($event); lastValidAddress = $event"
-                @paste="action('paste')($event)"
-            />
-        </div>
+        <button class="nq-button-s" @click="focus">Focus</button>
+        <br />
+        <br />
+        <AddressInput ref="addressInput$" v-model="args.modelValue" v-bind="args" v-on="events" />
     `,
 });
 
@@ -40,5 +44,4 @@ export const Default = Template.bind({});
 Default.args = {
     allowDomains: true,
     autofocus: false,
-    modelValue: '',
 };

@@ -1,10 +1,12 @@
-import { action } from '@storybook/addon-actions';
-import AccountList from './AccountList.vue';
+import { ref } from 'vue';
+import AccountList, { AccountListEvent } from './AccountList.vue';
+import { getEventArgTypeFromEnum, getEventListenerFromEnum } from '../../helpers/storybook/EventHelper';
 
 export default {
     title: 'AccountList',
     component: AccountList,
     argTypes: {
+        // Props
         accounts: { control: { type: 'object' } },
         disabledAddresses: { control: { type: 'object' } },
         walletId: { control: { type: 'text' } },
@@ -14,34 +16,33 @@ export default {
         disableContracts: { control: { type: 'boolean' } },
         disabled: { control: { type: 'boolean' } },
         tooltipProps: { control: { type: 'object' } },
+
+        // Events
+        ...getEventArgTypeFromEnum(AccountListEvent),
     },
 };
 
 const Template = (args) => ({
-    // Components used in your story `template` are defined in the `components` object
     components: { AccountList },
-    // The story's `args` need to be mapped into the template through the `setup()` method
     setup() {
-        // Story args can be spread into the returned object
-        return { ...args, action };
+        const accountList$ = ref(null);
+
+        function focusFirstAddress() {
+            if (accountList$.value) accountList$.value.focus(args.accounts[0].userFriendlyAddress);
+        }
+
+        return {
+            events: getEventListenerFromEnum(AccountListEvent),
+            args,
+            accountList$,
+            focusFirstAddress,
+        };
     },
-    // Then, the spread values can be accessed directly in the template
     template: `
-        <AccountList
-            walletId="helloworld1"
-
-            :accounts="accounts"
-            :decimals="decimals"
-            :editable="editable"
-            :disabled="disabled"
-            :minBalance="minBalance"
-            :tooltipProps="tooltipProps"
-            :disableContracts="disableContracts"
-            :disabledAddresses="disabledAddresses"
-
-            @account-changed="action('account-changed')($event)"
-            @account-selected="action('account-selected')($event)"
-        />
+        <button class="nq-button-s" @click="focusFirstAddress">Focus first address (editable: true)</button>
+        <br />
+        <br />
+        <AccountList ref="accountList$" v-bind="args" v-on="events" />
     `,
 });
 

@@ -1,5 +1,4 @@
-<script lang="ts">
-import { defineComponent, h } from 'vue';
+import { defineComponent, getCurrentInstance, h } from 'vue';
 import { loadI18n, I18n$tVariables } from './I18nComposable';
 
 /**
@@ -14,14 +13,13 @@ export default defineComponent({
             type: String,
             required: true,
         },
+        componentName: {
+            type: String,
+            required: true,
+        },
         tag: {
             type: String,
             default: 'span',
-        },
-    },
-    methods: {
-        $t(key: string, variablesOrLang?: I18n$tVariables | string, variables?: I18n$tVariables) {
-            return loadI18n(this.tag)(key, variablesOrLang, variables);
         },
     },
     render() {
@@ -31,15 +29,14 @@ export default defineComponent({
             );
         }
 
-        const message = this.$t(this.$options.name!, this.path.replace(/\\n/g, '\n'));
+        const message = loadI18n(this.$props.componentName)(this.$props.path.replace(/\\n/g, '\n'));
         const children = message.split(/({\w+})/g)
             .map((part) => {
                 const variableNameMatch = part.match(/^{(\w+)}$/);
                 if (!variableNameMatch) return part; // plain text part or empty part
-                return this.$slots[variableNameMatch[1]] || part;
+                return this.$slots[variableNameMatch[1]]!() || part;
             });
 
-        return h(this.$props.tag, h(children));
+        return h(this.$props.tag, {}, children);
     }
 });
-</script>

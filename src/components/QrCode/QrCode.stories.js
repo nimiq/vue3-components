@@ -1,14 +1,14 @@
 import { action } from '@storybook/addon-actions';
-import { ref } from 'vue';
-import QrCode from './QrCode.vue';
+import QrCode, { QrCodeErrorCorrection } from './QrCode.vue';
 
 export default {
     title: 'QrCode',
     component: QrCode,
     argTypes: {
+        // Props
         data: { control: { type: 'text' } },
         errorCorrection: {
-            options: ['L', 'M', 'H', 'Q'],
+            options: Object.values(QrCodeErrorCorrection),
             control: { type: 'select' }
         },
         radius: {
@@ -21,39 +21,33 @@ export default {
         },
         fill: { control: { type: 'color' } },
         background: { control: { type: 'color' } },
+        size: { control: { type: 'number' } },
     },
-    args: {
-        data: 'TEST-DATA',
-        errorCorrection: 'M',
-        radius: .5,
-        fill: '#0582ca',
-        background: '#ffffff',
-        size: 128,
-    }
 };
 
-export const Default = (args) => ({
-    // Components used in your story `template` are defined in the `components` object
+const Template = (args) => ({
     components: { QrCode },
     methods: {
         async toDataUrl() {
             action('dataUrl')(await this.$refs['qr-code'].toDataUrl());
         }
     },
-    // The story's `args` need to be mapped into the template through the `setup()` method
     setup() {
-        const dataUrl = ref('');
-
-        // Story args can be spread into the returned object
-        return { ...args, dataUrl };
+        return { args };
     },
-    // Then, the spread values can be accessed directly in the template
     template: `
         <button @click="toDataUrl">Export to Data Url</button>
         <br />
         <br />
-        <QrCode ref="qr-code"
-            :data="data" :errorCorrection="errorCorrection" :radius="parseFloat(radius)" :fill="fill"
-            :background="background" :size="parseInt(size)"/>
+        <QrCode ref="qr-code" v-bind="args"/>
     `,
 });
+
+export const Default = Template.bind({});
+Default.args = {
+    data: 'TEST-DATA',
+    radius: .5,
+    fill: '#0582ca',
+    background: '#ffffff',
+    size: 128,
+};

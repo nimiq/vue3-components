@@ -1,5 +1,5 @@
 <template>
-    <button class="close-button nq-button-s" @click="onClick" @mousedown.prevent>
+    <button class="close-button nq-button-s" @mousedown.prevent>
         <CloseIcon/>
     </button>
 </template>
@@ -10,13 +10,6 @@ import { CloseIcon } from '../Icons';
 
 export default defineComponent({
     name: 'CloseButton',
-    setup(props, context) {
-        function onClick(event: MouseEvent) {
-            context.emit('click', event);
-        }
-
-        return { onClick };
-    },
     components: {
         CloseIcon,
     }

@@ -49,7 +49,7 @@ export default defineComponent({
         },
     },
     setup(props, context) {
-        function _validateDecimals(decimals: number | undefined) {
+        function validateDecimals(decimals: number | undefined) {
             if (props.decimals !== undefined && decimals !== props.decimals) {
                 // skip validation for minDecimals and maxDecimals if they're overwritten by decimals
                 return;
@@ -65,9 +65,9 @@ export default defineComponent({
             }
         }
 
-        watch(() => props.minDecimals, _validateDecimals, { immediate: true });
-        watch(() => props.maxDecimals, _validateDecimals, { immediate: true });
-        watch(() => props.decimals, _validateDecimals, { immediate: true });
+        watch(() => props.minDecimals, validateDecimals, { immediate: true });
+        watch(() => props.maxDecimals, validateDecimals, { immediate: true });
+        watch(() => props.decimals, validateDecimals, { immediate: true });
 
         const formattedAmount = computed(() => {
             let minDecimals: number;

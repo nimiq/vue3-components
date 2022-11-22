@@ -27,6 +27,7 @@ export default {
         trigger: { table: { disable: true } },
         icon: { table: { disable: true } },
         default: { table: { disable: true } },
+        container: { table: { disable: true } },
     },
 };
 
