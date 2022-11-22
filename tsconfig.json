@@ -1,43 +1,29 @@
 {
-    "compilerOptions": {
-        "target": "esnext",
-        "module": "esnext",
-        "jsx": "preserve",
-        "importHelpers": true,
-        "incremental": false,
-        "moduleResolution": "node",
-        "experimentalDecorators": true,
-        "esModuleInterop": true,
-        "sourceMap": true,
-        "declaration": true,
-        "declarationDir": "dist/src",
-        "baseUrl": ".",
-        "types": [
-            "node",
-            "webpack-env"
-        ],
-        "paths": {
-            "@/*": [
-                "src/*"
-            ]
-        },
-        "lib": [
-            "esnext",
-            "dom",
-            "dom.iterable",
-            "scripthost"
-        ]
-    },
-    "include": [
-        "types/svg.d.ts",
-        "src/main.ts" // Must be included for TSLint to work
-        // "src/**/*.ts",
-        // "src/**/*.tsx",
-        // "src/**/*.vue",
-        // "tests/**/*.ts",
-        // "tests/**/*.tsx"
-    ],
-    "exclude": [
-        "node_modules"
-    ]
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "outDir": "dist",
+    "strict": true,
+    "declaration": true,
+    "jsx": "preserve",
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "importHelpers": true,
+		"incremental": false,
+		"baseUrl": ".",
+    "lib": [
+        "esnext",
+        "dom",
+        "dom.iterable",
+			  "scripthost"
+      ],
+    "types": ["vite/client"]
+  },
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],
+  "exclude": [
+		"node_modules"
+	]
 }
