@@ -1,3 +1,6 @@
+export declare enum PageHeaderEvent {
+    BACK = "back"
+}
 declare const _default: import("vue").DefineComponent<{
     backArrow: {
         type: BooleanConstructor;
@@ -17,9 +20,10 @@ declare const _default: import("vue").DefineComponent<{
     };
 }, {
     progressSteps: import("vue").ComputedRef<number[]>;
+    PageHeaderEvent: typeof PageHeaderEvent;
 }, unknown, {}, {
     $t: (key: string, variablesOrLang?: string | import("../../i18n/I18nComposable").I18n$tVariables | undefined, variables?: import("../../i18n/I18nComposable").I18n$tVariables | undefined) => string;
-}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, Record<string, any>, string, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
+}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, {}, string, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
     backArrow: {
         type: BooleanConstructor;
         default: boolean;
@@ -37,9 +41,9 @@ declare const _default: import("vue").DefineComponent<{
         default: number;
     };
 }>>, {
-    step: number;
     backArrow: boolean;
     progressIndicator: boolean;
     numberSteps: number;
+    step: number;
 }>;
 export default _default;

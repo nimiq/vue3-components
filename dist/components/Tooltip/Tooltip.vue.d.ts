@@ -66,7 +66,7 @@ declare const _default: import("vue").DefineComponent<{
     hide: (force?: boolean) => void;
     mouseOver: (mouseOverTooltip: boolean) => void;
     onClick: () => void;
-}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, Record<string, any>, string, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
+}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, {}, string, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
     /**
     * Container within which the tooltip should be positioned if possible.
     */

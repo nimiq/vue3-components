@@ -1,20 +1,20 @@
 declare const _default: import("vue").DefineComponent<{
     addresses: {
-        default: () => never[];
         type: () => string[];
+        default: () => never[];
     };
     animate: {
-        default: boolean;
         type: BooleanConstructor;
+        default: boolean;
     };
-}, unknown, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, Record<string, any>, string, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
+}, unknown, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, {}, string, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
     addresses: {
-        default: () => never[];
         type: () => string[];
+        default: () => never[];
     };
     animate: {
-        default: boolean;
         type: BooleanConstructor;
+        default: boolean;
     };
 }>>, {
     animate: boolean;

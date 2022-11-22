@@ -1,6 +1,6 @@
 {
   "name": "@nimiq/vue3-components",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "scripts": {
     "dev": "vite",
     "lint": "vue-tsc --noEmit",
@@ -8,16 +8,15 @@
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
-  "files": [
-    "dist"
-  ],
-  "main": "./dist/vue3-components.umd.js",
-  "module": "./dist/vue3-components.es.js",
+  "type":"module",
+  "files": ["dist"],
+  "main": "./dist/vue3-components.umd.cjs",
+  "module": "./dist/vue3-components.js",
   "types": "./dist/main.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/vue3-components.es.js",
-      "require": "./dist/vue3-components.umd.js"
+      "import": "./dist/vue3-components.js",
+      "require": "./dist/vue3-components.umd.cjs"
     }
   },
   "dependencies": {

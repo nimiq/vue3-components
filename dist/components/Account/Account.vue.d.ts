@@ -1,4 +1,11 @@
 import { Ref } from 'vue';
+export declare enum AccountEvent {
+    CHANGED = "changed"
+}
+export declare enum AccountLayout {
+    ROW = "row",
+    COLUMN = "column"
+}
 declare const _default: import("vue").DefineComponent<{
     label: {
         type: StringConstructor;
@@ -14,15 +21,18 @@ declare const _default: import("vue").DefineComponent<{
     };
     layout: {
         type: StringConstructor;
-        default: string;
+        default: AccountLayout;
         validator: (layout: any) => boolean;
+    };
+    editable: {
+        type: BooleanConstructor;
+        default: boolean;
     };
     address: StringConstructor;
     image: StringConstructor;
     placeholder: StringConstructor;
     walletLabel: StringConstructor;
     balance: NumberConstructor;
-    editable: BooleanConstructor;
 }, {
     label$: Ref<import("vue").DefineComponent<{
         maxBytes: NumberConstructor;
@@ -47,9 +57,10 @@ declare const _default: import("vue").DefineComponent<{
         width: Ref<number>;
         onInput: () => void;
         onBlur: () => void;
+        LabelInputEvent: typeof import("../LabelInput/LabelInput.vue").LabelInputEvent;
     }, unknown, {}, {
         $t: (key: string, variablesOrLang?: string | import("../../i18n/I18nComposable").I18n$tVariables | undefined, variables?: import("../../i18n/I18nComposable").I18n$tVariables | undefined) => string;
-    }, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, ("paste" | "update:modelValue" | "changed")[], "paste" | "update:modelValue" | "changed", import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
+    }, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, import("../LabelInput/LabelInput.vue").LabelInputEvent[], import("../LabelInput/LabelInput.vue").LabelInputEvent, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
         maxBytes: NumberConstructor;
         modelValue: {
             type: StringConstructor;
@@ -65,19 +76,19 @@ declare const _default: import("vue").DefineComponent<{
             default: boolean;
         };
     }>> & {
-        onPaste?: ((...args: any[]) => any) | undefined;
         "onUpdate:modelValue"?: ((...args: any[]) => any) | undefined;
         onChanged?: ((...args: any[]) => any) | undefined;
+        onPaste?: ((...args: any[]) => any) | undefined;
     }, {
-        disabled: boolean;
         modelValue: string;
         vanishing: boolean;
+        disabled: boolean;
     }> | null>;
     showImage: Ref<boolean>;
     isNimiqAddress: () => boolean;
     isLabelNimiqAddress: () => boolean;
-    onInput: (label: string) => void;
-}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, "changed"[], "changed", import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
+    onModelValueUpdate: (label: string) => void;
+}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, AccountEvent.CHANGED[], AccountEvent, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
     label: {
         type: StringConstructor;
         required: true;
@@ -92,21 +103,24 @@ declare const _default: import("vue").DefineComponent<{
     };
     layout: {
         type: StringConstructor;
-        default: string;
+        default: AccountLayout;
         validator: (layout: any) => boolean;
+    };
+    editable: {
+        type: BooleanConstructor;
+        default: boolean;
     };
     address: StringConstructor;
     image: StringConstructor;
     placeholder: StringConstructor;
     walletLabel: StringConstructor;
     balance: NumberConstructor;
-    editable: BooleanConstructor;
 }>> & {
     onChanged?: ((...args: any[]) => any) | undefined;
 }, {
-    layout: string;
     decimals: number;
     displayAsCashlink: boolean;
+    layout: string;
     editable: boolean;
 }>;
 export default _default;

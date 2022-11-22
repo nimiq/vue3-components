@@ -1,10 +1,16 @@
 import QrCreator from 'qr-creator';
+export declare enum QrCodeErrorCorrection {
+    L = "L",
+    M = "M",
+    H = "H",
+    Q = "Q"
+}
 declare const _default: import("vue").DefineComponent<{
     data: StringConstructor;
     errorCorrection: {
-        type: () => 'L' | 'M' | 'H' | 'Q';
-        default: string;
-        validator: (value: string) => boolean;
+        type: () => QrCodeErrorCorrection;
+        default: QrCodeErrorCorrection;
+        validator: (value: any) => boolean;
     };
     radius: {
         type: NumberConstructor;
@@ -33,12 +39,12 @@ declare const _default: import("vue").DefineComponent<{
 }, {
     data: string | undefined;
     canvas$: import("vue").Ref<HTMLCanvasElement | null>;
-}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, Record<string, any>, string, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
+}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, {}, string, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
     data: StringConstructor;
     errorCorrection: {
-        type: () => 'L' | 'M' | 'H' | 'Q';
-        default: string;
-        validator: (value: string) => boolean;
+        type: () => QrCodeErrorCorrection;
+        default: QrCodeErrorCorrection;
+        validator: (value: any) => boolean;
     };
     radius: {
         type: NumberConstructor;
@@ -69,7 +75,7 @@ declare const _default: import("vue").DefineComponent<{
     background: string;
     size: number;
     radius: number;
-    errorCorrection: "Q" | "M" | "L" | "H";
+    errorCorrection: QrCodeErrorCorrection;
 }>;
 /**
  * **Nimiq QR Code Component**

@@ -76,7 +76,7 @@ declare const _default: import("vue").DefineComponent<{
             validator: (value: any) => boolean;
         };
     }, {
-        _toSimplifiedTime: {
+        toSimplifiedTime: {
             (millis: number, includeUnit?: true | undefined, maxUnit?: string | undefined): string;
             (millis: number, includeUnit: false, maxUnit?: string | undefined): number;
         };
@@ -121,7 +121,7 @@ declare const _default: import("vue").DefineComponent<{
             hide: (force?: boolean) => void;
             mouseOver: (mouseOverTooltip: boolean) => void;
             onClick: () => void;
-        }, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, Record<string, any>, string, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
+        }, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, {}, string, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
             container: {
                 new (): HTMLElement;
                 prototype: HTMLElement;
@@ -156,11 +156,11 @@ declare const _default: import("vue").DefineComponent<{
         }> | null>;
         detailsShown: import("vue").Ref<boolean>;
         radius: import("@nimiq/utils/dist/src/tweenable/Tweenable").default;
-        _timeLeft: import("vue").ComputedRef<number>;
-        _progress: import("vue").ComputedRef<number>;
-        _timeCircleInfo: import("vue").ComputedRef<import("../Timer/Timer.vue").CircleInfo>;
-        _fillerCircleInfo: import("vue").ComputedRef<import("../Timer/Timer.vue").CircleInfo>;
-    }, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, Record<string, any>, string, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
+        timeLeftRef: import("vue").ComputedRef<number>;
+        progress: import("vue").ComputedRef<number>;
+        timeCircleInfo: import("vue").ComputedRef<import("../Timer/Timer.vue").CircleInfo>;
+        fillerCircleInfo: import("vue").ComputedRef<import("../Timer/Timer.vue").CircleInfo>;
+    }, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, {}, string, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
         startTime: NumberConstructor;
         endTime: NumberConstructor;
         alwaysShowTime: {
@@ -226,7 +226,7 @@ declare const _default: import("vue").DefineComponent<{
         hide: (force?: boolean) => void;
         mouseOver: (mouseOverTooltip: boolean) => void;
         onClick: () => void;
-    }, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, Record<string, any>, string, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
+    }, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, {}, string, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
         container: {
             new (): HTMLElement;
             prototype: HTMLElement;
@@ -269,7 +269,7 @@ declare const _default: import("vue").DefineComponent<{
     onPriceTooltipToggle: (isShow: boolean) => void;
 }, unknown, {}, {
     $t: (key: string, variablesOrLang?: string | import("../../i18n/I18nComposable").I18n$tVariables | undefined, variables?: import("../../i18n/I18nComposable").I18n$tVariables | undefined) => string;
-}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, Record<string, any>, string, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
+}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, {}, string, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
     cryptoAmount: {
         type: PropType<{
             amount: number;

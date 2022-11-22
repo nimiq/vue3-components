@@ -1,3 +1,6 @@
+export declare enum CarouselEvent {
+    SELECT = "select"
+}
 declare const _default: import("vue").DefineComponent<{
     entries: {
         type: () => string[];
@@ -24,11 +27,11 @@ declare const _default: import("vue").DefineComponent<{
 }, {
     root$: import("vue").Ref<HTMLDivElement | null>;
     refs$: import("vue").Ref<{
-        [x: string]: HTMLElement;
+        [ref: string]: HTMLElement;
     }>;
     effectiveSelected: import("vue").Ref<string>;
-    _updateSelection: (newSelection: string | undefined) => void;
-}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, Record<string, any>, string, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
+    updateSelection: (newSelection: string | undefined) => void;
+}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, CarouselEvent.SELECT[], CarouselEvent, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
     entries: {
         type: () => string[];
         default: () => never[];
@@ -51,10 +54,12 @@ declare const _default: import("vue").DefineComponent<{
         type: BooleanConstructor;
         default: boolean;
     };
-}>>, {
+}>> & {
+    onSelect?: ((...args: any[]) => any) | undefined;
+}, {
     entries: string[];
-    animationDuration: number;
     disabled: boolean;
+    animationDuration: number;
     entryMargin: number;
     hideBackgroundEntries: boolean;
 }>;

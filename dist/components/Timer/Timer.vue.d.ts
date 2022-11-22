@@ -7,8 +7,8 @@ export interface CircleInfo {
     offset: number;
     strokeWidth: number;
 }
-declare function _toSimplifiedTime(millis: number, includeUnit?: true, maxUnit?: string): string;
-declare function _toSimplifiedTime(millis: number, includeUnit: false, maxUnit?: string): number;
+declare function toSimplifiedTime(millis: number, includeUnit?: true, maxUnit?: string): string;
+declare function toSimplifiedTime(millis: number, includeUnit: false, maxUnit?: string): number;
 export declare enum TimerEvents {
     END = "end"
 }
@@ -40,7 +40,7 @@ declare const _default: import("vue").DefineComponent<{
         validator: (value: any) => boolean;
     };
 }, {
-    _toSimplifiedTime: typeof _toSimplifiedTime;
+    toSimplifiedTime: typeof toSimplifiedTime;
     TooltipThemes: typeof TooltipThemes;
     TimerThemes: typeof TimerThemes;
     root$: import("vue").Ref<import("vue").DefineComponent<{
@@ -82,7 +82,7 @@ declare const _default: import("vue").DefineComponent<{
         hide: (force?: boolean) => void;
         mouseOver: (mouseOverTooltip: boolean) => void;
         onClick: () => void;
-    }, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, Record<string, any>, string, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
+    }, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, {}, string, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
         container: {
             new (): HTMLElement;
             prototype: HTMLElement;
@@ -117,11 +117,11 @@ declare const _default: import("vue").DefineComponent<{
     }> | null>;
     detailsShown: import("vue").Ref<boolean>;
     radius: Tweenable;
-    _timeLeft: import("vue").ComputedRef<number>;
-    _progress: import("vue").ComputedRef<number>;
-    _timeCircleInfo: import("vue").ComputedRef<CircleInfo>;
-    _fillerCircleInfo: import("vue").ComputedRef<CircleInfo>;
-}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, Record<string, any>, string, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
+    timeLeftRef: import("vue").ComputedRef<number>;
+    progress: import("vue").ComputedRef<number>;
+    timeCircleInfo: import("vue").ComputedRef<CircleInfo>;
+    fillerCircleInfo: import("vue").ComputedRef<CircleInfo>;
+}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, {}, string, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
     startTime: NumberConstructor;
     endTime: NumberConstructor;
     alwaysShowTime: {

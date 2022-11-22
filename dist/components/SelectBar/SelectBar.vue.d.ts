@@ -5,6 +5,9 @@ export interface SelectBarOption {
     text: string;
     index: number;
 }
+export declare enum SelectBarEvent {
+    CHANGED = "changed"
+}
 declare const _default: import("vue").DefineComponent<{
     name: {
         type: StringConstructor;
@@ -24,7 +27,7 @@ declare const _default: import("vue").DefineComponent<{
         index: number;
     }>;
     getColor: (option: SelectBarOption) => string;
-}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, "changed"[], "changed", import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
+}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, SelectBarEvent.CHANGED[], SelectBarEvent, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
     name: {
         type: StringConstructor;
         required: true;

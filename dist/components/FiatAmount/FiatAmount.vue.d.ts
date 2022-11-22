@@ -17,8 +17,8 @@ declare const _default: import("vue").DefineComponent<{
     };
     locale: StringConstructor;
 }, {
-    _currencyString: import("vue").ComputedRef<string>;
-}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, Record<string, any>, string, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
+    currencyString: import("vue").ComputedRef<string>;
+}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, {}, string, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
     amount: {
         type: NumberConstructor;
         required: true;

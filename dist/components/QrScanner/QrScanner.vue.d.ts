@@ -19,10 +19,10 @@ declare const _default: import("vue").DefineComponent<{
     hasCamera: import("vue").Ref<boolean>;
     isMobileOrTablet: boolean;
     browser: BrowserDetection.Browser;
-    _cancel: () => void;
+    cancel: () => void;
 }, unknown, {}, {
     $t: (key: string, variablesOrLang?: string | import("../../i18n/I18nComposable").I18n$tVariables | undefined, variables?: import("../../i18n/I18nComposable").I18n$tVariables | undefined) => string;
-}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, Record<string, any>, string, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
+}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, {}, string, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
     reportFrequency: {
         type: NumberConstructor;
         default: number;

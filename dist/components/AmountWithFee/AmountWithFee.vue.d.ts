@@ -1,4 +1,7 @@
 import { FiatApiSupportedFiatCurrency } from '@nimiq/utils';
+export declare enum AmountWithFeeEvent {
+    MODELVALUE_UPDATE = "update:modelValue"
+}
 declare const _default: import("vue").DefineComponent<{
     modelValue: {
         type: () => ({
@@ -48,7 +51,8 @@ declare const _default: import("vue").DefineComponent<{
         formattedValue: import("vue").WritableComputedRef<string>;
         width: import("vue").Ref<number>;
         fontSize: import("vue").Ref<number>;
-    }, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, "update:modelValue"[], "update:modelValue", import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
+        AmountInputEvent: typeof import("../AmountInput/AmountInput.vue").AmountInputEvent;
+    }, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, import("../AmountInput/AmountInput.vue").AmountInputEvent[], import("../AmountInput/AmountInput.vue").AmountInputEvent, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
         modelValue: NumberConstructor;
         maxFontSize: {
             type: NumberConstructor;
@@ -68,9 +72,11 @@ declare const _default: import("vue").DefineComponent<{
         };
     }>> & {
         "onUpdate:modelValue"?: ((...args: any[]) => any) | undefined;
+        onPaste?: ((...args: any[]) => any) | undefined;
+        onSubmit?: ((...args: any[]) => any) | undefined;
     }, {
-        placeholder: string;
         decimals: number;
+        placeholder: string;
         vanishing: boolean;
         maxFontSize: number;
     }> | null>;
@@ -78,7 +84,7 @@ declare const _default: import("vue").DefineComponent<{
     isValid: import("vue").ComputedRef<boolean>;
 }, unknown, {}, {
     $t: (key: string, variablesOrLang?: string | import("../../i18n/I18nComposable").I18n$tVariables | undefined, variables?: import("../../i18n/I18nComposable").I18n$tVariables | undefined) => string;
-}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, Record<string, any>, string, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
+}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, AmountWithFeeEvent.MODELVALUE_UPDATE[], AmountWithFeeEvent, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
     modelValue: {
         type: () => ({
             amount: number;
@@ -97,7 +103,9 @@ declare const _default: import("vue").DefineComponent<{
     };
     fiatAmount: NumberConstructor;
     fiatCurrency: () => FiatApiSupportedFiatCurrency;
-}>>, {
+}>> & {
+    "onUpdate:modelValue"?: ((...args: any[]) => any) | undefined;
+}, {
     modelValue: {
         amount: number;
         fee: number;

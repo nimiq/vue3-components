@@ -31,7 +31,7 @@ declare const _default: import("vue").DefineComponent<{
     formattedAmount: import("vue").ComputedRef<string>;
     isApprox: import("vue").ComputedRef<boolean>;
     ticker: import("vue").ComputedRef<string>;
-}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, Record<string, any>, string, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
+}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, {}, string, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
     amount: {
         required: true;
         validator: typeof amountValidator;
@@ -59,10 +59,10 @@ declare const _default: import("vue").DefineComponent<{
         default: number;
     };
 }>>, {
-    currency: string;
     minDecimals: number;
     maxDecimals: number;
     showApprox: boolean;
+    currency: string;
     currencyDecimals: number;
 }>;
 export default _default;
