@@ -7,7 +7,8 @@
     "deploy": "yarn build && gh-pages -d . -b build/full -m Rebuild -t",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "BASE_PATH=/vue3-components/ build-storybook",
-    "deploy-storybook": "yarn build-storybook && gh-pages -d storybook-static -b gh-pages -m 'Update storybook build'"
+    "deploy-storybook": "yarn build-storybook && gh-pages -d storybook-static -b gh-pages -m 'Update storybook build'",
+    "deploy-all": "yarn deploy && yarn deploy-storybook"
   },
   "files": [
     "dist"
