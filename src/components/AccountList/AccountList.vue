@@ -55,7 +55,7 @@ import { defineComponent, onBeforeUpdate, ref } from 'vue'
 import Account from '../Account/Account.vue';
 import { AccountInfo, ContractInfo } from '../AccountSelector/AccountSelector.vue';
 import Tooltip from '../Tooltip/Tooltip.vue';
-import { CaretRightSmallIcon } from '../Icons';
+import { CaretRightSmallIcon } from '../../icons/Icons';
 import { loadI18n } from '../../i18n/I18nComposable';
 
 export enum AccountListEvent {

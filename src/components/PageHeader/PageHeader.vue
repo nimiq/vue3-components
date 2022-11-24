@@ -15,7 +15,7 @@
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
 import { loadI18n } from '../../i18n/I18nComposable';
-import { ArrowLeftIcon } from '../Icons';
+import { ArrowLeftIcon } from '../../icons/Icons';
 
 export enum PageHeaderEvent {
     BACK = 'back',

@@ -6,7 +6,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { CloseIcon } from '../Icons';
+import { CloseIcon } from '../../icons/Icons';
 
 export default defineComponent({
     name: 'CloseButton',

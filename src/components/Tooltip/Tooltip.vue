@@ -36,7 +36,7 @@
 <script lang="ts">
 import { computed, defineComponent, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import { StyleValue } from '@vue/runtime-dom';
-import { AlertTriangleIcon } from '../Icons';
+import { AlertTriangleIcon } from '../../icons/Icons';
 
 export enum TooltipVerticalPosition {
     TOP = 'top',
