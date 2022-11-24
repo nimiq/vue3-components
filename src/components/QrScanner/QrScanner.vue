@@ -100,7 +100,9 @@ export default defineComponent({
         let cameraRetryTimer: number | null = null;
 
         onMounted(async () => {
-            // this.repositionOverlay = this.repositionOverlay.bind(this); // TODO: is this still necessary?
+            // @ts-ignore-next-line
+            // QrScannerLib._disableBarcodeDetector = true;
+
             scanner = new QrScannerLib(video$.value!, (result) => onResult(result), {});
             video$.value!.addEventListener('canplay', () => video$.value!.classList.add('ready'));
             window.addEventListener('resize', repositionOverlay);
@@ -172,8 +174,6 @@ export default defineComponent({
             });
         }
 
-        context.expose({ start, stop, setGrayscaleWeights, setInversionMode, repositionOverlay });
-
         function isVisible() {
             return !!root$.value && root$.value.offsetWidth > 0;
         }
@@ -189,6 +189,14 @@ export default defineComponent({
             lastResultTime = Date.now();
             context.emit(QrScannerEvents.RESULT, result);
         }
+
+        context.expose({
+            start,
+            stop,
+            setGrayscaleWeights,
+            setInversionMode,
+            repositionOverlay,
+        });
 
         return {
             root$,
