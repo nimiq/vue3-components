@@ -6,7 +6,7 @@
     "lint": "vue-tsc --noEmit",
     "build": "yarn lint && vite build && vue-tsc --emitDeclarationOnly",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "BASE_PATH=/vue3-components/ build-storybook"
   },
   "files": [
     "dist"

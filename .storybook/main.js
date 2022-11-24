@@ -1,4 +1,5 @@
 const svgLoader = require("vite-svg-loader");
+
 module.exports = {
   stories: [
     "../src/**/*.stories.mdx",
@@ -17,6 +18,8 @@ module.exports = {
     builder: "@storybook/builder-vite"
   },
   async viteFinal(config) {
+    config.base = process.env.BASE_PATH || config.base;
+
     // customize the Vite config here
     config.plugins.push(svgLoader({
       svgo: false
