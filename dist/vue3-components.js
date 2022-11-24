@@ -1932,7 +1932,7 @@ function _L(e, t, i, u, M, L) {
     W(o)
   ], 32);
 }
-const Tt = /* @__PURE__ */ _(GL, [["render", _L], ["__scopeId", "data-v-e6eaded3"]]);
+const Tt = /* @__PURE__ */ _(GL, [["render", _L], ["__scopeId", "data-v-04d3da97"]]);
 var At = /* @__PURE__ */ ((e) => (e.CLOSE = "close", e.CHANGED = "changed", e))(At || {});
 const ZL = Z({
   name: "AccountDetails",
@@ -2172,7 +2172,7 @@ function FL(e, t, i, u, M, L) {
     })
   ], 34);
 }
-const ke = /* @__PURE__ */ _(RL, [["render", FL], ["__scopeId", "data-v-836beb41"]]);
+const ke = /* @__PURE__ */ _(RL, [["render", FL], ["__scopeId", "data-v-0ca9be35"]]);
 var Dt = /* @__PURE__ */ ((e) => (e.ACCOUNT_SELECTED = "account-selected", e.ACCOUNT_CHANGED = "account-changed", e))(Dt || {});
 const VL = Z({
   name: "AccountList",
@@ -2323,7 +2323,7 @@ function XL(e, t, i, u, M, L) {
     }, 1032, ["class", "onClick"]))), 128))
   ]);
 }
-const qL = /* @__PURE__ */ _(VL, [["render", XL], ["__scopeId", "data-v-71c392d4"]]), KL = Z({
+const qL = /* @__PURE__ */ _(VL, [["render", XL], ["__scopeId", "data-v-646ef48d"]]), KL = Z({
   name: "AccountRing",
   components: { Identicon: jt },
   props: {
@@ -3625,7 +3625,7 @@ function x0(e, t, i, u, M, L) {
     X(e.$slots, "more", {}, void 0, !0)
   ], 2);
 }
-const wa = /* @__PURE__ */ _(T0, [["render", x0], ["__scopeId", "data-v-cf7c2fbe"]]), Xe = Z({
+const wa = /* @__PURE__ */ _(T0, [["render", x0], ["__scopeId", "data-v-50129964"]]), Xe = Z({
   name: "I18n",
   props: {
     path: {
@@ -4000,7 +4000,7 @@ const Q0 = Z({
     I18n: Xe
   }
 });
-const G0 = (e) => (ne("data-v-e2407fc8"), e = e(), ae(), e), _0 = { class: "price-breakdown" }, Z0 = { key: 0 }, W0 = { key: 1 }, $0 = { class: "free-service-info info" }, R0 = /* @__PURE__ */ G0(() => /* @__PURE__ */ C("hr", null, null, -1)), H0 = { class: "total" }, F0 = {
+const G0 = (e) => (ne("data-v-d82993c8"), e = e(), ae(), e), _0 = { class: "price-breakdown" }, Z0 = { key: 0 }, W0 = { key: 1 }, $0 = { class: "free-service-info info" }, R0 = /* @__PURE__ */ G0(() => /* @__PURE__ */ C("hr", null, null, -1)), H0 = { class: "total" }, F0 = {
   key: 1,
   class: "network-fee-info info"
 }, V0 = { class: "arrow-runway" };
@@ -4137,7 +4137,7 @@ function J0(e, t, i, u, M, L) {
     }, null, 8, ["startTime", "endTime", "theme", "tooltipProps"])) : G("", !0)
   ], 2);
 }
-const ma = /* @__PURE__ */ _(Q0, [["render", J0], ["__scopeId", "data-v-e2407fc8"]]);
+const ma = /* @__PURE__ */ _(Q0, [["render", J0], ["__scopeId", "data-v-d82993c8"]]);
 let Ut = null;
 class Qt {
 }

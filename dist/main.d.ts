@@ -28,7 +28,7 @@ export { default as SelectBar } from './components/SelectBar/SelectBar.vue';
 export { default as SmallPage } from './components/SmallPage/SmallPage.vue';
 export { default as Timer } from './components/Timer/Timer.vue';
 export { default as Tooltip } from './components/Tooltip/Tooltip.vue';
-export * from './components/Icons';
+export * from './icons/Icons';
 declare global {
     interface Window {
         __dynamicImportHandler__?: Function;
