@@ -30,7 +30,7 @@
     "input-format": "^0.3.7",
     "postcss": "8.4.19",
     "qr-creator": "^1.0.0",
-    "qr-scanner": "^1.4.1",
+    "qr-scanner": "^1.4.2",
     "vue": "^3.2.45"
   },
   "devDependencies": {
