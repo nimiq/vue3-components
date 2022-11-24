@@ -2,11 +2,13 @@
   "name": "@nimiq/vue3-components",
   "version": "1.0.0",
   "scripts": {
-    "dev": "vite",
     "lint": "vue-tsc --noEmit",
     "build": "yarn lint && vite build && vue-tsc --emitDeclarationOnly",
+    "deploy": "yarn build && gh-pages -d . -b build/full -m Rebuild -t",
+
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "BASE_PATH=/vue3-components/ build-storybook",
+    "deploy-storybook": "yarn build-storybook && gh-pages -d storybook-static -b gh-pages -m 'Update storybook build'"
   },
   "type":"module",
   "files": ["dist"],
@@ -41,6 +43,7 @@
     "@vitejs/plugin-vue": "^3.2.0",
     "babel-loader": "^8.2.2",
     "css-loader": "^5.2.4",
+    "gh-pages": "^4.0.0",
     "sass": "^1.32.12",
     "sass-loader": "^10.0.0",
     "style-loader": "^2.0.0",

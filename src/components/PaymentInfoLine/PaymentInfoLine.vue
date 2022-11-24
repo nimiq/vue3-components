@@ -122,7 +122,7 @@ import Timer from '../Timer/Timer.vue';
 import Amount, { amountValidator } from '../Amount/Amount.vue';
 import FiatAmount from '../FiatAmount/FiatAmount.vue';
 import Tooltip, { TooltipThemes } from '../Tooltip/Tooltip.vue';
-import { AlertTriangleIcon, ArrowRightSmallIcon } from '../Icons';
+import { AlertTriangleIcon, ArrowRightSmallIcon } from '../../icons/Icons';
 import I18n from '../../i18n/I18n';
 import { loadI18n } from '../../i18n/I18nComposable';
 
