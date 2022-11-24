@@ -31,7 +31,7 @@ export { default as Timer } from './components/Timer/Timer.vue';
 export { default as Tooltip } from './components/Tooltip/Tooltip.vue';
 
 // Comment out unused icons in the components/Icons.ts file
-export * from './components/Icons';
+export * from './icons/Icons';
 
 // export { default as I18nMixin } from '../src.old/i18n/I18nMixin';
 

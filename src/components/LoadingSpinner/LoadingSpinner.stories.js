@@ -9,7 +9,6 @@ export default {
             control: { type: 'color' },
             table: { category: 'Story props' }
         }
-
     },
 };
 
