@@ -2450,7 +2450,7 @@ __metadata:
     typescript: ^4.6.4
     vite: ^3.2.3
     vite-plugin-dynamic-publicpath: ^1.1.2
-    vite-svg-loader: ^3.1.2
+    vite-svg-loader: ^3.6.0
     vue: ^3.2.45
     vue-loader: ^17.0.0
     vue-tsc: ^0.34.13
@@ -15170,13 +15170,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vite-svg-loader@npm:^3.1.2":
-  version: 3.1.2
-  resolution: "vite-svg-loader@npm:3.1.2"
+"vite-svg-loader@npm:^3.6.0":
+  version: 3.6.0
+  resolution: "vite-svg-loader@npm:3.6.0"
   dependencies:
     "@vue/compiler-sfc": ^3.2.20
     svgo: ^2.7.0
-  checksum: 3f43fa45d1090007dcd67a5d522999e39dbd231d6d92e23c6d548e51cc19c426d1f0f6ef747754ec70be2efad74e4e7a70271b81f0a9616be2ed125124389784
+  checksum: 1ee96ce9de04b728c9d6b53f7bb8228b5e6ceb3a7c72fd341da333a8c027d5e9f7e928cbd923dd3b2b3adff4ec764f2a0b98551592e8820e409d66d51fc0c421
   languageName: node
   linkType: hard
 
