@@ -21,14 +21,19 @@ export default defineConfig({
     build: {
         lib: {
             entry: path.resolve(__dirname, 'src/main.ts'),
-            name: 'NimiqVue3Components',
+            // name: 'NimiqVue3Components',
+            formats: ['es'],
         },
+        sourcemap: true,
         rollupOptions: {
             // make sure to externalize deps that shouldn't be bundled
             // into your library
             external: ['vue', './qr-scanner-worker.min.js'],
             output: {
-                inlineDynamicImports: true,
+                inlineDynamicImports: false,
+                preserveModules: true,
+                preserveModulesRoot: '.',
+
                 // Provide global variables to use in the UMD build
                 // for externalized deps
                 globals: {

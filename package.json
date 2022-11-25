@@ -1,6 +1,15 @@
 {
   "name": "@nimiq/vue3-components",
   "version": "0.0.0",
+  "license": "Apache-2.0",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "types": "./dist/main.d.ts",
+  "module": "./dist/src/vue3-components.js",
+  "exports": "./dist/src/vue3-components.js",
+  "sideEffects": false,
   "scripts": {
     "lint": "vue-tsc --noEmit",
     "build": "rm -rf dist && yarn lint && vite build && vue-tsc --emitDeclarationOnly",
@@ -9,18 +18,6 @@
     "build-storybook": "BASE_PATH=/vue3-components/ build-storybook",
     "deploy-storybook": "yarn gh-pages-clean ; yarn build-storybook && gh-pages -d storybook-static -b gh-pages -m 'Update storybook build'",
     "deploy-all": "yarn deploy && yarn deploy-storybook"
-  },
-  "files": [
-    "dist"
-  ],
-  "main": "./dist/vue3-components.umd.js",
-  "module": "./dist/vue3-components.es.js",
-  "types": "./dist/main.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/vue3-components.es.js",
-      "require": "./dist/vue3-components.umd.js"
-    }
   },
   "dependencies": {
     "@nimiq/identicons": "^1.6.2",
@@ -78,6 +75,5 @@
     "> 1%",
     "last 2 versions",
     "not ie <= 10"
-  ],
-  "license": "Apache-2.0"
+  ]
 }
