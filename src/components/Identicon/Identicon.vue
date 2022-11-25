@@ -10,6 +10,9 @@ import { ValidationUtils } from '@nimiq/utils';
 // @ts-expect-error Could not find a declaration file for module '@nimiq/identicons/dist/identicons.min.js'.
 import Identicons from '@nimiq/identicons/dist/identicons.min.js';
 
+import identiconRaw from '@nimiq/identicons/dist/identicons.min.svg?raw';
+Identicons.svgPath = `data:text/plain;base64,${window.btoa(identiconRaw)}`;
+
 export default defineComponent({
     name: 'Identicon',
     props: {
@@ -37,8 +40,9 @@ export default defineComponent({
         watch(() => props.address, computeDataUrl, { immediate: true })
         async function computeDataUrl(address: string, oldAddress?: string) {
             if (props.address && isUserFriendlyAddress(props.address)) {
-                // Set svgPath
-                Identicons.svgPath = (await import('@nimiq/identicons/dist/identicons.min.svg?url')).default;
+                // // Set svgPath
+                // Identicons.svgPath = (await import('@nimiq/identicons/dist/identicons.min.svg?url')).default;
+
                 dataUrl.value = await Identicons.toDataUrl(formatAddress(props.address));
             } else {
                 dataUrl.value = placeholderDataUrl.value;
