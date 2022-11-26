@@ -3,7 +3,6 @@
 
 # Project generated folders
 .yarn
-dist
 node_modules
 storybook-static
 
