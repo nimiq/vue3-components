@@ -13,10 +13,12 @@
   "scripts": {
     "lint": "vue-tsc --noEmit",
     "build": "rm -rf dist && yarn lint && vite build && vue-tsc --emitDeclarationOnly",
-    "deploy": "yarn gh-pages-clean ; yarn build && gh-pages -d . -b build/full -m Rebuild -v '(.yarn|node_modules|storybook-static)'",
+    "deploy": "yarn build && yarn deploy-only",
+    "deploy-only": "node deploy_scripts/build.js",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "BASE_PATH=/vue3-components/ build-storybook",
-    "deploy-storybook": "yarn gh-pages-clean ; yarn build-storybook && gh-pages -d storybook-static -b gh-pages -m 'Update storybook build'",
+    "deploy-storybook": "yarn build-storybook && yarn deploy-only-storybook",
+    "deploy-only-storybook": "node deploy_scripts/storybook.js",
     "deploy-all": "yarn deploy && yarn deploy-storybook"
   },
   "dependencies": {
