@@ -7,8 +7,8 @@
   ],
   "type": "module",
   "types": "./dist/main.d.ts",
-  "module": "./dist/src/vue3-components.js",
-  "exports": "./dist/src/vue3-components.js",
+  "module": "./dist/vue3-components.js",
+  "exports": "./dist/vue3-components.js",
   "sideEffects": false,
   "scripts": {
     "lint": "vue-tsc --noEmit",
