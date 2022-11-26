@@ -1,0 +1,81 @@
+{
+  "name": "@nimiq/vue3-components",
+  "version": "0.0.0",
+  "license": "Apache-2.0",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "types": "./dist/main.d.ts",
+  "module": "./dist/src/vue3-components.js",
+  "exports": "./dist/src/vue3-components.js",
+  "sideEffects": false,
+  "scripts": {
+    "lint": "vue-tsc --noEmit",
+    "build": "rm -rf dist && yarn lint && vite build && vue-tsc --emitDeclarationOnly",
+    "deploy": "yarn build && yarn deploy-only",
+    "deploy-only": "node deploy_scripts/build.js",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "BASE_PATH=/vue3-components/ build-storybook",
+    "deploy-storybook": "yarn build-storybook && yarn deploy-only-storybook",
+    "deploy-only-storybook": "node deploy_scripts/storybook.js",
+    "deploy-all": "yarn deploy && yarn deploy-storybook"
+  },
+  "dependencies": {
+    "@nimiq/identicons": "^1.6.2",
+    "@nimiq/style": "^0.8.3",
+    "@nimiq/utils": "^0.8.2",
+    "browserslist": "4.21.4",
+    "input-format": "^0.3.7",
+    "postcss": "8.4.19",
+    "qr-creator": "^1.0.0",
+    "qr-scanner": "^1.4.2",
+    "vue": "^3.2.45"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.14.0",
+    "@storybook/addon-actions": "^6.5.13",
+    "@storybook/addon-essentials": "^6.5.13",
+    "@storybook/addon-links": "^6.5.13",
+    "@storybook/builder-vite": "^0.2.5",
+    "@storybook/preset-scss": "^1.0.3",
+    "@storybook/vue3": "^6.5.13",
+    "@vitejs/plugin-vue": "^3.2.0",
+    "babel-loader": "^8.2.2",
+    "css-loader": "^5.2.4",
+    "gh-pages": "^4.0.0",
+    "sass": "^1.32.12",
+    "sass-loader": "^10.0.0",
+    "style-loader": "^2.0.0",
+    "typescript": "^4.6.4",
+    "vite": "^3.2.3",
+    "vite-plugin-dynamic-publicpath": "^1.1.2",
+    "vite-svg-loader": "^3.6.0",
+    "vue-loader": "^17.0.0",
+    "vue-tsc": "^0.34.13"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/essential",
+      "eslint:recommended"
+    ],
+    "rules": {},
+    "parserOptions": {
+      "parser": "babel-eslint"
+    }
+  },
+  "postcss": {
+    "plugins": {
+      "autoprefixer": {}
+    }
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not ie <= 10"
+  ]
+}
