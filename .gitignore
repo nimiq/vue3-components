@@ -1,6 +1,11 @@
+# MacOs-specific files
 .DS_Store
+
+# Project generated folders
+.yarn
+dist
 node_modules
-dist-storybook
+storybook-static
 
 # generated json language files
 src/i18n/**/*.json
@@ -23,5 +28,3 @@ yarn-error.log*
 *.sln
 *.sw*
 *.iml
-.yarn
-storybook-static
