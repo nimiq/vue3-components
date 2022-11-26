@@ -7,8 +7,8 @@
   ],
   "type": "module",
   "types": "./dist/main.d.ts",
-  "module": "./dist/vue3-components.js",
-  "exports": "./dist/vue3-components.js",
+  "module": "./dist/src/vue3-components.js",
+  "exports": "./dist/src/vue3-components.js",
   "sideEffects": false,
   "scripts": {
     "lint": "vue-tsc --noEmit",
@@ -44,6 +44,7 @@
     "babel-loader": "^8.2.2",
     "css-loader": "^5.2.4",
     "gh-pages": "^4.0.0",
+    "rollup-plugin-rename-node-modules": "^1.3.1",
     "sass": "^1.32.12",
     "sass-loader": "^10.0.0",
     "style-loader": "^2.0.0",
