@@ -2444,6 +2444,7 @@ __metadata:
     postcss: 8.4.19
     qr-creator: ^1.0.0
     qr-scanner: ^1.4.2
+    rollup-plugin-rename-node-modules: ^1.3.1
     sass: ^1.32.12
     sass-loader: ^10.0.0
     style-loader: ^2.0.0
@@ -13254,6 +13255,18 @@ __metadata:
     hash-base: ^3.0.0
     inherits: ^2.0.1
   checksum: 006accc40578ee2beae382757c4ce2908a826b27e2b079efdcd2959ee544ddf210b7b5d7d5e80467807604244e7388427330f5c6d4cd61e6edaddc5773ccc393
+  languageName: node
+  linkType: hard
+
+"rollup-plugin-rename-node-modules@npm:^1.3.1":
+  version: 1.3.1
+  resolution: "rollup-plugin-rename-node-modules@npm:1.3.1"
+  dependencies:
+    estree-walker: ^2.0.1
+    magic-string: ^0.25.7
+  peerDependencies:
+    rollup: ^2.28.2
+  checksum: ef64fca4ae6e3b5f45d438315a34c368b259b7024f3f6a2f73c6fd819fdf98d7623327abdd0d641694ce030641312d4e91ce4cb171e195fc9f580a3a02f303ff
   languageName: node
   linkType: hard
 
