@@ -38,10 +38,8 @@ export default defineConfig({
             // into your library
             external: ['vue'],
             output: {
-                inlineDynamicImports: false,
                 // Generate one file per component,
                 // but since it create a node_module folder that get removed during the packaging then it doesn't work
-                // TODO: find a way to include the node_modules folder into the package (package.json:files get ignored)
                 preserveModules: true,
                 preserveModulesRoot: '.',
 
