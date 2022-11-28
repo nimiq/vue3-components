@@ -38,6 +38,7 @@
     "@storybook/preset-scss": "^1.0.3",
     "@storybook/vue3": "^6.5.13",
     "@vitejs/plugin-vue": "^3.2.0",
+    "autoprefixer": "^10.4.13",
     "babel-loader": "^8.2.2",
     "browserslist": "4.21.4",
     "css-loader": "^5.2.4",

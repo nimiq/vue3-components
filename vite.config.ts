@@ -4,6 +4,7 @@ import vue from '@vitejs/plugin-vue'
 import svgLoader from 'vite-svg-loader'
 import crypto from 'crypto';
 import renameNodeModules from "rollup-plugin-rename-node-modules";
+import autoprefixer from 'autoprefixer'
 
 // Fix build for Node version with OpenSSL 3
 const origCreateHash = crypto.createHash;
@@ -18,6 +19,13 @@ export default defineConfig({
         svgLoader({ svgo: false }),
         renameNodeModules('modules'),
     ],
+    css: {
+        postcss: {
+            plugins: [
+                autoprefixer(),
+            ],
+        }
+    },
     build: {
         lib: {
             entry: path.resolve(__dirname, 'src/main.ts'),
