@@ -2,7 +2,6 @@ import path from 'path'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import svgLoader from 'vite-svg-loader'
-import { useDynamicPublicPath } from 'vite-plugin-dynamic-publicpath'
 import crypto from 'crypto';
 import renameNodeModules from "rollup-plugin-rename-node-modules";
 
@@ -17,7 +16,6 @@ export default defineConfig({
     plugins: [
         vue(),
         svgLoader({ svgo: false }),
-        useDynamicPublicPath(),
         renameNodeModules('modules'),
     ],
     build: {
