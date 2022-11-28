@@ -15,10 +15,10 @@ export default {
 export const Default = (args) => ({
     components: { LoadingSpinner },
     setup() {
-        return { ...args };
+        return { args };
     },
     template: `
-        <div :style="{ color }">
+        <div :style="args.color ? { color: args.color } : {}">
             <LoadingSpinner />
         </div>
     `,
