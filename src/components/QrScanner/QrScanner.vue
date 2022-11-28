@@ -67,7 +67,7 @@ import { BrowserDetection } from '@nimiq/utils';
 import I18n from '../../i18n/I18n';
 import { loadI18n } from '../../i18n/I18nComposable';
 
-export const enum QrScannerEvents {
+export enum QrScannerEvents {
     RESULT = 'result',
     CANCEL = 'cancel',
     ERROR = 'error',
@@ -75,6 +75,7 @@ export const enum QrScannerEvents {
 
 export default defineComponent({
     name: 'QrScanner',
+    emits: Object.values(QrScannerEvents),
     props: {
         reportFrequency: {
             type: Number,
