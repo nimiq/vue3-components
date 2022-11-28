@@ -28,7 +28,7 @@ export default defineConfig({
         rollupOptions: {
             // make sure to externalize deps that shouldn't be bundled
             // into your library
-            external: ['vue', './qr-scanner-worker.min.js'],
+            external: ['vue'],
             output: {
                 inlineDynamicImports: false,
                 // Generate one file per component,
