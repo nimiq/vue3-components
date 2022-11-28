@@ -1,12 +1,12 @@
 import d from "./vue3-components2.js";
-import { TooltipHorizontalPosition as z, TooltipThemes as M, TooltipVerticalPosition as A } from "./vue3-components2.js";
-import { resolveComponent as m, openBlock as s, createElementBlock as n, normalizeClass as u, createElementVNode as f, withModifiers as l, renderSlot as i, createVNode as a, createCommentVNode as r, Transition as $, withCtx as v, normalizeStyle as g } from "vue";
+import { TooltipEvents as z, TooltipHorizontalPosition as M, TooltipThemes as A, TooltipVerticalPosition as F } from "./vue3-components2.js";
+import { resolveComponent as m, openBlock as n, createElementBlock as r, normalizeClass as u, createElementVNode as f, withModifiers as l, renderSlot as i, createVNode as a, createCommentVNode as s, Transition as v, withCtx as $, normalizeStyle as T } from "vue";
 import "./vue3-components3.js";
-import T from "../../../_virtual/vue3-components.js";
+import g from "../../../_virtual/vue3-components.js";
 const k = ["tabindex"];
-function w(o, e, y, C, S, b) {
+function w(o, e, y, C, S, B) {
   const p = m("AlertTriangleIcon");
-  return s(), n("span", {
+  return n(), r("span", {
     class: u(["tooltip", [o.verticalPosition, {
       shown: o.isShown,
       "transition-position": o.transitionPosition,
@@ -25,31 +25,32 @@ function w(o, e, y, C, S, b) {
       tabindex: o.disabled || o.noFocus ? -1 : 0,
       class: "trigger"
     }, [
-      o.$slots.icon ? r("", !0) : i(o.$slots, "trigger", { key: 0 }, () => [
+      o.$slots.icon ? s("", !0) : i(o.$slots, "trigger", { key: 0 }, () => [
         a(p, { class: "nq-orange" })
       ], !0),
-      o.$slots.icon && !o.$slots.trigger ? i(o.$slots, "icon", { key: 1 }, void 0, !0) : r("", !0)
+      o.$slots.icon && !o.$slots.trigger ? i(o.$slots, "icon", { key: 1 }, void 0, !0) : s("", !0)
     ], 40, k),
-    a($, { name: "transition-fade" }, {
-      default: v(() => [
-        o.isShown ? (s(), n("div", {
+    a(v, { name: "transition-fade" }, {
+      default: $(() => [
+        o.isShown ? (n(), r("div", {
           key: 0,
           ref: "tooltipBox$",
           class: "tooltip-box",
-          style: g(o.tooltipBoxStyles)
+          style: T(o.tooltipBoxStyles)
         }, [
           i(o.$slots, "default", {}, void 0, !0)
-        ], 4)) : r("", !0)
+        ], 4)) : s("", !0)
       ]),
       _: 3
     })
   ], 34);
 }
-const I = /* @__PURE__ */ T(d, [["render", w], ["__scopeId", "data-v-0ca9be35"]]);
+const I = /* @__PURE__ */ g(d, [["render", w], ["__scopeId", "data-v-72d41571"]]);
 export {
-  z as TooltipHorizontalPosition,
-  M as TooltipThemes,
-  A as TooltipVerticalPosition,
+  z as TooltipEvents,
+  M as TooltipHorizontalPosition,
+  A as TooltipThemes,
+  F as TooltipVerticalPosition,
   I as default
 };
 //# sourceMappingURL=vue3-components.js.map

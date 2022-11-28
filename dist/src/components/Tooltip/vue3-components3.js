@@ -1,5 +1,5 @@
-const e = "";
+const _ = "";
 export {
-  e as default
+  _ as default
 };
 //# sourceMappingURL=vue3-components3.js.map

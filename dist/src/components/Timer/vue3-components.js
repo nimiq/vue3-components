@@ -1,21 +1,21 @@
 import p from "./vue3-components2.js";
-import { TimerThemes as j } from "./vue3-components2.js";
-import { resolveComponent as l, openBlock as t, createBlock as T, mergeProps as c, withCtx as r, createElementBlock as s, createElementVNode as i, createVNode as n, Transition as w, toDisplayString as a, createTextVNode as u, pushScopeId as k, popScopeId as I } from "vue";
+import { TimerEvents as j, TimerThemes as q } from "./vue3-components2.js";
+import { resolveComponent as n, openBlock as t, createBlock as T, mergeProps as c, withCtx as r, createElementBlock as s, createElementVNode as i, createVNode as l, Transition as w, toDisplayString as m, createTextVNode as u, pushScopeId as k, popScopeId as I } from "vue";
 import "./vue3-components3.js";
 import g from "../../../_virtual/vue3-components.js";
-const m = (e) => (k("data-v-84be38fa"), e = e(), I(), e), y = {
+const a = (e) => (k("data-v-1bd24b28"), e = e(), I(), e), y = {
   xmlns: "http://www.w3.org/2000/svg",
   viewBox: "0 0 26 26"
 }, S = ["r", "stroke-dasharray", "stroke-dashoffset", "stroke-width"], v = ["r", "stroke-dasharray", "stroke-dashoffset", "stroke-width"], E = {
   key: 0,
   class: "info-exclamation-icon"
-}, $ = /* @__PURE__ */ m(() => /* @__PURE__ */ i("rect", {
+}, $ = /* @__PURE__ */ a(() => /* @__PURE__ */ i("rect", {
   x: "12",
   y: "9",
   width: "2",
   height: "2",
   rx: "1"
-}, null, -1)), C = /* @__PURE__ */ m(() => /* @__PURE__ */ i("rect", {
+}, null, -1)), C = /* @__PURE__ */ a(() => /* @__PURE__ */ i("rect", {
   x: "12",
   y: "12.5",
   width: "2",
@@ -30,9 +30,9 @@ const m = (e) => (k("data-v-84be38fa"), e = e(), I(), e), y = {
   x: "50%",
   y: "50%"
 };
-function R(e, o, P, B, W, b) {
-  const h = l("I18n"), f = l("Tooltip");
-  return t(), T(f, c({
+function R(e, o, b, P, B, W) {
+  const h = n("I18n"), d = n("Tooltip");
+  return t(), T(d, c({
     class: "timer",
     ref: "root$"
   }, {
@@ -45,8 +45,8 @@ function R(e, o, P, B, W, b) {
       ...e.tooltipProps ? e.tooltipProps.styles : void 0
     }
   }, {
-    onShow: o[0] || (o[0] = (d) => e.detailsShown = !0),
-    onHide: o[1] || (o[1] = (d) => e.detailsShown = !1),
+    onShow: o[0] || (o[0] = (f) => e.detailsShown = !0),
+    onHide: o[1] || (o[1] = (f) => e.detailsShown = !1),
     class: {
       "time-shown": e.detailsShown || e.alwaysShowTime,
       "little-time-left": e.progress >= 0.75,
@@ -75,21 +75,21 @@ function R(e, o, P, B, W, b) {
           "stroke-dashoffset": e.fillerCircleInfo.offset,
           "stroke-width": e.fillerCircleInfo.strokeWidth
         }, null, 8, v),
-        n(w, { name: "transition-fade" }, {
+        l(w, { name: "transition-fade" }, {
           default: r(() => [
-            !e.detailsShown && !e.alwaysShowTime ? (t(), s("g", E, N)) : (t(), s("text", V, a(e.toSimplifiedTime(e.timeLeftRef, !1, e.maxUnit)), 1))
+            !e.detailsShown && !e.alwaysShowTime ? (t(), s("g", E, N)) : (t(), s("text", V, m(e.toSimplifiedTime(e.timeLeftRef, !1, e.maxUnit)), 1))
           ]),
           _: 1
         })
       ]))
     ]),
     default: r(() => [
-      n(h, {
+      l(h, {
         path: "This offer expires in {timer}.",
         componentName: "Timer"
       }, {
         timer: r(() => [
-          u(a(e.toSimplifiedTime(e.timeLeftRef, !0, e.maxUnit)), 1)
+          u(m(e.toSimplifiedTime(e.timeLeftRef, !0, e.maxUnit)), 1)
         ]),
         _: 1
       })
@@ -97,9 +97,10 @@ function R(e, o, P, B, W, b) {
     _: 1
   }, 16, ["class"]);
 }
-const D = /* @__PURE__ */ g(p, [["render", R], ["__scopeId", "data-v-84be38fa"]]);
+const D = /* @__PURE__ */ g(p, [["render", R], ["__scopeId", "data-v-1bd24b28"]]);
 export {
-  j as TimerThemes,
+  j as TimerEvents,
+  q as TimerThemes,
   D as default
 };
 //# sourceMappingURL=vue3-components.js.map

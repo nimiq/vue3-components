@@ -26,7 +26,7 @@ declare const _default: import("vue").DefineComponent<{
     };
     theme: {
         type: StringConstructor;
-        default: string;
+        default: TimerThemes;
         validator: (value: any) => boolean;
     };
     strokeWidth: {
@@ -48,8 +48,14 @@ declare const _default: import("vue").DefineComponent<{
             new (): HTMLElement;
             prototype: HTMLElement;
         };
-        disabled: BooleanConstructor;
-        noFocus: BooleanConstructor;
+        disabled: {
+            type: BooleanConstructor;
+            default: boolean;
+        };
+        noFocus: {
+            type: BooleanConstructor;
+            default: boolean;
+        };
         preferredPosition: {
             type: StringConstructor;
             default: string;
@@ -82,13 +88,19 @@ declare const _default: import("vue").DefineComponent<{
         hide: (force?: boolean) => void;
         mouseOver: (mouseOverTooltip: boolean) => void;
         onClick: () => void;
-    }, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, {}, string, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
+    }, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, import("../Tooltip/Tooltip.vue").TooltipEvents[], import("../Tooltip/Tooltip.vue").TooltipEvents, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
         container: {
             new (): HTMLElement;
             prototype: HTMLElement;
         };
-        disabled: BooleanConstructor;
-        noFocus: BooleanConstructor;
+        disabled: {
+            type: BooleanConstructor;
+            default: boolean;
+        };
+        noFocus: {
+            type: BooleanConstructor;
+            default: boolean;
+        };
         preferredPosition: {
             type: StringConstructor;
             default: string;
@@ -108,7 +120,11 @@ declare const _default: import("vue").DefineComponent<{
             validator: (value: any) => boolean;
         };
         styles: () => Partial<CSSStyleDeclaration>;
-    }>>, {
+    }>> & {
+        onClick?: ((...args: any[]) => any) | undefined;
+        onShow?: ((...args: any[]) => any) | undefined;
+        onHide?: ((...args: any[]) => any) | undefined;
+    }, {
         disabled: boolean;
         noFocus: boolean;
         preferredPosition: string;
@@ -121,7 +137,7 @@ declare const _default: import("vue").DefineComponent<{
     progress: import("vue").ComputedRef<number>;
     timeCircleInfo: import("vue").ComputedRef<CircleInfo>;
     fillerCircleInfo: import("vue").ComputedRef<CircleInfo>;
-}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, {}, string, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
+}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, TimerEvents.END[], TimerEvents, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
     startTime: NumberConstructor;
     endTime: NumberConstructor;
     alwaysShowTime: {
@@ -130,7 +146,7 @@ declare const _default: import("vue").DefineComponent<{
     };
     theme: {
         type: StringConstructor;
-        default: string;
+        default: TimerThemes;
         validator: (value: any) => boolean;
     };
     strokeWidth: {
@@ -143,7 +159,9 @@ declare const _default: import("vue").DefineComponent<{
         required: false;
         validator: (value: any) => boolean;
     };
-}>>, {
+}>> & {
+    onEnd?: ((...args: any[]) => any) | undefined;
+}, {
     strokeWidth: number;
     theme: string;
     alwaysShowTime: boolean;

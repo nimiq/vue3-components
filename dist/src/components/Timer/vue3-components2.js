@@ -1,23 +1,23 @@
-import { defineComponent as H, ref as u, onMounted as G, onUnmounted as Z, computed as I, watch as M } from "vue";
-import J from "../Tooltip/vue3-components.js";
-import K from "../../i18n/vue3-components2.js";
-import { loadI18n as Q } from "../../i18n/vue3-components.js";
-import X from './../../../modules/@nimiq/utils/dist/module/vue3-components7.js';
-import { TooltipThemes as Y } from "../Tooltip/vue3-components2.js";
-const z = [
+import { defineComponent as G, ref as u, onMounted as Z, onUnmounted as J, computed as I, watch as M } from "vue";
+import K from "../Tooltip/vue3-components.js";
+import Q from "../../i18n/vue3-components2.js";
+import { loadI18n as X } from "../../i18n/vue3-components.js";
+import Y from './../../../modules/@nimiq/utils/dist/module/vue3-components7.js';
+import { TooltipThemes as p } from "../Tooltip/vue3-components2.js";
+const U = [
   { unit: "minute", factor: 60 },
   { unit: "hour", factor: 60 },
   { unit: "day", factor: 24 }
 ];
-function p(e, g = !0, d) {
+function ee(e, g = !0, d) {
   let n = e / 1e3, i = "second";
-  for (const { unit: t, factor: a } of z) {
+  for (const { unit: t, factor: a } of U) {
     if (n / a < 1 || i === d)
       break;
     n /= a, i = t;
   }
   if (n = Math.floor(n), g) {
-    const t = Q("Timer");
+    const t = X("Timer");
     return i = {
       get second() {
         return t("second");
@@ -47,10 +47,11 @@ function p(e, g = !0, d) {
   } else
     return n;
 }
-const D = 8, U = 3.25 * D, x = D, $ = 1.5;
-var L = /* @__PURE__ */ ((e) => (e.NORMAL = "normal", e.INVERSE = "inverse", e.WHITE = "white", e))(L || {});
-const ue = H({
+const $ = 8, D = 3.25 * $, x = $, N = 1.5;
+var z = /* @__PURE__ */ ((e) => (e.END = "end", e))(z || {}), L = /* @__PURE__ */ ((e) => (e.NORMAL = "normal", e.INVERSE = "inverse", e.WHITE = "white", e))(L || {});
+const re = G({
   name: "Timer",
+  emits: Object.values(z),
   props: {
     startTime: Number,
     endTime: Number,
@@ -75,55 +76,55 @@ const ue = H({
     }
   },
   setup(e, g) {
-    const d = u(null), n = u(0), i = u(0), t = u(!1), a = new X(t.value || e.alwaysShowTime ? x * $ : x), o = u(2 * Math.PI * a.currentValue), f = u(null), v = u(null), h = u(null), R = u(U);
-    function N(m) {
+    const d = u(null), n = u(0), i = u(0), t = u(!1), a = new Y(t.value || e.alwaysShowTime ? x * N : x), o = u(2 * Math.PI * a.currentValue), v = u(null), f = u(null), h = u(null), E = u(D);
+    function q(m) {
       n.value = m - Date.now();
     }
-    g.expose({ synchronize: N }), G(() => {
-      requestAnimationFrame(() => R.value = d.value.offsetWidth), window.addEventListener("resize", F);
-    }), Z(() => {
-      f.value && clearTimeout(f.value), v.value && clearTimeout(v.value), h.value && cancelAnimationFrame(h.value), window.removeEventListener("resize", F);
+    g.expose({ synchronize: q }), Z(() => {
+      requestAnimationFrame(() => E.value = d.value.offsetWidth), window.addEventListener("resize", F);
+    }), J(() => {
+      v.value && clearTimeout(v.value), f.value && clearTimeout(f.value), h.value && cancelAnimationFrame(h.value), window.removeEventListener("resize", F);
     });
     const T = I(() => e.startTime === void 0 || e.endTime === void 0 ? 0 : Math.max(0, e.endTime - e.startTime)), S = I(() => e.startTime === void 0 || e.endTime === void 0 ? 0 : Math.max(0, Math.min(T.value, e.endTime - i.value))), _ = I(() => e.startTime === void 0 || e.endTime === void 0 || T.value === 0 ? 0 : 1 - S.value / T.value), b = I(() => {
-      const m = o.value - 2.5 * e.strokeWidth, l = Math.min(m, (1 - _.value) * o.value), r = l + e.strokeWidth, s = o.value - l, c = o.value / 4 - s;
-      return { length: l, lengthWithLineCaps: r, gap: s, offset: c, strokeWidth: e.strokeWidth };
-    }), q = I(() => {
-      const m = o.value - b.value.lengthWithLineCaps - 2 * e.strokeWidth, l = Math.max(0, m), r = Math.min(e.strokeWidth, l), s = Math.max(0, l - r), c = o.value - s, E = o.value / 4 - e.strokeWidth / 2 - e.strokeWidth - r / 2;
-      return { length: s, lengthWithLineCaps: l, gap: c, offset: E, strokeWidth: r };
+      const m = o.value - 2.5 * e.strokeWidth, r = Math.min(m, (1 - _.value) * o.value), l = r + e.strokeWidth, s = o.value - r, c = o.value / 4 - s;
+      return { length: r, lengthWithLineCaps: l, gap: s, offset: c, strokeWidth: e.strokeWidth };
+    }), j = I(() => {
+      const m = o.value - b.value.lengthWithLineCaps - 2 * e.strokeWidth, r = Math.max(0, m), l = Math.min(e.strokeWidth, r), s = Math.max(0, r - l), c = o.value - s, y = o.value / 4 - e.strokeWidth / 2 - e.strokeWidth - l / 2;
+      return { length: s, lengthWithLineCaps: r, gap: c, offset: y, strokeWidth: l };
     });
     function B() {
-      const m = R.value / U, r = o.value * m * 3, s = 1e3 / 60, c = S.value, E = T.value, O = 2;
+      const m = E.value / D, l = o.value * m * 3, s = 1e3 / 60, c = S.value, y = T.value, O = 2;
       let k = 1e3, A = k / O;
-      for (const { factor: V } of z) {
-        const w = k * V, P = w / O, j = Math.min(P, Math.max(s, E / r));
-        if ((c - j) / w < 1) {
+      for (const { factor: V } of U) {
+        const w = k * V, P = w / O, H = Math.min(P, Math.max(s, y / l));
+        if ((c - H) / w < 1) {
           c / w > 1 && (A = c - w);
           break;
         }
         k = w, A = P;
       }
-      return Math.min(A, Math.max(s, T.value / r));
+      return Math.min(A, Math.max(s, T.value / l));
     }
     M(t, C, { immediate: !0 }), M(() => e.alwaysShowTime, C);
     function C() {
-      a.tweenTo(t.value || e.alwaysShowTime ? $ * x : x, 300), W();
+      a.tweenTo(t.value || e.alwaysShowTime ? N * x : x, 300), W();
     }
-    M(() => e.startTime, y, { immediate: !0 }), M(() => e.endTime, y), M(n, y);
-    function y() {
-      i.value = Date.now() + n.value, f.value && clearTimeout(f.value), e.startTime && e.endTime && (f.value = window.setTimeout(
+    M(() => e.startTime, R, { immediate: !0 }), M(() => e.endTime, R), M(n, R);
+    function R() {
+      i.value = Date.now() + n.value, v.value && clearTimeout(v.value), e.startTime && e.endTime && (v.value = window.setTimeout(
         () => g.emit("end", e.endTime),
         e.endTime - i.value
       ), W());
     }
     function W() {
-      i.value = Date.now() + n.value, o.value = 2 * Math.PI * a.currentValue, !(S.value === 0 && a.finished) && (v.value && clearTimeout(v.value), h.value && cancelAnimationFrame(h.value), a.finished ? v.value = window.setTimeout(() => W(), B()) : h.value = requestAnimationFrame(() => W()));
+      i.value = Date.now() + n.value, o.value = 2 * Math.PI * a.currentValue, !(S.value === 0 && a.finished) && (f.value && clearTimeout(f.value), h.value && cancelAnimationFrame(h.value), a.finished ? f.value = window.setTimeout(() => W(), B()) : h.value = requestAnimationFrame(() => W()));
     }
     function F() {
-      d.value && (R.value = d.value.offsetWidth);
+      d.value && (E.value = d.value.offsetWidth);
     }
     return {
-      toSimplifiedTime: p,
-      TooltipThemes: Y,
+      toSimplifiedTime: ee,
+      TooltipThemes: p,
       TimerThemes: L,
       root$: d,
       detailsShown: t,
@@ -131,13 +132,14 @@ const ue = H({
       timeLeftRef: S,
       progress: _,
       timeCircleInfo: b,
-      fillerCircleInfo: q
+      fillerCircleInfo: j
     };
   },
-  components: { Tooltip: J, I18n: K }
+  components: { Tooltip: K, I18n: Q }
 });
 export {
+  z as TimerEvents,
   L as TimerThemes,
-  ue as default
+  re as default
 };
 //# sourceMappingURL=vue3-components2.js.map

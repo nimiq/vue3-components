@@ -11,6 +11,11 @@ export declare enum TooltipThemes {
     NORMAL = "normal",
     INVERSE = "inverse"
 }
+export declare enum TooltipEvents {
+    SHOW = "show",
+    HIDE = "hide",
+    CLICK = "click"
+}
 declare const _default: import("vue").DefineComponent<{
     /**
     * Container within which the tooltip should be positioned if possible.
@@ -19,8 +24,14 @@ declare const _default: import("vue").DefineComponent<{
         new (): HTMLElement;
         prototype: HTMLElement;
     };
-    disabled: BooleanConstructor;
-    noFocus: BooleanConstructor;
+    disabled: {
+        type: BooleanConstructor;
+        default: boolean;
+    };
+    noFocus: {
+        type: BooleanConstructor;
+        default: boolean;
+    };
     /**
     * Preferred tooltip position as "[vertical] [horizontal]" or "[vertical]".
     */
@@ -66,7 +77,7 @@ declare const _default: import("vue").DefineComponent<{
     hide: (force?: boolean) => void;
     mouseOver: (mouseOverTooltip: boolean) => void;
     onClick: () => void;
-}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, {}, string, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
+}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, TooltipEvents[], TooltipEvents, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
     /**
     * Container within which the tooltip should be positioned if possible.
     */
@@ -74,8 +85,14 @@ declare const _default: import("vue").DefineComponent<{
         new (): HTMLElement;
         prototype: HTMLElement;
     };
-    disabled: BooleanConstructor;
-    noFocus: BooleanConstructor;
+    disabled: {
+        type: BooleanConstructor;
+        default: boolean;
+    };
+    noFocus: {
+        type: BooleanConstructor;
+        default: boolean;
+    };
     /**
     * Preferred tooltip position as "[vertical] [horizontal]" or "[vertical]".
     */
@@ -108,7 +125,11 @@ declare const _default: import("vue").DefineComponent<{
     * Styles to apply on the tooltip box without the need to use deep css selectors.
     */
     styles: () => Partial<CSSStyleDeclaration>;
-}>>, {
+}>> & {
+    onClick?: ((...args: any[]) => any) | undefined;
+    onShow?: ((...args: any[]) => any) | undefined;
+    onHide?: ((...args: any[]) => any) | undefined;
+}, {
     disabled: boolean;
     noFocus: boolean;
     preferredPosition: string;
