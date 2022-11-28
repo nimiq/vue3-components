@@ -1,8 +1,9 @@
 import h from "./vue3-components2.js";
-import { resolveComponent as p, openBlock as s, createElementBlock as o, createElementVNode as a, normalizeClass as _, renderSlot as v, toDisplayString as n, createVNode as d, Transition as f, withCtx as t, createBlock as l, createCommentVNode as u, pushScopeId as k, popScopeId as w } from "vue";
+import { QrScannerEvents as P } from "./vue3-components2.js";
+import { resolveComponent as p, openBlock as s, createElementBlock as o, createElementVNode as a, normalizeClass as _, renderSlot as v, toDisplayString as n, createVNode as d, Transition as f, withCtx as t, createBlock as l, createCommentVNode as u, pushScopeId as k, popScopeId as b } from "vue";
 import "./vue3-components3.js";
-import b from "../../../_virtual/vue3-components.js";
-const i = (e) => (k("data-v-f23a72ce"), e = e(), w(), e), y = {
+import w from "../../../_virtual/vue3-components.js";
+const i = (e) => (k("data-v-f2dcb425"), e = e(), b(), e), y = {
   class: "qr-scanner nq-blue-bg",
   ref: "root$"
 }, g = {
@@ -29,13 +30,13 @@ const i = (e) => (k("data-v-f23a72ce"), e = e(), w(), e), y = {
 }, C = {
   key: 0,
   class: "camera-access-failed-warning"
-}, I = { key: 1 }, N = { class: "camera-access-failed-warning" }, Q = { key: 0 }, B = { key: 0 }, V = /* @__PURE__ */ i(() => /* @__PURE__ */ a("span", { class: "browser-menu-icon" }, null, -1)), q = /* @__PURE__ */ i(() => /* @__PURE__ */ a("div", { class: "browser-menu-arrow" }, null, -1)), H = {
+}, I = { key: 1 }, N = { class: "camera-access-failed-warning" }, Q = { key: 0 }, B = { key: 0 }, V = /* @__PURE__ */ i(() => /* @__PURE__ */ a("span", { class: "browser-menu-icon" }, null, -1)), q = /* @__PURE__ */ i(() => /* @__PURE__ */ a("div", { class: "browser-menu-arrow" }, null, -1)), E = {
   key: 1,
   class: "access-denied-instructions"
-}, M = {
+}, H = {
   key: 1,
   class: "access-denied-instructions"
-}, A = /* @__PURE__ */ i(() => /* @__PURE__ */ a("b", null, "Safari", -1)), E = {
+}, M = /* @__PURE__ */ i(() => /* @__PURE__ */ a("b", null, "Safari", -1)), A = {
   key: 0,
   class: "camera-icon-chrome"
 }, F = {
@@ -77,8 +78,8 @@ function T(e, r, U, j, z, D) {
                   _: 1
                 }),
                 q
-              ])) : (s(), o("div", H, n(e.$t("Grant camera access when asked.")), 1))
-            ])) : (s(), o("div", M, [
+              ])) : (s(), o("div", E, n(e.$t("Grant camera access when asked.")), 1))
+            ])) : (s(), o("div", H, [
               e.browser === "safari" ? (s(), l(c, {
                 key: 0,
                 path: "Click on {safari} and go to\\nSettings for this Website > Camera",
@@ -86,7 +87,7 @@ function T(e, r, U, j, z, D) {
                 componentName: "QrScanner"
               }, {
                 safari: t(() => [
-                  A
+                  M
                 ]),
                 _: 1
               })) : (s(), l(c, {
@@ -96,7 +97,7 @@ function T(e, r, U, j, z, D) {
                 componentName: "QrScanner"
               }, {
                 icon: t(() => [
-                  e.browser === "chrome" ? (s(), o("span", E)) : e.browser === "firefox" ? (s(), o("span", F)) : (s(), o("span", R, n(e.$t("the camera icon")), 1))
+                  e.browser === "chrome" ? (s(), o("span", A)) : e.browser === "firefox" ? (s(), o("span", F)) : (s(), o("span", R, n(e.$t("the camera icon")), 1))
                 ]),
                 _: 1
               }))
@@ -108,8 +109,9 @@ function T(e, r, U, j, z, D) {
     })
   ], 512);
 }
-const Y = /* @__PURE__ */ b(h, [["render", T], ["__scopeId", "data-v-f23a72ce"]]);
+const Y = /* @__PURE__ */ w(h, [["render", T], ["__scopeId", "data-v-f2dcb425"]]);
 export {
+  P as QrScannerEvents,
   Y as default
 };
 //# sourceMappingURL=vue3-components.js.map

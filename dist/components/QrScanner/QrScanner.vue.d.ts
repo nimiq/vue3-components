@@ -1,6 +1,6 @@
 import { PropType } from 'vue';
 import { BrowserDetection } from '@nimiq/utils';
-export declare const enum QrScannerEvents {
+export declare enum QrScannerEvents {
     RESULT = "result",
     CANCEL = "cancel",
     ERROR = "error"
@@ -22,13 +22,17 @@ declare const _default: import("vue").DefineComponent<{
     cancel: () => void;
 }, unknown, {}, {
     $t: (key: string, variablesOrLang?: string | import("../../i18n/I18nComposable").I18n$tVariables | undefined, variables?: import("../../i18n/I18nComposable").I18n$tVariables | undefined) => string;
-}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, {}, string, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
+}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, QrScannerEvents[], QrScannerEvents, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
     reportFrequency: {
         type: NumberConstructor;
         default: number;
     };
     validate: PropType<(scanResult: string) => boolean>;
-}>>, {
+}>> & {
+    onError?: ((...args: any[]) => any) | undefined;
+    onResult?: ((...args: any[]) => any) | undefined;
+    onCancel?: ((...args: any[]) => any) | undefined;
+}, {
     reportFrequency: number;
 }>;
 export default _default;

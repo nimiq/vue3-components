@@ -121,23 +121,23 @@ class s {
     let l, c = !1;
     t && ("scanRegion" in t || "qrEngine" in t || "canvas" in t || "disallowCanvasResizing" in t || "alsoTryWithoutScanRegion" in t || "returnDetailedScanResult" in t) ? (l = t.scanRegion, i = t.qrEngine, a = t.canvas, n = t.disallowCanvasResizing || !1, o = t.alsoTryWithoutScanRegion || !1, c = !0) : console.warn(t || i || a || n || o ? "You're using a deprecated api for scanImage which will be removed in the future." : "Note that the return type of scanImage will change in the future. To already switch to the new api today, you can pass returnDetailedScanResult: true."), t = !!i;
     try {
-      let m, h;
-      [i, m] = await Promise.all([i || s.createQrEngine(), s._loadImage(e)]), [a, h] = s._drawToCanvas(m, l, a, n);
-      let g;
+      let g, h;
+      [i, g] = await Promise.all([i || s.createQrEngine(), s._loadImage(e)]), [a, h] = s._drawToCanvas(g, l, a, n);
+      let m;
       if (i instanceof Worker) {
         let r = i;
-        t || s._postWorkerMessageSync(r, "inversionMode", "both"), g = await new Promise((d, _) => {
-          let p, y, v, w = -1;
+        t || s._postWorkerMessageSync(r, "inversionMode", "both"), m = await new Promise((d, p) => {
+          let _, y, v, w = -1;
           y = (u) => {
-            u.data.id === w && (r.removeEventListener("message", y), r.removeEventListener("error", v), clearTimeout(p), u.data.data !== null ? d({ data: u.data.data, cornerPoints: s._convertPoints(u.data.cornerPoints, l) }) : _(s.NO_QR_CODE_FOUND));
+            u.data.id === w && (r.removeEventListener("message", y), r.removeEventListener("error", v), clearTimeout(_), u.data.data !== null ? d({ data: u.data.data, cornerPoints: s._convertPoints(u.data.cornerPoints, l) }) : p(s.NO_QR_CODE_FOUND));
           }, v = (u) => {
-            r.removeEventListener("message", y), r.removeEventListener("error", v), clearTimeout(p), _("Scanner error: " + (u ? u.message || u : "Unknown Error"));
-          }, r.addEventListener("message", y), r.addEventListener("error", v), p = setTimeout(() => v("timeout"), 1e4);
+            r.removeEventListener("message", y), r.removeEventListener("error", v), clearTimeout(_), p("Scanner error: " + (u ? u.message || u : "Unknown Error"));
+          }, r.addEventListener("message", y), r.addEventListener("error", v), _ = setTimeout(() => v("timeout"), 1e4);
           let f = h.getImageData(0, 0, a.width, a.height);
           w = s._postWorkerMessageSync(r, "decode", f, [f.data.buffer]);
         });
       } else
-        g = await Promise.race([new Promise((r, d) => window.setTimeout(() => d("Scanner error: timeout"), 1e4)), (async () => {
+        m = await Promise.race([new Promise((r, d) => window.setTimeout(() => d("Scanner error: timeout"), 1e4)), (async () => {
           try {
             var [r] = await i.detect(a);
             if (!r)
@@ -149,10 +149,10 @@ class s {
             throw `Scanner error: ${r}`;
           }
         })()]);
-      return c ? g : g.data;
-    } catch (m) {
+      return c ? m : m.data;
+    } catch (g) {
       if (!l || !o)
-        throw m;
+        throw g;
       let h = await s.scanImage(e, { qrEngine: i, canvas: a, disallowCanvasResizing: n });
       return c ? h : h.data;
     } finally {
@@ -171,9 +171,7 @@ class s {
     s._postWorkerMessage(this._qrEnginePromise, "inversionMode", e);
   }
   static async createQrEngine(e) {
-    if (e && console.warn("Specifying a worker path is not required and not supported anymore."), e = () => import("__PUBLIC_PATH_MARKER__" + (window.__dynamicImportHandler__ || function(i) {
-      return i;
-    })("../../Users/yukiioz/Desktop/Git/vue3-components/node_modules/qr-scanner/qr-scanner-worker.min.js") + "__PUBLIC_PATH_MARKER__").then((i) => i.createWorker()), !(!s._disableBarcodeDetector && "BarcodeDetector" in window && BarcodeDetector.getSupportedFormats && (await BarcodeDetector.getSupportedFormats()).includes("qr_code")))
+    if (e && console.warn("Specifying a worker path is not required and not supported anymore."), e = () => import("./vue3-components2.js").then((i) => i.createWorker()), !(!s._disableBarcodeDetector && "BarcodeDetector" in window && BarcodeDetector.getSupportedFormats && (await BarcodeDetector.getSupportedFormats()).includes("qr_code")))
       return e();
     let t = navigator.userAgentData;
     return t && t.brands.some(({ brand: i }) => /Chromium/i.test(i)) && /mac ?OS/i.test(t.platform) && await t.getHighEntropyValues(["architecture", "platformVersion"]).then(({ architecture: i, platformVersion: a }) => /arm/i.test(i || "arm") && 13 <= parseInt(a || "13")).catch(() => !0) ? e() : new BarcodeDetector({ formats: ["qr_code"] });
@@ -194,8 +192,8 @@ class s {
   _updateOverlay() {
     requestAnimationFrame(() => {
       if (this.$overlay) {
-        var e = this.$video, t = e.videoWidth, i = e.videoHeight, a = e.offsetWidth, n = e.offsetHeight, o = e.offsetLeft, l = e.offsetTop, c = window.getComputedStyle(e), m = c.objectFit, h = t / i, g = a / n;
-        switch (m) {
+        var e = this.$video, t = e.videoWidth, i = e.videoHeight, a = e.offsetWidth, n = e.offsetHeight, o = e.offsetLeft, l = e.offsetTop, c = window.getComputedStyle(e), g = c.objectFit, h = t / i, m = a / n;
+        switch (g) {
           case "none":
             var r = t, d = i;
             break;
@@ -203,15 +201,15 @@ class s {
             r = a, d = n;
             break;
           default:
-            (m === "cover" ? h > g : h < g) ? (d = n, r = d * h) : (r = a, d = r / h), m === "scale-down" && (r = Math.min(r, t), d = Math.min(d, i));
+            (g === "cover" ? h > m : h < m) ? (d = n, r = d * h) : (r = a, d = r / h), g === "scale-down" && (r = Math.min(r, t), d = Math.min(d, i));
         }
-        var [_, p] = c.objectPosition.split(" ").map((v, w) => {
+        var [p, _] = c.objectPosition.split(" ").map((v, w) => {
           const f = parseFloat(v);
           return v.endsWith("%") ? (w ? n - d : a - r) * f / 100 : f;
         });
-        c = this._scanRegion.width || t, g = this._scanRegion.height || i, m = this._scanRegion.x || 0;
+        c = this._scanRegion.width || t, m = this._scanRegion.height || i, g = this._scanRegion.x || 0;
         var y = this._scanRegion.y || 0;
-        h = this.$overlay.style, h.width = `${c / t * r}px`, h.height = `${g / i * d}px`, h.top = `${l + p + y / i * d}px`, i = /scaleX\(-1\)/.test(e.style.transform), h.left = `${o + (i ? a - _ - r : _) + (i ? t - m - c : m) / t * r}px`, h.transform = e.style.transform;
+        h = this.$overlay.style, h.width = `${c / t * r}px`, h.height = `${m / i * d}px`, h.top = `${l + _ + y / i * d}px`, i = /scaleX\(-1\)/.test(e.style.transform), h.left = `${o + (i ? a - p - r : p) + (i ? t - g - c : g) / t * r}px`, h.transform = e.style.transform;
       }
     });
   }
