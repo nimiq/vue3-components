@@ -15,7 +15,10 @@ export default {
         shopLogoUrl: { control: 'text' },
         startTime: { control: 'number' },
         endTime: { control: 'number' },
-        theme: { control: { type: 'select', options: Object.values(PaymentInfoLineThemes) } },
+        theme: {
+            control: { type: 'select' },
+            options: Object.values(PaymentInfoLineThemes)
+        },
         tooltipContainer: { control: 'object', table: { disable: true } },
     },
 };
