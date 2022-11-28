@@ -3,14 +3,15 @@ import PageHeader from '../PageHeader/PageHeader.vue';
 import SmallPage from '../SmallPage/SmallPage.vue';
 import PageBody from '../PageBody/PageBody.vue';
 import Account from '../Account/Account.vue';
-import Tooltip, { TooltipThemes } from './Tooltip.vue';
+import Tooltip, { TooltipThemes, TooltipEvents } from './Tooltip.vue';
 import { computed, ref } from 'vue';
+import { getEventArgTypeFromEnum, getEventListenerFromEnum } from '../../helpers/storybook/EventHelper';
 
 export default {
     title: 'Tooltip',
     component: Tooltip,
     argTypes: {
-        useContainer: { control: { type: 'boolean' } },
+        // Props
         disabled: { control: { type: 'boolean' } },
         noFocus: { control: { type: 'boolean' } },
         preferredPosition: {
@@ -24,17 +25,26 @@ export default {
             options: Object.values(TooltipThemes),
         },
         styles: { control: { type: 'object' } },
-        trigger: { table: { disable: true } },
-        icon: { table: { disable: true } },
-        default: { table: { disable: true } },
-        container: { table: { disable: true } },
+        container: { control: false },
+
+        // Slots
+        trigger: { control: false },
+        default: { control: false },
+        icon: { control: false },
+
+        // Events
+        ...getEventArgTypeFromEnum(TooltipEvents),
+
+        // Custom Storybook Props
+        useContainer: {
+            control: { type: 'boolean' },
+            table: { category: 'Story props' }
+        },
     },
 };
 
 const Template = (args) => ({
-    // Components used in your story `template` are defined in the `components` object
     components: { Tooltip, SmallPage, PageHeader, PageBody, Account },
-    // The story's `args` need to be mapped into the template through the `setup()` method
     setup() {
         const tooltip$ = ref(null);
         const container$ = ref(null);
@@ -46,9 +56,9 @@ const Template = (args) => ({
             return container$.value.$el;
         });
 
-        // Story args can be spread into the returned object
         return {
-            ...args,
+            events: getEventListenerFromEnum(TooltipEvents),
+            args,
             tooltip$,
             container$,
             container,
@@ -56,31 +66,23 @@ const Template = (args) => ({
             action,
         };
     },
-    // Then, the spread values can be accessed directly in the template
     template: `
-        <SmallPage :class="{ 'nq-blue-bg': theme === 'inverse' }">
+        <SmallPage :class="{ 'nq-blue-bg': args.theme === 'inverse' }">
             <PageHeader>Test</PageHeader>
             <PageBody ref="container$" style="overflow-y: scroll; background: rgba(127,127,127,.1)">
                 <div style="height: 320px"></div>
                 <div style="max-width: 100%; display: flex; align-items: center;">
-                    <button class="nq-button-s" :class="[theme]" @click="tooltip$ && tooltip$.show()">
+                    <button class="nq-button-s" :class="[args.theme]" @click="tooltip$ && tooltip$.show()">
                         Show
                     </button>
                     &nbsp;or&nbsp;
-                    <button class="nq-button-s" :class="[theme]" @click="tooltip$ && tooltip$.hide()">
+                    <button class="nq-button-s" :class="[args.theme]" @click="tooltip$ && tooltip$.hide()">
                         hide
                     </button>
                     &nbsp;or hover me:&nbsp;
-                    <Tooltip ref="tooltip$"
-                        :container="container"
-                        :preferredPosition="preferredPosition"
-                        :margin="margin"
-                        :autoWidth="autoWidth"
-                        :disabled="disabled"
-                        :theme="theme"
-                        :styles="styles"
-                        @show="shown = true; action('show')($event)"
-                        @hide="shown = false; action('hide')($event)"
+                    <Tooltip ref="tooltip$" v-bind="args" v-on="events" :container="container"
+                        @show="shown = true;"
+                        @hide="shown = false;"
                     >
                         <div style="font-size: 2rem; min-width: 25rem">
                             This is the Tooltip I was talking about.
@@ -89,7 +91,7 @@ const Template = (args) => ({
                     </Tooltip>
                 </div>
                 <div>
-                    Shown: {{shown}}
+                    Shown: {{ shown }}
                 </div>
                 <div style="height:3000px"></div>
             </PageBody>
@@ -100,11 +102,4 @@ const Template = (args) => ({
 export const Default = Template.bind({});
 Default.args = {
     useContainer: true,
-    preferredPosition: 'top right',
-    margin: {},
-    autoWidth: false,
-    disabled: false,
-    theme: TooltipThemes.NORMAL,
-    styles: {},
-    noFocus: false,
 };

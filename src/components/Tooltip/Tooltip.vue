@@ -53,15 +53,28 @@ export enum TooltipThemes {
     INVERSE = 'inverse',
 }
 
+export enum TooltipEvents {
+    SHOW = 'show',
+    HIDE = 'hide',
+    CLICK = 'click',
+}
+
 export default defineComponent({
     name: 'Tooltip',
+    emits: Object.values(TooltipEvents),
     props: {
         /**
         * Container within which the tooltip should be positioned if possible.
         */
         container: HTMLElement,
-        disabled: Boolean,
-        noFocus: Boolean,
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
+        noFocus: {
+            type: Boolean,
+            default: false,
+        },
         /**
         * Preferred tooltip position as "[vertical] [horizontal]" or "[vertical]".
         */
@@ -178,12 +191,12 @@ export default defineComponent({
                 transitionPosition.value = false; // when shown next time, render immediately at correct position
                 if (newWatcherValue === false) {
                     lastToggle.value = Date.now();
-                    context.emit('hide');
+                    context.emit(TooltipEvents.HIDE);
                 }
                 return; // no need to update as tooltip not visible
             } else if (newWatcherValue === true) {
                 lastToggle.value = Date.now();
-                context.emit('show');
+                context.emit(TooltipEvents.SHOW);
             }
 
             if (props.container) {
@@ -316,7 +329,7 @@ export default defineComponent({
         function onClick() {
             if (Date.now() - lastToggle.value < 200) return; // just toggled by mouseover or focus
             toggle(/* force */ true);
-            context.emit('click');
+            context.emit(TooltipEvents.CLICK);
         }
 
         context.expose({ show, hide, toggle, update });
