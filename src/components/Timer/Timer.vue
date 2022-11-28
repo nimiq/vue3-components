@@ -121,7 +121,7 @@ export enum TimerThemes {
 
 export default defineComponent({
     name: 'Timer',
-    // extends: I18nMixin,
+    emits: Object.values(TimerEvents),
     props: {
         startTime: Number,
         endTime: Number,
@@ -131,7 +131,7 @@ export default defineComponent({
         },
         theme: {
             type: String,
-            default: 'normal',
+            default: TimerThemes.NORMAL,
             validator: (value: any) => Object.values(TimerThemes).includes(value),
         },
         strokeWidth: {

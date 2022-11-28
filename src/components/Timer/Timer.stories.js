@@ -1,25 +1,31 @@
 import { action } from '@storybook/addon-actions';
 import { ref } from 'vue';
-import Timer, { TimerThemes } from './Timer.vue';
+import { getEventArgTypeFromEnum, getEventListenerFromEnum } from '../../helpers/storybook/EventHelper';
+import Timer, { TimerThemes, TimerEvents } from './Timer.vue';
 
 export default {
     title: 'Timer',
     component: Timer,
     argTypes: {
+        // Props
         startTime: { control: 'number' },
         endTime: { control: 'number' },
         alwaysShowTime: { control: 'boolean' },
         theme: { control: { type: 'select', options: Object.values(TimerThemes) } },
         strokeWidth: { control: 'number' },
         tooltipProps: { control: 'object' },
-        maxUnit: { control: { type: 'select', options: [undefined, 'second', 'minute', 'hour', 'day'] } },
+        maxUnit: {
+            control: { type: 'select' },
+            options: [undefined, 'second', 'minute', 'hour', 'day']
+        },
+
+        // Events
+        ...getEventArgTypeFromEnum(TimerEvents),
     },
 };
 
 const Template = (args) => ({
-    // Components used in your story `template` are defined in the `components` object
     components: { Timer },
-    // The story's `args` need to be mapped into the template through the `setup()` method
     setup() {
         const timerEnded = ref(true);
         const startTime = ref(args.startTime);
@@ -32,9 +38,9 @@ const Template = (args) => ({
             timerEnded.value = false;
         }
 
-        // Story args can be spread into the returned object
         return {
-            ...args,
+            events: getEventListenerFromEnum(TimerEvents),
+            args,
             action,
             startTimer,
             timerEnded,
@@ -45,13 +51,10 @@ const Template = (args) => ({
     // Then, the spread values can be accessed directly in the template
     template: `
         <div>
-            <div :class="{ 'nq-blue-bg': theme === 'inverse' || theme === 'white' }" style="display: flex; align-items: center; padding: 7rem 3rem 10rem 12rem">
-                <Timer :startTime="startTime" :endTime="endTime" :theme="theme" :alwaysShowTime="alwaysShowTime"
-                    :tooltipProps="tooltipProps" @end="timerEnded = true" style="margin: 2rem" :maxUnit="maxUnit"/>
-                <Timer :startTime="startTime" :endTime="endTime" :theme="theme" :alwaysShowTime="alwaysShowTime"
-                    :tooltipProps="tooltipProps" style="width: 10rem; margin: 2rem" :maxUnit="maxUnit"/>
-                <Timer :startTime="startTime" :endTime="endTime" :theme="theme" :alwaysShowTime="alwaysShowTime"
-                    :tooltipProps="tooltipProps" style="width: 20rem; margin: 2rem" :maxUnit="maxUnit"/>
+            <div :class="{ 'nq-blue-bg': args.theme === 'inverse' || args.theme === 'white' }" style="display: flex; align-items: center; padding: 7rem 3rem 10rem 12rem">
+                <Timer v-bind="args" v-on="events" :startTime="startTime" :endTime="endTime" @end="timerEnded = true" style="margin: 2rem" />
+                <Timer v-bind="args" v-on="events" :startTime="startTime" :endTime="endTime" style="width: 10rem; margin: 2rem" />
+                <Timer v-bind="args" v-on="events" :startTime="startTime" :endTime="endTime" style="width: 20rem; margin: 2rem" />
             </div>
             <div v-if="startTime" style="margin: 1rem 2rem">Timer {{ timerEnded ? 'ended' : 'running' }}</div>
             <div style="display: flex; flex-wrap: wrap; max-width: 95rem;">
@@ -71,6 +74,4 @@ export const Default = Template.bind({});
 Default.args = {
     startTime: 0,
     endTime: 0,
-    theme: TimerThemes.NORMAL,
-    alwaysShowTime: true,
 };
