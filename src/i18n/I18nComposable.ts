@@ -10,7 +10,7 @@ export enum I18N_EVENTS {
 const I18N_DEFAULT_LANGUAGE = 'en';
 const I18N_SUPPORTED_LANGUAGES = [
     I18N_DEFAULT_LANGUAGE,
-    'de', 'es', 'fr', 'nl', 'ru', 'uk', 'zh',
+    'de', 'es', 'fr', 'nl', 'pt', 'ru', 'uk', 'zh',
 ];
 
 /** Current active language */
