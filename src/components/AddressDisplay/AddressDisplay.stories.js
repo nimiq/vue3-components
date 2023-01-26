@@ -7,6 +7,10 @@ export default {
         // Props
         address: { control: { type: 'text' } },
         copyable: { control: { type: 'boolean' } },
+        format: {
+            control: { type: 'select' },
+            options: ['nimiq', 'ethereum'],
+        },
     },
 };
 
