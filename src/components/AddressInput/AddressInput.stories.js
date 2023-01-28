@@ -7,9 +7,11 @@ export default {
     component: AddressInput,
     argTypes: {
         // Props
-        autofocus: { control: { type: 'boolean' } },
+        allowNimAddresses: { control: { type: 'boolean' } },
+        allowEthAddresses: { control: { type: 'boolean' } },
         allowDomains: { control: { type: 'boolean' } },
         modelValue: { control: false },
+        autofocus: { control: { type: 'boolean' } },
 
         // Events
         ...getEventArgTypeFromEnum(AddressInputEvent)
@@ -42,6 +44,8 @@ const Template = (args) => ({
 
 export const Default = Template.bind({});
 Default.args = {
-    allowDomains: true,
+    allowNimAddresses: true,
+    allowEthAddresses: false,
+    allowDomains: false,
     autofocus: false,
 };

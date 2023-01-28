@@ -2405,6 +2405,7 @@ __metadata:
     browserslist: 4.21.4
     gh-pages: ^4.0.0
     input-format: ^0.3.7
+    js-sha3: ^0.8.0
     postcss: ^8.4.19
     qr-creator: ^1.0.0
     qr-scanner: ^1.4.2
@@ -9968,6 +9969,13 @@ __metadata:
     merge-stream: ^2.0.0
     supports-color: ^8.0.0
   checksum: 98cd68b696781caed61c983a3ee30bf880b5bd021c01d98f47b143d4362b85d0737f8523761e2713d45e18b4f9a2b98af1eaee77afade4111bb65c77d6f7c980
+  languageName: node
+  linkType: hard
+
+"js-sha3@npm:^0.8.0":
+  version: 0.8.0
+  resolution: "js-sha3@npm:0.8.0"
+  checksum: 75df77c1fc266973f06cce8309ce010e9e9f07ec35ab12022ed29b7f0d9c8757f5a73e1b35aa24840dced0dea7059085aa143d817aea9e188e2a80d569d9adce
   languageName: node
   linkType: hard
 
