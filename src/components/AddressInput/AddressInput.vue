@@ -598,9 +598,9 @@ export default defineComponent({
         transition: opacity .2s ease;
     }
 
-    .grid.transition-fade-enter,
+    .grid.transition-fade-enter-from,
     .grid.transition-fade-leave-to,
-    .grid g.transition-fade-enter,
+    .grid g.transition-fade-enter-from,
     .grid g.transition-fade-leave-to {
         opacity: 0 !important;
     }

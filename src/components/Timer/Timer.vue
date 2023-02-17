@@ -451,7 +451,7 @@ export default defineComponent({
         transition: opacity .3s var(--nimiq-ease);
     }
 
-    .transition-fade-enter,
+    .transition-fade-enter-from,
     .transition-fade-leave-to {
         opacity: 0 !important;
     }

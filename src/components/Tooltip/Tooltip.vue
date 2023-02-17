@@ -442,7 +442,7 @@ export default defineComponent({
         transition: opacity .3s var(--nimiq-ease), transform .2s var(--nimiq-ease), top .2s var(--nimiq-ease);
     }
 
-    .tooltip-box.transition-fade-enter,
+    .tooltip-box.transition-fade-enter-from,
     .tooltip-box.transition-fade-leave-to {
         opacity: 0;
     }
