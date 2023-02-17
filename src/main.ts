@@ -19,6 +19,7 @@ export { default as FiatAmount } from './components/FiatAmount/FiatAmount.vue';
 export { default as Identicon } from './components/Identicon/Identicon.vue';
 export { default as LabelInput } from './components/LabelInput/LabelInput.vue';
 export { default as LoadingSpinner } from './components/LoadingSpinner/LoadingSpinner.vue';
+export { default as LongPressButton } from './components/LongPressButton/LongPressButton.vue';
 export { default as PageBody } from './components/PageBody/PageBody.vue';
 export { default as PageFooter } from './components/PageFooter/PageFooter.vue';
 export { default as PageHeader } from './components/PageHeader/PageHeader.vue';
