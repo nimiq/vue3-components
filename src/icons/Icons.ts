@@ -11,6 +11,7 @@ const IconBase = (component: Component) => defineComponent({
  * SVG files in an /icons/ directory are automatically loaded as Vue components
  * via the vite-svg-loader.
  */
+import AlertCircle from '@nimiq/style/src/icons/alert-circle.svg?component';
 import AlertTriangle from '@nimiq/style/src/icons/alert-triangle.svg?component';
 import ArrowLeftSmall from '@nimiq/style/src/icons/arrow-left-small.svg?component';
 import ArrowLeft from '@nimiq/style/src/icons/arrow-left.svg?component';
@@ -54,6 +55,7 @@ import View from '@nimiq/style/src/icons/view.svg?component';
  * Comment out any unused icons here
  */
 // tslint:disable:variable-name
+export const AlertCircleIcon = IconBase(AlertCircle);
 export const AlertTriangleIcon = IconBase(AlertTriangle);
 export const ArrowLeftSmallIcon = IconBase(ArrowLeftSmall);
 export const ArrowLeftIcon = IconBase(ArrowLeft);

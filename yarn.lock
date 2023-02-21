@@ -2371,10 +2371,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nimiq/style@npm:^0.8.3":
-  version: 0.8.3
-  resolution: "@nimiq/style@npm:0.8.3"
-  checksum: f07f3876b7e7bd887c06da1f59ca6b94d1ad3011b7e29d6d203ab8c06ded0ba5cb593126461af9207c5955a194436ddc43d17dfc9ce801964e33c42075132194
+"@nimiq/style@npm:^0.8.5":
+  version: 0.8.5
+  resolution: "@nimiq/style@npm:0.8.5"
+  checksum: ff88add6f57ecd91e6e63e23ac06790ccc641abdcf6c6725d6b20a921f53eeae052d2fca56d7ad4b84db7cf3922efbb4227ee3f9cb725ea8740bd6ed9b2d36e1
   languageName: node
   linkType: hard
 
@@ -2392,7 +2392,7 @@ __metadata:
   resolution: "@nimiq/vue3-components@workspace:."
   dependencies:
     "@nimiq/identicons": ^1.6.2
-    "@nimiq/style": ^0.8.3
+    "@nimiq/style": ^0.8.5
     "@nimiq/utils": ^0.8.2
     "@storybook/addon-actions": ^6.5.13
     "@storybook/addon-essentials": ^6.5.13
