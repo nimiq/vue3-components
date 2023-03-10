@@ -25,8 +25,13 @@ import { loadI18n } from '../../i18n/I18nComposable';
 
 export const COPYABLE_DISPLAY_TIME = 800;
 
+export enum CopyableEvent {
+    COPY = 'copy',
+}
+
 export default defineComponent({
     name: 'Copyable',
+    emits: Object.values(CopyableEvent),
     props: {
         text: String,
     },
@@ -52,6 +57,8 @@ export default defineComponent({
             copiedResetTimeout.value = window.setTimeout(() => {
                 copied.value = false;
             }, COPYABLE_DISPLAY_TIME);
+
+            context.emit(CopyableEvent.COPY, text);
         }
 
         function onKeyDown(event: KeyboardEvent) {
@@ -71,7 +78,7 @@ export default defineComponent({
             copy,
         };
     }
-})
+});
 </script>
 
 <style scoped>

@@ -2378,12 +2378,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nimiq/utils@npm:^0.8.2":
-  version: 0.8.2
-  resolution: "@nimiq/utils@npm:0.8.2"
+"@nimiq/utils@npm:^0.9.1":
+  version: 0.9.1
+  resolution: "@nimiq/utils@npm:0.9.1"
   dependencies:
     big-integer: ^1.6.44
-  checksum: 964686db11a732b4ce5767db38615f50bd6e339daa3e39dc736a5a91c760cc9806270e96e2a3644bb4821ad7a401e3bdec733839e500bac1879c412b8e3bb13e
+  checksum: 91824af059102955e62032e4704565d53d758c6da67db49c7d0cd0f9ef239dfc54c5e0a279aa18b622eb7e1974a606af87366f0bcd447e4c42ce5059a7434b5e
   languageName: node
   linkType: hard
 
@@ -2393,7 +2393,7 @@ __metadata:
   dependencies:
     "@nimiq/identicons": ^1.6.2
     "@nimiq/style": ^0.8.5
-    "@nimiq/utils": ^0.8.2
+    "@nimiq/utils": ^0.9.1
     "@storybook/addon-actions": ^6.5.13
     "@storybook/addon-essentials": ^6.5.13
     "@storybook/addon-links": ^6.5.13
