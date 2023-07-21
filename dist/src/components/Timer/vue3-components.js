@@ -3,7 +3,7 @@ import { TimerEvents as j, TimerThemes as q } from "./vue3-components2.js";
 import { resolveComponent as n, openBlock as t, createBlock as T, mergeProps as c, withCtx as r, createElementBlock as s, createElementVNode as i, createVNode as l, Transition as w, toDisplayString as m, createTextVNode as u, pushScopeId as k, popScopeId as I } from "vue";
 import "./vue3-components3.js";
 import g from "../../../_virtual/vue3-components.js";
-const a = (e) => (k("data-v-1bd24b28"), e = e(), I(), e), y = {
+const a = (e) => (k("data-v-68607492"), e = e(), I(), e), y = {
   xmlns: "http://www.w3.org/2000/svg",
   viewBox: "0 0 26 26"
 }, S = ["r", "stroke-dasharray", "stroke-dashoffset", "stroke-width"], v = ["r", "stroke-dasharray", "stroke-dashoffset", "stroke-width"], E = {
@@ -30,7 +30,7 @@ const a = (e) => (k("data-v-1bd24b28"), e = e(), I(), e), y = {
   x: "50%",
   y: "50%"
 };
-function R(e, o, b, P, B, W) {
+function R(e, o, P, B, W, H) {
   const h = n("I18n"), d = n("Tooltip");
   return t(), T(d, c({
     class: "timer",
@@ -97,7 +97,7 @@ function R(e, o, b, P, B, W) {
     _: 1
   }, 16, ["class"]);
 }
-const D = /* @__PURE__ */ g(p, [["render", R], ["__scopeId", "data-v-1bd24b28"]]);
+const D = /* @__PURE__ */ g(p, [["render", R], ["__scopeId", "data-v-68607492"]]);
 export {
   j as TimerEvents,
   q as TimerThemes,

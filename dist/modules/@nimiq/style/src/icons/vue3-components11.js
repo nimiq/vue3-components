@@ -1,25 +1,23 @@
 import { openBlock as e, createElementBlock as t, createElementVNode as o } from "vue";
-const n = {
-  xmlns: "http://www.w3.org/2000/svg",
-  width: "12",
-  height: "12",
-  viewBox: "0 0 12 12"
-}, r = /* @__PURE__ */ o("path", {
-  d: "M11,1,4,11,1,8",
-  fill: "none",
+const r = {
+  width: "74",
+  height: "74",
+  viewBox: "0 0 74 74",
+  xmlns: "http://www.w3.org/2000/svg"
+}, n = /* @__PURE__ */ o("path", {
+  d: "M71.12 1.84a4.5 4.5 0 0 0-6.28 1.04l-42.1 58.74L8.68 47.54a4.5 4.5 0 1 0-6.36 6.37l17.8 17.81a4.57 4.57 0 0 0 6.84-.56l45.2-63.03a4.5 4.5 0 0 0-1.04-6.29z",
+  fill: "currentColor",
   stroke: "currentColor",
-  "stroke-linecap": "round",
-  "stroke-linejoin": "round",
-  "stroke-width": "2"
+  "stroke-width": ".8"
 }, null, -1), c = [
-  r
+  n
 ];
-function l(s, i) {
-  return e(), t("svg", n, c);
+function l(s, a) {
+  return e(), t("svg", r, c);
 }
-const h = { render: l };
+const d = { render: l };
 export {
-  h as default,
+  d as default,
   l as render
 };
 //# sourceMappingURL=vue3-components11.js.map

@@ -12,20 +12,26 @@
   "sideEffects": false,
   "scripts": {
     "lint": "vue-tsc --noEmit",
-    "build": "rm -rf dist && yarn lint && vite build && vue-tsc --emitDeclarationOnly",
+    "build": "rm -rf dist && yarn lint && yarn i18n:lib && vite build && vue-tsc --emitDeclarationOnly",
     "deploy": "yarn build && yarn deploy-only",
     "deploy-only": "node deploy_scripts/build.js",
-    "storybook": "start-storybook -p 6006",
-    "build-storybook": "BASE_PATH=/vue3-components/ build-storybook",
+    "storybook": "yarn i18n:lib && start-storybook -p 6006",
+    "build-storybook": "yarn i18n:lib && BASE_PATH=/vue3-components/ build-storybook",
     "deploy-storybook": "yarn build-storybook && yarn deploy-only-storybook",
     "deploy-only-storybook": "node deploy_scripts/storybook.js",
-    "deploy-all": "yarn deploy && yarn deploy-storybook"
+    "deploy-all": "yarn deploy && yarn deploy-storybook",
+    "i18n:extract": "echo \"vue3-components use vue-components's language files. Please update them there.\"",
+    "i18n:pull": "tx pull --force --all && echo \"\nNewest translations pulled, but consider whether updating them in vue-components and then merging all the latest changes including the language updates over might be the better approach to keep the code and translations in sync.\"",
+    "i18n:push": "echo \"vue3-components use vue-components's language files. Please update them there.\"",
+    "i18n:lib": "rimraf src/i18n/?? ; node node_modules/webpack-i18n-tools/tools/convertToJsonLib.js 'src/i18n/!(en).po'",
+    "i18n:sync": "echo \"vue3-components use vue-components's language files. Please update them there.\""
   },
   "dependencies": {
     "@nimiq/identicons": "^1.6.2",
-    "@nimiq/style": "^0.8.3",
-    "@nimiq/utils": "^0.8.2",
+    "@nimiq/style": "^0.8.5",
+    "@nimiq/utils": "^0.9.1",
     "input-format": "^0.3.7",
+    "js-sha3": "^0.8.0",
     "qr-creator": "^1.0.0",
     "qr-scanner": "^1.4.2"
   },
@@ -41,12 +47,14 @@
     "browserslist": "4.21.4",
     "gh-pages": "^4.0.0",
     "postcss": "^8.4.19",
+    "rimraf": "^5.0.1",
     "rollup-plugin-rename-node-modules": "^1.3.1",
     "typescript": "^4.6.4",
     "vite": "^3.2.3",
     "vite-svg-loader": "^3.6.0",
     "vue": "^3.2.45",
-    "vue-tsc": "^0.34.13"
+    "vue-tsc": "^0.34.13",
+    "webpack-i18n-tools": "https://github.com/nimiq/webpack-i18n-tools#commit=5d8b1b5201ad63c5144dc3ccc0c706e107075c34"
   },
   "postcss": {
     "plugins": {

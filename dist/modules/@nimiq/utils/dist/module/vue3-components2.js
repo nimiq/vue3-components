@@ -1,15 +1,15 @@
 class i {
-  static copy(n) {
+  static copy(c) {
     const e = document.createElement("textarea");
-    e.value = n, e.setAttribute("readonly", ""), e.style.contain = "strict", e.style.position = "absolute", e.style.left = "-9999px", e.style.fontSize = "12pt";
-    const t = document.getSelection(), c = t.rangeCount > 0 ? t.getRangeAt(0) : null, o = document.activeElement && (document.activeElement.nodeName === "INPUT" || document.activeElement.nodeName === "TEXTAREA") ? document.activeElement : null;
-    document.body.append(e), e.select(), e.selectionStart = 0, e.selectionEnd = n.length;
+    e.value = c, e.setAttribute("readonly", ""), e.style.contain = "strict", e.style.position = "absolute", e.style.left = "-9999px", e.style.fontSize = "12pt";
+    const t = document.getSelection(), o = t.rangeCount > 0 ? t.getRangeAt(0) : null, n = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    document.body.append(e), e.select(), e.selectionStart = 0, e.selectionEnd = c.length;
     let l = !1;
     try {
       l = document.execCommand("copy");
     } catch {
     }
-    return e.remove(), o ? o.focus() : c && (t.removeAllRanges(), t.addRange(c)), l;
+    return e.remove(), n && n.focus(), o && !(n instanceof HTMLInputElement || n instanceof HTMLTextAreaElement) && (t.removeAllRanges(), t.addRange(o)), l;
   }
 }
 export {

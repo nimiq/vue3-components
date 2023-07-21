@@ -1,34 +1,21 @@
-import { openBlock as c, createElementBlock as t, createElementVNode as e } from "vue";
-const r = {
-  width: "7",
-  height: "30",
-  viewBox: "0 0 7 30",
+import { openBlock as e, createElementBlock as t, createElementVNode as o } from "vue";
+const n = {
+  width: "54",
+  height: "54",
+  viewBox: "0 0 54 54",
   xmlns: "http://www.w3.org/2000/svg"
-}, o = /* @__PURE__ */ e("g", { fill: "currentColor" }, [
-  /* @__PURE__ */ e("circle", {
-    cx: "3.5",
-    cy: "3",
-    r: "3"
-  }),
-  /* @__PURE__ */ e("circle", {
-    cx: "3.5",
-    cy: "15",
-    r: "3"
-  }),
-  /* @__PURE__ */ e("circle", {
-    cx: "3.5",
-    cy: "27",
-    r: "3"
-  })
-], -1), n = [
-  o
+}, c = /* @__PURE__ */ o("path", {
+  d: "M26.95 0A27.05 27.05 0 0 0 .21 22.32a1.12 1.12 0 0 0 1.13 1.3h18.72c.62 0 1.12-.5 1.12-1.12v-8.1a2.25 2.25 0 0 1 3.66-1.76l15.75 12.6a2.25 2.25 0 0 1 0 3.52l-15.75 12.6a2.25 2.25 0 0 1-3.66-1.76v-8.1c0-.62-.5-1.12-1.12-1.12H1.35a1.14 1.14 0 0 0-1.13 1.3 27 27 0 0 0 53.55-5.78A27.25 27.25 0 0 0 26.95 0z",
+  fill: "currentColor"
+}, null, -1), r = [
+  c
 ];
-function i(l, s) {
-  return c(), t("svg", r, n);
+function l(a, s) {
+  return e(), t("svg", n, r);
 }
-const h = { render: i };
+const i = { render: l };
 export {
-  h as default,
-  i as render
+  i as default,
+  l as render
 };
 //# sourceMappingURL=vue3-components28.js.map

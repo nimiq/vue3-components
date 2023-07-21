@@ -1,5 +1,5 @@
-import { openBlock as o, createElementBlock as t, createElementVNode as e } from "vue";
-const r = {
+import { openBlock as o, createElementBlock as r, createElementVNode as e } from "vue";
+const t = {
   width: "16",
   height: "16",
   viewBox: "0 0 16 16",
@@ -11,29 +11,27 @@ const r = {
   y2: "11.333",
   stroke: "currentColor",
   fill: "none",
-  "stroke-linecap": "round",
-  "stroke-width": "1.5"
-}, null, -1), l = /* @__PURE__ */ e("circle", {
+  "stroke-linecap": "round"
+}, null, -1), c = /* @__PURE__ */ e("circle", {
   cx: "8",
   cy: "4.75",
   r: "0.5",
   fill: "currentColor",
   stroke: "currentColor",
-  "stroke-width": "1"
-}, null, -1), c = /* @__PURE__ */ e("circle", {
+  "stroke-width": "0.5"
+}, null, -1), l = /* @__PURE__ */ e("circle", {
   cx: "8",
   cy: "8",
-  r: "7.25",
+  r: "7.5",
   stroke: "currentColor",
-  "stroke-width": "1.5",
   fill: "none"
 }, null, -1), s = [
   n,
-  l,
-  c
+  c,
+  l
 ];
-function i(d, h) {
-  return o(), t("svg", r, s);
+function i(d, _) {
+  return o(), r("svg", t, s);
 }
 const u = { render: i };
 export {

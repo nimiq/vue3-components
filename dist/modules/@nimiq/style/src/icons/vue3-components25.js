@@ -1,23 +1,23 @@
-import { openBlock as e, createElementBlock as o, createElementVNode as t } from "vue";
-const c = {
-  width: "32",
-  height: "47",
-  viewBox: "0 0 32 47",
-  xmlns: "http://www.w3.org/2000/svg"
-}, n = /* @__PURE__ */ t("path", {
-  "fill-rule": "evenodd",
-  "clip-rule": "evenodd",
-  d: "M29.5 22.512V12.96C29.5 5.802 23.456 0 16 0S2.5 5.802 2.5 12.96v9.552c-4.26 6.43-2.966 14.887 3.041 19.868 6.007 4.982 14.911 4.982 20.918 0 6.008-4.981 7.302-13.438 3.041-19.868zM16 34.56c-2.209 0-4-1.72-4-3.84s1.791-3.84 4-3.84c2.21 0 4 1.72 4 3.84s-1.79 3.84-4 3.84zm8.027-17.653a.952.952 0 0 0 .473-.816V12.96c0-4.507-3.805-8.16-8.5-8.16-4.694 0-8.5 3.653-8.5 8.16v3.131c0 .332.179.641.473.816.294.175.661.192.971.045a16.437 16.437 0 0 1 14.112 0c.31.147.677.13.971-.045z",
+import { openBlock as e, createElementBlock as t, createElementVNode as c } from "vue";
+const o = {
+  xmlns: "http://www.w3.org/2000/svg",
+  viewBox: "0 0 290 61"
+}, r = /* @__PURE__ */ c("path", {
+  d: "M145.5,46C137,46,130,39,130,30.5S137,15,145.5,15S161,22,161,30.5S154,46,145.5,46z M145.5,17 c-7.4,0-13.5,6.1-13.5,13.5S138.1,44,145.5,44S159,37.9,159,30.5S152.9,17,145.5,17z",
   fill: "currentColor"
-}, null, -1), r = [
+}, null, -1), n = /* @__PURE__ */ c("path", {
+  d: "M285.5,3H107V2c0-1.1-0.9-2-2-2H89c-1.1,0-2,0.9-2,2v1H41V2c0-1.1-0.9-2-2-2H23c-1.1,0-2,0.9-2,2v1H4 C1.8,3,0,4.8,0,7v47c0,2.2,1.8,4,4,4h281.5c2.5,0,4.5-2,4.5-4.5v-46C290,5,288,3,285.5,3z M102,40.9c0,1.1-0.9,2.1-2,2.1H28 c-1.1,0-2-0.9-2-2.1V20.1c0-1.1,0.9-2.1,2-2.1h72c1.1,0,2,0.9,2,2.1V40.9z M288,53.5c0,1.4-1.1,2.5-2.5,2.5h-140 C131.4,56,120,44.6,120,30.5C120,16.4,131.4,5,145.5,5h140c1.4,0,2.5,1.1,2.5,2.5V53.5z",
+  fill: "currentColor"
+}, null, -1), l = [
+  r,
   n
 ];
-function l(d, s) {
-  return e(), o("svg", c, r);
+function s(h, d) {
+  return e(), t("svg", o, l);
 }
-const h = { render: l };
+const i = { render: s };
 export {
-  h as default,
-  l as render
+  i as default,
+  s as render
 };
 //# sourceMappingURL=vue3-components25.js.map

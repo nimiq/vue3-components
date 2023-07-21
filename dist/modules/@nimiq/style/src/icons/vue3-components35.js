@@ -1,21 +1,21 @@
-import { openBlock as e, createElementBlock as l, createElementVNode as t } from "vue";
-const a = {
-  width: "20",
-  height: "20",
-  viewBox: "0 0 20 20",
+import { openBlock as t, createElementBlock as e, createElementVNode as o } from "vue";
+const c = {
+  width: "98",
+  height: "123",
+  viewBox: "0 0 98 123",
   xmlns: "http://www.w3.org/2000/svg"
-}, o = /* @__PURE__ */ t("path", {
-  d: "M10.01 14.82a1 1 0 0 0 1.37-.37l3.37-5.83a.17.17 0 0 1 .22-.06l.73.41a.67.67 0 0 0 1-.58l-.07-3.89a.67.67 0 0 0-.99-.57l-3.4 1.89a.67.67 0 0 0 0 1.15l.71.42c.08.05.11.15.06.23l-3.37 5.83a1 1 0 0 0 .37 1.37zM8.23 5.19l-3.55 5.76a.17.17 0 0 1-.23.06l-.55-.32a.67.67 0 0 0-1 .59l.07 3.89a.67.67 0 0 0 .99.57l3.4-1.89a.67.67 0 0 0 0-1.16l-.89-.51a.17.17 0 0 1-.07-.1.16.16 0 0 1 .02-.13l3.52-5.72a1 1 0 1 0-1.7-1.05z",
+}, n = /* @__PURE__ */ o("path", {
+  d: "M85.7 42.3l8-8a5.1 5.1 0 1 0-7.3-7.2l-8.2 8.2c-7-5.2-15.4-8.5-24-9.4V10.3h10.2a5.1 5.1 0 0 0 0-10.3H33.6a5.1 5.1 0 0 0 0 10.3H44v15.6a48.7 48.7 0 1 0 41.8 16.4zM49 112.8a38.4 38.4 0 1 1 0-77 38.4 38.4 0 0 1 0 77z M54.2 48.6a5.1 5.1 0 0 0-10.3 0V74a5.2 5.2 0 0 0 5.2 5.1 5.1 5.1 0 0 0 5-5V48.5z",
   fill: "currentColor"
 }, null, -1), r = [
-  o
+  n
 ];
-function n(c, s) {
-  return e(), l("svg", a, r);
+function a(l, h) {
+  return t(), e("svg", c, r);
 }
-const h = { render: n };
+const d = { render: a };
 export {
-  h as default,
-  n as render
+  d as default,
+  a as render
 };
 //# sourceMappingURL=vue3-components35.js.map

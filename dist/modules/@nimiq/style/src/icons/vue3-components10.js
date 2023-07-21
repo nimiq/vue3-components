@@ -1,23 +1,25 @@
-import { openBlock as e, createElementBlock as t, createElementVNode as o } from "vue";
-const r = {
-  width: "74",
-  height: "74",
-  viewBox: "0 0 74 74",
-  xmlns: "http://www.w3.org/2000/svg"
-}, n = /* @__PURE__ */ o("path", {
-  d: "M71.12 1.84a4.5 4.5 0 0 0-6.28 1.04l-42.1 58.74L8.68 47.54a4.5 4.5 0 1 0-6.36 6.37l17.8 17.81a4.57 4.57 0 0 0 6.84-.56l45.2-63.03a4.5 4.5 0 0 0-1.04-6.29z",
-  fill: "currentColor",
+import { openBlock as t, createElementBlock as o, createElementVNode as e } from "vue";
+const n = {
+  xmlns: "http://www.w3.org/2000/svg",
+  viewBox: "0 0 16 16",
+  width: "16",
+  height: "16"
+}, r = /* @__PURE__ */ e("g", {
+  fill: "none",
   stroke: "currentColor",
-  "stroke-width": ".8"
-}, null, -1), c = [
-  n
+  "stroke-linecap": "round"
+}, [
+  /* @__PURE__ */ e("path", { d: "M10.5,5.5h0a2,2,0,0,0-2-2h-1a2,2,0,0,0-2,2V7a2,2,0,0,0,2,2H8" }),
+  /* @__PURE__ */ e("path", { d: "M5.5,10.5h0a2,2,0,0,0,2,2h1a2,2,0,0,0,2-2V9a2,2,0,0,0-2-2H8" })
+], -1), a = [
+  r
 ];
-function l(s, a) {
-  return e(), t("svg", r, c);
+function h(c, s) {
+  return t(), o("svg", n, a);
 }
-const d = { render: l };
+const d = { render: h };
 export {
   d as default,
-  l as render
+  h as render
 };
 //# sourceMappingURL=vue3-components10.js.map

@@ -1,23 +1,22 @@
 import { openBlock as e, createElementBlock as t, createElementVNode as o } from "vue";
-const l = {
-  width: "17",
+const r = {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "16",
   height: "16",
-  viewBox: "0 0 17 16",
-  xmlns: "http://www.w3.org/2000/svg"
-}, r = /* @__PURE__ */ o("path", {
+  viewBox: "0 0 16 16"
+}, l = /* @__PURE__ */ o("path", {
+  fill: "currentColor",
   "fill-rule": "evenodd",
-  "clip-rule": "evenodd",
-  d: "M15.913 13.333L9.68 1.433a1.333 1.333 0 0 0-2.362 0l-6.232 11.9a1.333 1.333 0 0 0 1.182 1.952H14.73a1.333 1.333 0 0 0 1.182-1.952zm-8.08-7.718a.667.667 0 0 1 1.334 0v4a.667.667 0 1 1-1.334 0v-4zm.682 7.674h.018a.983.983 0 0 0 .967-1.022 1.018 1.018 0 0 0-1.016-.978h-.019a.984.984 0 0 0-.965 1.02c.02.546.468.978 1.015.98z",
-  fill: "currentColor"
+  d: "M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-9.14 2.71a1 1 0 0 1 1-1h.29a1 1 0 0 1 1 1v.3a1 1 0 0 1-1 1h-.3a1 1 0 0 1-1-1v-.3zm1-6.71a1 1 0 0 0-1 1v2.57a1 1 0 0 0 1 1h.29a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1h-.3z"
 }, null, -1), n = [
-  r
+  l
 ];
-function c(a, d) {
-  return e(), t("svg", l, n);
+function a(c, h) {
+  return e(), t("svg", r, n);
 }
-const h = { render: c };
+const i = { render: a };
 export {
-  h as default,
-  c as render
+  i as default,
+  a as render
 };
 //# sourceMappingURL=vue3-components.js.map

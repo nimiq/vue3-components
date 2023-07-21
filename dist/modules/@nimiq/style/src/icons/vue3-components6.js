@@ -1,25 +1,36 @@
-import { openBlock as e, createElementBlock as t, createElementVNode as o } from "vue";
+import { openBlock as o, createElementBlock as t, createElementVNode as e } from "vue";
 const n = {
-  width: "10",
-  height: "11",
-  viewBox: "0 0 10 11",
+  width: "23",
+  height: "18",
+  viewBox: "0 0 23 18",
   xmlns: "http://www.w3.org/2000/svg"
-}, r = /* @__PURE__ */ o("path", {
-  d: "M5.00098 2L8.53602 5.53603L5.00098 9.07107",
+}, r = /* @__PURE__ */ e("path", {
+  d: "M13.9995 1.99902L20.999 9.00049L13.9995 16",
   stroke: "currentColor",
   fill: "none",
-  "stroke-width": "1.5",
+  "stroke-width": "2",
+  "stroke-linecap": "round",
+  "stroke-linejoin": "round"
+}, null, -1), i = /* @__PURE__ */ e("line", {
+  x1: "18.999",
+  y1: "9",
+  x2: "0.999023",
+  y2: "9",
+  stroke: "currentColor",
+  fill: "none",
+  "stroke-width": "2",
   "stroke-linecap": "round",
   "stroke-linejoin": "round"
 }, null, -1), l = [
-  r
+  r,
+  i
 ];
-function s(c, i) {
-  return e(), t("svg", n, l);
+function s(c, d) {
+  return o(), t("svg", n, l);
 }
-const h = { render: s };
+const u = { render: s };
 export {
-  h as default,
+  u as default,
   s as render
 };
 //# sourceMappingURL=vue3-components6.js.map

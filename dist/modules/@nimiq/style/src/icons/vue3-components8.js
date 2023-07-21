@@ -1,18 +1,18 @@
 import { openBlock as e, createElementBlock as t, createStaticVNode as o } from "vue";
 const n = {
   xmlns: "http://www.w3.org/2000/svg",
-  viewBox: "0 0 24 24",
-  width: "24",
-  height: "24"
-}, r = /* @__PURE__ */ o('<g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5px" stroke-linejoin="round"><path d="M15.25,8.25h0a2.5,2.5,0,0,0-2.5-2.5h-1.5a2.5,2.5,0,0,0-2.5,2.5v3a2.5,2.5,0,0,0,2.5,2.5h.5"></path><path d="M8.75,15.75h0a2.5,2.5,0,0,0,2.5,2.5h1.5a2.5,2.5,0,0,0,2.5-2.5v-3a2.5,2.5,0,0,0-2.5-2.5h-.5"></path><line x1="12" y1="3.75" x2="12" y2="5.25"></line><line x1="12" y1="18.75" x2="12" y2="20.25"></line></g>', 1), h = [
+  viewBox: "0 0 64 64",
+  width: "64",
+  height: "64"
+}, r = /* @__PURE__ */ o('<g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2.5px" stroke-linejoin="round"><path d="M40.25,23.25v-.5a6.5,6.5,0,0,0-6.5-6.5h-3.5a6.5,6.5,0,0,0-6.5,6.5v6.5a6.5,6.5,0,0,0,6.5,6.5h2"></path><path d="M23.75,40.75v.5a6.5,6.5,0,0,0,6.5,6.5h3.5a6.5,6.5,0,0,0,6.5-6.5v-6.5a6.5,6.5,0,0,0-6.5-6.5h-2"></path><line x1="32" y1="11.25" x2="32" y2="15.25"></line><line x1="32" y1="48.75" x2="32" y2="52.75"></line></g>', 1), i = [
   r
 ];
-function a(i, l) {
-  return e(), t("svg", n, h);
+function a(h, s) {
+  return e(), t("svg", n, i);
 }
-const c = { render: a };
+const l = { render: a };
 export {
-  c as default,
+  l as default,
   a as render
 };
 //# sourceMappingURL=vue3-components8.js.map

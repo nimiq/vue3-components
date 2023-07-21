@@ -1,27 +1,30 @@
-import a from "./vue3-components2.js";
-import { openBlock as t, createBlock as p, resolveDynamicComponent as c, withCtx as n, createElementBlock as s, Fragment as d, renderList as i, createTextVNode as l, toDisplayString as m, pushScopeId as u, popScopeId as _, createElementVNode as f } from "vue";
+import o from "./vue3-components2.js";
+import { openBlock as t, createBlock as n, resolveDynamicComponent as c, normalizeClass as p, withCtx as l, createElementBlock as a, Fragment as i, renderList as d, createTextVNode as m, toDisplayString as f, createCommentVNode as u } from "vue";
 import "./vue3-components3.js";
-import h from "../../../_virtual/vue3-components.js";
-const y = (e) => (u("data-v-51e3bdc9"), e = e(), _(), e), k = /* @__PURE__ */ y(() => /* @__PURE__ */ f("span", { class: "space" }, "\xA0", -1));
-function x(e, b, v, C, I, S) {
-  return t(), p(c(e.copyable ? "Copyable" : "div"), {
-    text: e.chunks.join(" ").toUpperCase(),
-    class: "address-display"
+import y from "../../../_virtual/vue3-components.js";
+const _ = {
+  key: 0,
+  class: "space"
+};
+function k(e, h, C, $, x, g) {
+  return t(), n(c(e.copyable ? "Copyable" : "div"), {
+    text: e.text,
+    class: p(["address-display", `format-${e.format}`])
   }, {
-    default: n(() => [
-      (t(!0), s(d, null, i(e.chunks, (o, r) => (t(), s("span", {
+    default: l(() => [
+      (t(!0), a(i, null, d(e.chunks, (r, s) => (t(), a("span", {
         class: "chunk",
-        key: o + r
+        key: r + s
       }, [
-        l(m(o), 1),
-        k
+        m(f(r), 1),
+        e.chunkTrailingSpaces ? (t(), a("span", _, "\xA0")) : u("", !0)
       ]))), 128))
     ]),
     _: 1
-  }, 8, ["text"]);
+  }, 8, ["text", "class"]);
 }
-const w = /* @__PURE__ */ h(a, [["render", x], ["__scopeId", "data-v-51e3bdc9"]]);
+const A = /* @__PURE__ */ y(o, [["render", k], ["__scopeId", "data-v-7dae2213"]]);
 export {
-  w as default
+  A as default
 };
 //# sourceMappingURL=vue3-components.js.map

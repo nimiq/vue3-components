@@ -10,6 +10,9 @@
  * **text** {string} [optional] - A specific text to be copied to the clipboard on click
  */
 export declare const COPYABLE_DISPLAY_TIME = 800;
+export declare enum CopyableEvent {
+    COPY = "copy"
+}
 declare const _default: import("vue").DefineComponent<{
     text: StringConstructor;
 }, {
@@ -19,7 +22,9 @@ declare const _default: import("vue").DefineComponent<{
     copy: () => void;
 }, unknown, {}, {
     $t: (key: string, variablesOrLang?: string | import("../../i18n/I18nComposable").I18n$tVariables | undefined, variables?: import("../../i18n/I18nComposable").I18n$tVariables | undefined) => string;
-}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, {}, string, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
+}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, CopyableEvent.COPY[], CopyableEvent, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
     text: StringConstructor;
-}>>, {}>;
+}>> & {
+    onCopy?: ((...args: any[]) => any) | undefined;
+}, {}>;
 export default _default;

@@ -1,5 +1,3 @@
-export declare const ADDRESS_MAX_LENGTH_WITHOUT_SPACES: number;
-export declare const ADDRESS_MAX_LENGTH: number;
 export declare enum AddressInputEvent {
     PASTE = "paste",
     MODELVALUE_UPDATE = "update:modelValue",
@@ -11,14 +9,19 @@ declare const _default: import("vue").DefineComponent<{
         default: string;
     };
     autofocus: BooleanConstructor;
+    allowNimAddresses: {
+        type: BooleanConstructor;
+        default: boolean;
+    };
+    allowEthAddresses: BooleanConstructor;
     allowDomains: BooleanConstructor;
 }, {
     root$: import("vue").Ref<HTMLDivElement | null>;
     textarea$: import("vue").Ref<HTMLTextAreaElement | null>;
     currentValue: import("vue").Ref<string>;
     supportsMixBlendMode: boolean;
-    willBeAddressBool: import("vue").ComputedRef<boolean>;
-    isDomain: import("vue").ComputedRef<boolean>;
+    displayAsNimAddress: import("vue").ComputedRef<boolean>;
+    displayAsDomain: import("vue").ComputedRef<boolean>;
     onKeyDown: (e: KeyboardEvent) => void;
     onInput: (e: Event & {
         inputType?: string;
@@ -35,6 +38,11 @@ declare const _default: import("vue").DefineComponent<{
         default: string;
     };
     autofocus: BooleanConstructor;
+    allowNimAddresses: {
+        type: BooleanConstructor;
+        default: boolean;
+    };
+    allowEthAddresses: BooleanConstructor;
     allowDomains: BooleanConstructor;
 }>> & {
     "onUpdate:modelValue"?: ((...args: any[]) => any) | undefined;
@@ -43,6 +51,8 @@ declare const _default: import("vue").DefineComponent<{
 }, {
     modelValue: string;
     autofocus: boolean;
+    allowNimAddresses: boolean;
+    allowEthAddresses: boolean;
     allowDomains: boolean;
 }>;
 export default _default;

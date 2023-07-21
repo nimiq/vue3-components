@@ -1,45 +1,21 @@
-import { openBlock as o, createElementBlock as t, createElementVNode as e } from "vue";
-const r = {
-  width: "102",
-  height: "102",
-  viewBox: "0 0 102 102",
+import { openBlock as e, createElementBlock as t, createElementVNode as o } from "vue";
+const c = {
+  width: "20",
+  height: "20",
+  viewBox: "0 0 20 20",
   xmlns: "http://www.w3.org/2000/svg"
-}, c = /* @__PURE__ */ e("circle", {
-  cx: "51",
-  cy: "51",
-  r: "48",
-  stroke: "currentColor",
-  fill: "none",
-  "stroke-width": "6"
-}, null, -1), n = /* @__PURE__ */ e("circle", {
-  cx: "35.1485",
-  cy: "40.6627",
-  r: "4.82432",
+}, n = /* @__PURE__ */ o("path", {
+  d: "M15.36 11.38a.83.83 0 0 0-.59-1.42h-3.31a.2.2 0 0 1-.2-.2V1.24a1.25 1.25 0 1 0-2.5 0v8.5c0 .12-.1.2-.22.2H5.23a.83.83 0 0 0-.59 1.43l4.77 4.77c.33.33.86.33 1.18 0l4.77-4.77zM16.02 18.75c0-.69-.55-1.25-1.25-1.25H5.23a1.25 1.25 0 1 0 0 2.5h9.54c.7 0 1.25-.56 1.25-1.25z",
   fill: "currentColor"
-}, null, -1), l = /* @__PURE__ */ e("circle", {
-  cx: "66.8514",
-  cy: "40.6622",
-  r: "4.82432",
-  fill: "currentColor"
-}, null, -1), i = /* @__PURE__ */ e("path", {
-  d: "M39 68.9863C39 68.9863 44.8244 68.9863 51.0271 68.9863C57.2298 68.9863 63.0541 68.9863 63.0541 68.9863",
-  stroke: "currentColor",
-  fill: "none",
-  "stroke-width": "6",
-  "stroke-linecap": "round",
-  "stroke-linejoin": "round"
-}, null, -1), s = [
-  c,
-  n,
-  l,
-  i
+}, null, -1), r = [
+  n
 ];
-function d(h, u) {
-  return o(), t("svg", r, s);
+function l(a, h) {
+  return e(), t("svg", c, r);
 }
-const a = { render: d };
+const d = { render: l };
 export {
-  a as default,
-  d as render
+  d as default,
+  l as render
 };
 //# sourceMappingURL=vue3-components17.js.map

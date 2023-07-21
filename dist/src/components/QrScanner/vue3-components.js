@@ -3,7 +3,7 @@ import { QrScannerEvents as P } from "./vue3-components2.js";
 import { resolveComponent as p, openBlock as s, createElementBlock as o, createElementVNode as a, normalizeClass as _, renderSlot as v, toDisplayString as n, createVNode as d, Transition as f, withCtx as t, createBlock as l, createCommentVNode as u, pushScopeId as k, popScopeId as b } from "vue";
 import "./vue3-components3.js";
 import w from "../../../_virtual/vue3-components.js";
-const i = (e) => (k("data-v-f2dcb425"), e = e(), b(), e), y = {
+const i = (e) => (k("data-v-9a43b122"), e = e(), b(), e), y = {
   class: "qr-scanner nq-blue-bg",
   ref: "root$"
 }, g = {
@@ -109,7 +109,7 @@ function T(e, r, U, j, z, D) {
     })
   ], 512);
 }
-const Y = /* @__PURE__ */ w(h, [["render", T], ["__scopeId", "data-v-f2dcb425"]]);
+const Y = /* @__PURE__ */ w(h, [["render", T], ["__scopeId", "data-v-9a43b122"]]);
 export {
   P as QrScannerEvents,
   Y as default

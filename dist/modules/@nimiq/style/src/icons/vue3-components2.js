@@ -1,36 +1,23 @@
-import { openBlock as o, createElementBlock as t, createElementVNode as e } from "vue";
-const n = {
-  width: "11",
-  height: "9",
-  viewBox: "0 0 11 9",
+import { openBlock as e, createElementBlock as t, createElementVNode as o } from "vue";
+const l = {
+  width: "17",
+  height: "16",
+  viewBox: "0 0 17 16",
   xmlns: "http://www.w3.org/2000/svg"
-}, r = /* @__PURE__ */ e("path", {
-  d: "M4.25,7.75.75,4.25,4.25.75",
-  "stroke-width": "1.5",
-  "stroke-linecap": "round",
-  "stroke-linejoin": "round",
-  stroke: "currentColor",
-  fill: "none"
-}, null, -1), l = /* @__PURE__ */ e("line", {
-  x1: "1",
-  y1: "4.25",
-  x2: "10.25",
-  y2: "4.25",
-  "stroke-width": "1.5",
-  "stroke-linecap": "round",
-  "stroke-linejoin": "round",
-  stroke: "currentColor",
-  fill: "none"
-}, null, -1), s = [
-  r,
-  l
+}, r = /* @__PURE__ */ o("path", {
+  "fill-rule": "evenodd",
+  "clip-rule": "evenodd",
+  d: "M15.913 13.333L9.68 1.433a1.333 1.333 0 0 0-2.362 0l-6.232 11.9a1.333 1.333 0 0 0 1.182 1.952H14.73a1.333 1.333 0 0 0 1.182-1.952zm-8.08-7.718a.667.667 0 0 1 1.334 0v4a.667.667 0 1 1-1.334 0v-4zm.682 7.674h.018a.983.983 0 0 0 .967-1.022 1.018 1.018 0 0 0-1.016-.978h-.019a.984.984 0 0 0-.965 1.02c.02.546.468.978 1.015.98z",
+  fill: "currentColor"
+}, null, -1), n = [
+  r
 ];
-function i(c, d) {
-  return o(), t("svg", n, s);
+function c(a, d) {
+  return e(), t("svg", l, n);
 }
-const u = { render: i };
+const h = { render: c };
 export {
-  u as default,
-  i as render
+  h as default,
+  c as render
 };
 //# sourceMappingURL=vue3-components2.js.map

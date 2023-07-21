@@ -4,7 +4,7 @@ import { resolveComponent as m, openBlock as n, createElementBlock as r, normali
 import "./vue3-components3.js";
 import g from "../../../_virtual/vue3-components.js";
 const k = ["tabindex"];
-function w(o, e, y, C, S, B) {
+function w(o, e, y, C, S, b) {
   const p = m("AlertTriangleIcon");
   return n(), r("span", {
     class: u(["tooltip", [o.verticalPosition, {
@@ -45,7 +45,7 @@ function w(o, e, y, C, S, B) {
     })
   ], 34);
 }
-const I = /* @__PURE__ */ g(d, [["render", w], ["__scopeId", "data-v-72d41571"]]);
+const I = /* @__PURE__ */ g(d, [["render", w], ["__scopeId", "data-v-f929cbc6"]]);
 export {
   z as TooltipEvents,
   M as TooltipHorizontalPosition,

@@ -1,164 +1,211 @@
-import { defineComponent as k, ref as f, computed as x, onMounted as P, onUnmounted as W, watch as O } from "vue";
+import { defineComponent as U, ref as E, computed as g, onMounted as k, onUnmounted as G, watch as O } from "vue";
 import { ValidationUtils as Q } from './../../../modules/@nimiq/utils/dist/module/vue3-components9.js';
-import { onKeyDown as R, onChange as z, onPaste as H, onCut as I } from './../../../modules/input-format/modules/vue3-components4.js';
-import { Clipboard as K } from './../../../modules/@nimiq/utils/dist/module/vue3-components2.js';
-const A = 9 * 4, D = A + 8;
-function w(e, l, s = !1) {
-  if (!s || d(l + e)) {
-    switch (e.toUpperCase()) {
-      case "I":
-        e = "1";
-        break;
-      case "O":
-        e = "0";
-        break;
-      case "Z":
-        e = "2";
-        break;
-      case "W":
-        return;
-    }
-    return new RegExp(`^(N(Q?)|NQ\\d{1,2}|NQ\\d{2}[0-9A-Z]{1,${A - 4}})$`, "i").test(l + e) ? e : void 0;
-  } else
-    return /^[-a-z0-9]*([a-z0-9]\.[a-z]*)?$/i.test(l + e) ? e : void 0;
+import { onKeyDown as z, onChange as K, onPaste as W, onCut as j } from './../../../modules/input-format/modules/vue3-components4.js';
+import { Clipboard as J } from './../../../modules/@nimiq/utils/dist/module/vue3-components2.js';
+const Y = {
+  O: "0",
+  I: "1",
+  Z: "2"
+}, v = 9 * 4 + 8, Z = new RegExp(`^(?:NQ?|NQ\\d{1,2}|NQ\\d{2}[0-9A-HJ-NP-VXY]{1,${v - 4 - 8}})$`, "i"), S = 2 + 40, q = new RegExp(`^(?:0x?|0x[0-9a-f]{1,${S - 2}})$`, "i"), F = new RegExp("^[-a-z0-9]*(?:[a-z0-9]\\.[a-z]*)?$", "i"), N = /\s|\u200B/g;
+function A(e, o, i) {
+  if (N.test(e))
+    return;
+  const a = o.length >= 2 && Y[e.toUpperCase()] || e;
+  if (d(o + a, i))
+    return a;
+  if (D(o + a, i))
+    return o === "0" && a === "X" ? "x" : a;
+  if (B(o + e, i))
+    return e;
 }
-function m(e, l = !1) {
-  return !l || d(e) ? (e !== "" && e.toUpperCase() !== "N" && (e = g(e).replace(/.{4}/g, (s, o) => `${s}${(o + 4) % 12 ? " " : `
-`}`).substring(0, D), e.endsWith(" ") && (e += "\u200B")), {
+function p(e, o) {
+  return d(e, o) ? (e = c(e).replace(/.{4}/g, (i, a) => `${i}${(a + 4) % 12 ? " " : `
+`}`).substring(0, v), e.endsWith(" ") && (e += "\u200B"), {
     text: e,
     template: `wwww wwww wwww
 wwww wwww wwww
 wwww wwww wwww`
+  }) : D(e, o) ? (e = c(e).replace(/.{14}/g, (i) => `${i}
+`).substring(0, S + 2), {
+    text: e,
+    template: `wwwwwwwwwwwwww
+wwwwwwwwwwwwww
+wwwwwwwwwwwwww`
   }) : {
     text: e
   };
 }
-function g(e) {
-  return e.replace(/\s|\u200B/g, "");
+function c(e) {
+  return e.replace(N, "");
 }
-function B(e, l = !1) {
-  return !l || d(e) ? e.toUpperCase().replace(/\n/g, " ").replace(/\u200B/g, "") : e.replace(/\n/g, "").replace(/\u200B/g, "");
+function _(e, o) {
+  return d(e, o) ? e.toUpperCase().replace(/\n/g, " ").replace(/\u200B/g, "") : e.replace(/\n/g, "").replace(/\u200B/g, "");
 }
-function d(e) {
-  return e.length < 3 ? !1 : !!(e.toUpperCase().startsWith("NQ") && !isNaN(parseInt(e[2], 10)));
+function d(e, o) {
+  return o.allowNimAddresses && Z.test(c(e));
 }
-var b = /* @__PURE__ */ ((e) => (e.PASTE = "paste", e.MODELVALUE_UPDATE = "update:modelValue", e.ADDRESS = "address", e))(b || {});
-const j = k({
+function D(e, o) {
+  return o.allowEthAddresses && q.test(c(e));
+}
+function B(e, o) {
+  return o.allowDomains && !!e.length && F.test(e) && !d(e, o) && !D(e, o);
+}
+async function ee(e) {
+  if (/^0x[0-9a-f]{40}$/i.test(e)) {
+    if (!/[a-f]/.test(e) || !/[A-F]/.test(e))
+      return !0;
+    {
+      const o = e.replace(/0x/gi, ""), i = o.toLowerCase().split("").map((r) => r.charCodeAt(0)), { keccak_256: a } = await import("js-sha3"), u = a(i);
+      for (let r = 0; r < 40; r++)
+        if ((parseInt(u[r], 16) >= 8 ? o[r].toUpperCase() : o[r].toLowerCase()) !== o[r])
+          return !1;
+      return !0;
+    }
+  } else
+    return !1;
+}
+var R = /* @__PURE__ */ ((e) => (e.PASTE = "paste", e.MODELVALUE_UPDATE = "update:modelValue", e.ADDRESS = "address", e))(R || {});
+const se = U({
   name: "AddressInput",
-  emits: Object.values(b),
+  emits: Object.values(R),
   props: {
     modelValue: {
       type: String,
       default: ""
     },
     autofocus: Boolean,
+    allowNimAddresses: {
+      type: Boolean,
+      default: !0
+    },
+    allowEthAddresses: Boolean,
     allowDomains: Boolean
   },
-  setup(e, l) {
-    const s = f(null), o = f(null), i = f(""), v = f(-1), S = f(-1), T = CSS.supports("mix-blend-mode", "screen"), p = x(() => !e.allowDomains || d(i.value)), $ = x(() => i.value.length >= 3 && !p.value);
-    P(() => {
-      C(), document.addEventListener("selectionchange", r), e.autofocus && E();
-    }), W(() => {
-      document.removeEventListener("selectionchange", r);
+  setup(e, o) {
+    const i = E(null), a = E(null), u = E(""), r = E(-1), h = E(-1), $ = CSS.supports("mix-blend-mode", "screen"), l = g(() => ({
+      allowNimAddresses: e.allowNimAddresses,
+      allowEthAddresses: !!e.allowEthAddresses,
+      allowDomains: !!e.allowDomains
+    })), y = g(
+      () => e.allowNimAddresses && !e.allowEthAddresses && (!e.allowDomains || !u.value) || d(u.value, l.value)
+    ), L = g(
+      () => e.allowDomains && !e.allowNimAddresses && !e.allowEthAddresses || B(u.value, l.value)
+    );
+    k(() => {
+      C(), document.addEventListener("selectionchange", m), e.autofocus && x();
+    }), G(() => {
+      document.removeEventListener("selectionchange", m);
     });
-    function E(t = !1) {
-      !o.value || (o.value.focus(), t && o.value.scrollIntoView({ behavior: "smooth", block: "center" }));
+    function x(t = !1) {
+      const n = a.value;
+      !n || (n.focus(), t && n.scrollIntoView({ behavior: "smooth", block: "center" }));
     }
     O(() => e.modelValue, () => C());
     function C() {
-      if (g(e.modelValue) === g(i.value))
+      if (c(e.modelValue) === c(u.value))
         return;
-      const t = e.modelValue.split("").reduce((n, a) => n + (w(a, n, e.allowDomains) || ""), "");
-      o.value && (o.value.value = m(t, e.allowDomains).text), u(t);
+      const t = e.modelValue.split("").reduce((n, s) => n + (A(s, n, l.value) || ""), "");
+      a.value && (a.value.value = p(t, l.value).text), f(t);
     }
-    function h(t) {
-      R(
-        t,
-        o.value,
-        (n, a) => w(n, a, e.allowDomains),
-        (n) => m(n, e.allowDomains),
-        u
-      ), setTimeout(() => r(), 10);
-    }
-    function N(t) {
-      if (t.inputType === "deleteByDrag")
-        return;
-      const n = o.value;
+    function M(t) {
       z(
         t,
+        a.value,
+        (n, s) => A(n, s, l.value),
+        (n) => p(n, l.value),
+        f
+      ), setTimeout(() => m(), 10);
+    }
+    function T(t) {
+      if (t.inputType === "deleteByDrag")
+        return;
+      const n = a.value;
+      K(
+        t,
         n,
-        (a, c) => w(a, c, e.allowDomains),
-        (a) => m(a, e.allowDomains),
-        u
+        (s, w) => A(s, w, l.value),
+        (s) => p(s, l.value),
+        f
       );
     }
-    function U(t) {
-      const n = t.clipboardData, a = n ? n.getData("text/plain") : "";
-      l.emit("paste", t, a), H(
+    function H(t) {
+      const n = t.clipboardData, s = n ? n.getData("text/plain") : "";
+      o.emit("paste", t, s), W(
         t,
-        o.value,
-        (c, L) => w(c, L, e.allowDomains),
-        (c) => m(c, e.allowDomains),
-        u
+        a.value,
+        (w, I) => A(w, I, l.value),
+        (w) => p(w, l.value),
+        f
       );
     }
-    function _(t) {
-      I(
+    function b(t) {
+      j(
         t,
-        o.value,
-        (n, a) => w(n, a, e.allowDomains),
-        (n) => m(n, e.allowDomains),
-        u
+        a.value,
+        (n, s) => A(n, s, l.value),
+        (n) => p(n, l.value),
+        f
       ), V();
     }
-    function M() {
-      setTimeout(() => r());
+    function P() {
+      setTimeout(() => m());
     }
     function V() {
-      const t = B(document.getSelection().toString(), e.allowDomains);
-      setTimeout(() => K.copy(t));
+      const t = _(document.getSelection().toString(), l.value);
+      setTimeout(() => J.copy(t));
     }
-    function u(t) {
-      if (!o.value)
-        return;
-      const n = o.value;
-      if (n.selectionStart === n.selectionEnd && (n.value[n.selectionStart] === " " || n.value[n.selectionStart] === `
-`) && (n.selectionStart += 1), i.value = B(o.value.value, e.allowDomains), l.emit("update:modelValue", i.value), d(t)) {
-        const a = Q.isValidAddress(i.value);
-        a && l.emit("address", i.value), s.value && s.value.classList.toggle("invalid", i.value.length === D && !a);
+    async function f(t) {
+      const n = a.value;
+      if (!!n) {
+        if (n.selectionStart === n.selectionEnd && /\s/.test(n.value[n.selectionStart]) && (n.selectionStart += 1), u.value = _(n.value, l.value), o.emit("update:modelValue", u.value), d(t, l.value)) {
+          const s = Q.isValidAddress(u.value);
+          if (s && o.emit("address", u.value), !i.value)
+            return;
+          i.value.classList.toggle(
+            "invalid",
+            u.value.length === v && !s
+          );
+        } else if (D(t, l.value)) {
+          const s = u.value, w = await ee(c(s));
+          if (w && o.emit("address", s), !i.value)
+            return;
+          i.value.classList.toggle(
+            "invalid",
+            s.length === S && !w
+          );
+        }
       }
     }
-    function r() {
-      if (!o.value)
+    function m() {
+      const t = a.value;
+      if (!t)
         return;
-      const t = o.value, n = document.activeElement === t && (t.selectionStart !== D || t.selectionEnd !== D);
-      v.value = n ? Math.floor(t.selectionStart / 5) : -1, S.value = n ? Math.floor(t.selectionEnd / 5) : -1;
+      const n = document.activeElement === t && (t.selectionStart !== v || t.selectionEnd !== v);
+      r.value = n ? Math.floor(t.selectionStart / 5) : -1, h.value = n ? Math.floor(t.selectionEnd / 5) : -1;
     }
-    function y(t) {
-      return v.value <= t && t <= S.value;
+    function X(t) {
+      return r.value <= t && t <= h.value;
     }
-    return l.expose({ focus: E }), {
-      root$: s,
-      textarea$: o,
-      currentValue: i,
-      supportsMixBlendMode: T,
-      willBeAddressBool: p,
-      isDomain: $,
-      onKeyDown: h,
-      onInput: N,
-      onPaste: U,
-      onCut: _,
-      onFocus: M,
+    return o.expose({ focus: x }), {
+      root$: i,
+      textarea$: a,
+      currentValue: u,
+      supportsMixBlendMode: $,
+      displayAsNimAddress: y,
+      displayAsDomain: L,
+      onKeyDown: M,
+      onInput: T,
+      onPaste: H,
+      onCut: b,
+      onFocus: P,
       formatClipboard: V,
-      updateSelection: r,
-      isBlockFocused: y
+      updateSelection: m,
+      isBlockFocused: X
     };
   }
 });
 export {
-  D as ADDRESS_MAX_LENGTH,
-  A as ADDRESS_MAX_LENGTH_WITHOUT_SPACES,
-  b as AddressInputEvent,
-  j as default
+  R as AddressInputEvent,
+  se as default
 };
 //# sourceMappingURL=vue3-components2.js.map

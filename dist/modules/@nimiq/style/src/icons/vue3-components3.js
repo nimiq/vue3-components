@@ -1,29 +1,32 @@
 import { openBlock as o, createElementBlock as t, createElementVNode as e } from "vue";
 const n = {
-  width: "23",
-  height: "18",
-  viewBox: "0 0 23 18",
+  width: "11",
+  height: "9",
+  viewBox: "0 0 11 9",
   xmlns: "http://www.w3.org/2000/svg"
 }, r = /* @__PURE__ */ e("path", {
-  d: "M22 9L3 9",
-  stroke: "currentColor",
-  fill: "none",
-  "stroke-width": "2",
+  d: "M4.25,7.75.75,4.25,4.25.75",
+  "stroke-width": "1.5",
   "stroke-linecap": "round",
-  "stroke-linejoin": "round"
-}, null, -1), s = /* @__PURE__ */ e("path", {
-  d: "M9 16L2 9L9 2",
+  "stroke-linejoin": "round",
   stroke: "currentColor",
-  fill: "none",
-  "stroke-width": "2",
+  fill: "none"
+}, null, -1), l = /* @__PURE__ */ e("line", {
+  x1: "1",
+  y1: "4.25",
+  x2: "10.25",
+  y2: "4.25",
+  "stroke-width": "1.5",
   "stroke-linecap": "round",
-  "stroke-linejoin": "round"
-}, null, -1), l = [
+  "stroke-linejoin": "round",
+  stroke: "currentColor",
+  fill: "none"
+}, null, -1), s = [
   r,
-  s
+  l
 ];
 function i(c, d) {
-  return o(), t("svg", n, l);
+  return o(), t("svg", n, s);
 }
 const u = { render: i };
 export {

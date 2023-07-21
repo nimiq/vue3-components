@@ -22,7 +22,7 @@ const r = {
   r: "4.82432",
   fill: "currentColor"
 }, null, -1), i = /* @__PURE__ */ e("path", {
-  d: "M39.9729 70.9867C39.9729 70.9867 44.7972 68.23 50.9999 68.23C57.2026 68.23 62.027 70.9867 62.027 70.9867",
+  d: "M39 68.9863C39 68.9863 44.8244 68.9863 51.0271 68.9863C57.2298 68.9863 63.0541 68.9863 63.0541 68.9863",
   stroke: "currentColor",
   fill: "none",
   "stroke-width": "6",
@@ -34,7 +34,7 @@ const r = {
   l,
   i
 ];
-function d(h, _) {
+function d(h, u) {
   return o(), t("svg", r, s);
 }
 const a = { render: d };
