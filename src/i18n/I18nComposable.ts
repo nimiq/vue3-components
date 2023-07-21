@@ -62,10 +62,7 @@ async function loadComponentLanguageFile(componentName: string) {
     if (!(componentLang in loadedMessages) && i18nLang.value !== 'en') {
         // Lazy-load translations. For English we don't load a language file but use the translation keys directly.
         // Note that the request is cached and not repeated for parallel calls.
-        const messages = await import(
-            // tslint:disable-next-line: trailing-comma
-            /* webpackChunkName: "lang-[request]" */ `./${i18nLang}/${componentName}.json`
-        );
+        const messages = await import(`./${i18nLang.value}/${componentName}.json`);
 
         loadedMessages[componentLang] = messages.default || {};
     }
