@@ -36,7 +36,7 @@ export default defineConfig({
         rollupOptions: {
             // make sure to externalize deps that shouldn't be bundled
             // into your library
-            external: ['vue'],
+            external: ['vue', 'js-sha3'],
             output: {
                 // Generate one file per component,
                 // but since it create a node_module folder that get removed during the packaging then it doesn't work
