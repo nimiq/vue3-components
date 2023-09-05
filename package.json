@@ -9,7 +9,10 @@
   "types": "./dist/main.d.ts",
   "module": "./dist/src/vue3-components.js",
   "exports": {
-    ".": "./dist/src/vue3-components.js",
+    ".": {
+      "default": "./dist/src/vue3-components.js",
+      "types": "./dist/main.d.ts"
+    },
     "./css": "./dist/style.css"
   },
   "sideEffects": false,
