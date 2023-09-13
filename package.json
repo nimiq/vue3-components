@@ -60,7 +60,7 @@
     "vite-svg-loader": "^3.6.0",
     "vue": "^3.2.45",
     "vue-tsc": "^0.34.13",
-    "webpack-i18n-tools": "https://github.com/nimiq/webpack-i18n-tools#commit=5d8b1b5201ad63c5144dc3ccc0c706e107075c34"
+    "webpack-i18n-tools": "https://github.com/nimiq/webpack-i18n-tools#5d8b1b5201ad63c5144dc3ccc0c706e107075c34"
   },
   "postcss": {
     "plugins": {
