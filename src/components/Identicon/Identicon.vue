@@ -61,10 +61,6 @@ export default defineComponent({
 </script>
 
 <style scoped>
-    .identicon {
-        width: 10rem;
-    }
-
     img {
         width: 100%;
         height: 100%;
