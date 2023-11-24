@@ -166,10 +166,12 @@ export default defineComponent({
         });
 
         function show() {
+            if (props.disabled) return;
             tooltipToggled.value = true;
         }
 
         function hide(force: boolean = false) {
+            if (props.disabled) return;
             tooltipToggled.value = false;
             if (tooltipTrigger$.value) tooltipTrigger$.value.blur();
             if (!force) return;
