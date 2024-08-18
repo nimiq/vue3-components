@@ -12,6 +12,7 @@
                 @focus="isFocussed = true"
                 @blur="isFocussed = false"
                 @paste="$emit(AmountInputEvent.PASTE, $event)"
+                v-bind="$attrs"
                 v-model="formattedValue"
             />
         </form>

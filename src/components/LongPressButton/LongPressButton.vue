@@ -8,6 +8,7 @@
         @blur="isPressed = false /* if focus moves away, release the button */"
         @click.prevent.stop="$event.stopImmediatePropagation(); /* don't trigger handlers */"
         @submit.prevent.stop="$event.stopImmediatePropagation(); /* don't trigger handlers and default behavior */"
+        v-bind="$attrs"
     >
         <span class="mix-blend-mode-mask">
             <transition name="transition-indicator">

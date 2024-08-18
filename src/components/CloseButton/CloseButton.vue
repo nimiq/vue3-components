@@ -1,5 +1,5 @@
 <template>
-    <button class="close-button nq-button-s" @mousedown.prevent>
+    <button class="close-button nq-button-s" v-bind="$attrs" @mousedown.prevent>
         <CloseIcon/>
     </button>
 </template>

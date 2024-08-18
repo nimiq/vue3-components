@@ -12,6 +12,7 @@
             @input="onInput"
             @blur="onBlur"
             @paste="$emit(LabelInputEvent.PASTE, $event)"
+            v-bind="$attrs"
             ref="input$">
     </form>
 </template>
