@@ -17,6 +17,7 @@ export { default as Copyable } from './components/Copyable/Copyable.vue';
 export { default as CopyableField } from './components/CopyableField/CopyableField.vue';
 export { default as FiatAmount } from './components/FiatAmount/FiatAmount.vue';
 export { default as Identicon } from './components/Identicon/Identicon.vue';
+export { default as ShinyIdenticon } from './components/ShinyIdenticon/ShinyIdenticon.vue';
 export { default as LabelInput } from './components/LabelInput/LabelInput.vue';
 export { default as LoadingSpinner } from './components/LoadingSpinner/LoadingSpinner.vue';
 export { default as LongPressButton } from './components/LongPressButton/LongPressButton.vue';

@@ -2376,19 +2376,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nimiq/identicons@npm:^1.6.2":
-  version: 1.6.2
-  resolution: "@nimiq/identicons@npm:1.6.2"
-  dependencies:
-    dom-parser: ^0.1.5
-  checksum: 1dcc68bac36cfba6978937ff22ce02633b3142158537f3d4279bbf5113d0672d04afa805282febbd76684b125ce95b94f4579a55c5c086aec22b9ba1ca6e61eb
-  languageName: node
-  linkType: hard
-
 "@nimiq/style@npm:^0.8.5":
   version: 0.8.5
   resolution: "@nimiq/style@npm:0.8.5"
   checksum: ff88add6f57ecd91e6e63e23ac06790ccc641abdcf6c6725d6b20a921f53eeae052d2fca56d7ad4b84db7cf3922efbb4227ee3f9cb725ea8740bd6ed9b2d36e1
+  languageName: node
+  linkType: hard
+
+"@nimiq/utils@npm:^0.12.1":
+  version: 0.12.1
+  resolution: "@nimiq/utils@npm:0.12.1"
+  dependencies:
+    big-integer: ^1.6.44
+  checksum: 48d214a5491fc1a70d2984974968e3e8eae790143a5bd76f8aa0497efde53f933a925bc7ec46b0e4c741b8d0508239683639c840cd83a2582e62c0f77536b60b
   languageName: node
   linkType: hard
 
@@ -2405,7 +2405,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@nimiq/vue3-components@workspace:."
   dependencies:
-    "@nimiq/identicons": ^1.6.2
     "@nimiq/style": ^0.8.5
     "@nimiq/utils": ^0.9.1
     "@storybook/addon-actions": ^6.5.13
@@ -2418,6 +2417,7 @@ __metadata:
     autoprefixer: ^10.4.13
     browserslist: 4.21.4
     gh-pages: ^4.0.0
+    identicons-esm: ^0.2.6
     input-format: ^0.3.7
     js-sha3: ^0.8.0
     postcss: ^8.4.19
@@ -6969,13 +6969,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dom-parser@npm:^0.1.5":
-  version: 0.1.6
-  resolution: "dom-parser@npm:0.1.6"
-  checksum: 1ead37bc4bf21823649cd8a7d95e73a2fbfaf9dde838d3c666b4b6d7cc6c8b7498d41e24465b7a2d3f61b2e72304290a10c4545ddec7468b4a190cfdddc053f1
-  languageName: node
-  linkType: hard
-
 "dom-serializer@npm:^1.0.1":
   version: 1.3.2
   resolution: "dom-serializer@npm:1.3.2"
@@ -9265,6 +9258,15 @@ __metadata:
   dependencies:
     postcss: ^7.0.14
   checksum: a4ca2c6b82cb3eb879d635bd4028d74bca174edc49ee48ef5f01988489747d340a389d5a0ac6f6887a5c24ab8fc4386c781daab32a7ade5344a2edff66207635
+  languageName: node
+  linkType: hard
+
+"identicons-esm@npm:^0.2.6":
+  version: 0.2.6
+  resolution: "identicons-esm@npm:0.2.6"
+  dependencies:
+    "@nimiq/utils": ^0.12.1
+  checksum: 6cefdff06854ddd8e099bcb05410b0aafccb1bc7cf70efee735294b6cc3aaef3c9d3ab3a72d84215eba789d3231ecfc2f172222c26a110015ea5a87dfc0edf95
   languageName: node
   linkType: hard
 

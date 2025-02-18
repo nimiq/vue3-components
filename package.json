@@ -33,9 +33,9 @@
     "i18n:sync": "echo \"vue3-components use vue-components's language files. Please update them there.\""
   },
   "dependencies": {
-    "@nimiq/identicons": "^1.6.2",
     "@nimiq/style": "^0.8.5",
     "@nimiq/utils": "^0.9.1",
+    "identicons-esm": "^0.2.6",
     "input-format": "^0.3.7",
     "js-sha3": "^0.8.0",
     "qr-creator": "^1.0.0",

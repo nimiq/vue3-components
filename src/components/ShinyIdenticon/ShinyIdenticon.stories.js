@@ -1,22 +1,27 @@
-import Identicon from './Identicon.vue';
+import ShinyIdenticon from './ShinyIdenticon.vue';
 
 export default {
-    title: 'Identicon',
-    component: Identicon,
+    title: 'ShinyIdenticon',
+    component: ShinyIdenticon,
     argTypes: {
         // Props
         address: { control: { type: 'text' } },
+        material: { 
+            control: { type: 'select' },
+            options: ['bronze', 'silver', 'gold'],
+            required: true
+        },
         shouldValidateAddress: { control: { type: 'boolean' } },
     },
 };
 
 const Template = (args) => ({
-    components: { Identicon },
+    components: { ShinyIdenticon },
     setup() {
         return { args };
     },
     template: `
-        <Identicon v-bind="args"/>
+        <ShinyIdenticon v-bind="args"/>
     `,
 });
 
@@ -24,4 +29,5 @@ export const Default = Template.bind({});
 Default.args = {
     address: 'NQ07 0000 00000000 0000 0000 0000 0000 0000',
     shouldValidateAddress: true,
+    material: 'bronze'
 };

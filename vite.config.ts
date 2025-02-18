@@ -15,7 +15,13 @@ crypto.createHash = (alg: string, opts: crypto.HashOptions | undefined) => {
 // https://vitejs.dev/config/
 export default defineConfig({
     plugins: [
-        vue(),
+        vue({
+            template: {
+                compilerOptions: {
+                    isCustomElement: (tag) => ['nimiq-shiny-identicon','nimiq-identicon'].includes(tag)
+                }
+            }
+        }),
         svgLoader({ svgo: false }),
         renameNodeModules('modules'),
     ],
